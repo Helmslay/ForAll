@@ -28,3 +28,9 @@ Use this log for decisions affecting more than one module. Format: status, conte
 
 ## ADR-009 — browser offline scope
 **Status:** Accepted with limits. Cache shell and bounded offline packages; local data works offline; no promise of unlimited browser storage.
+
+## ADR-010 — G1 foundation may proceed before G0 completion
+**Status:** Accepted by explicit user authorization (2026-11-17).  
+**Context:** The user will perform Russian-network acceptance checks after the first development build. Completing the frontend/backend development foundation does not require implementing satellite-data access.  
+**Decision:** Continue G1 foundation tasks through the first local development build while G0 remains open. Do not implement provider adapters, real STAC search, raster access, imagery rendering, downloads, or claim no-VPN availability before the applicable G0 checks pass. Russian-network tests are deferred until the user receives the dev-build.  
+**Consequences:** G1 work is temporarily authorized as a sequencing exception. G0 remains an independent hard gate for all real data/provider functionality and release claims.
