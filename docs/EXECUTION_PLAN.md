@@ -66,6 +66,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 - WEB-01.08 — frontend proxy — **DONE** (PR #15; frontend CI run `44115192957` SUCCESS; merge commit `680c3845a0bc21bce0bb29543073c6262594409f`).
 - WEB-01.09 — Docker Compose dev — **DONE** (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
 - WEB-01.10 — local setup guide and dev-port hardening — **DONE** (PR #17 merged; exact-head frontend CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`; WEB-01.09 DONE).
+- WEB-01.11 — frontend dependency audit and severity gate — **IN_PROGRESS** (depends on WEB-01.03 and WEB-01.10; classify current npm advisories without blind upgrades).
 
 Gate G1: новый разработчик запускает проект по инструкции, health и проверки проходят.
 
