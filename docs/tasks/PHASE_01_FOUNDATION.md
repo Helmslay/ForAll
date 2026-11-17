@@ -48,8 +48,13 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.1
 **Ограничения и follow-up:** отдельный запуск с принудительно отключённым сетевым интерфейсом не выполнялся. `npm ci` сообщил о 7 moderate severity vulnerabilities в dependency tree; точные advisory paths ещё не исследованы, `npm audit fix --force` не запускался. Backend, карта, Sentinel data и доступность из России этой задачей не затрагивались.
 
 ## WEB-01.04 — app shell placeholder
-Зависимость: WEB-01.02. Создать header/sidebar/workspace placeholders на русском. Без фиктивных сцен и спутниковых данных. Render test.
-Приёмка: семантические regions корректны.
+**Статус:** IN_PROGRESS.  
+**Зависимость:** WEB-01.02 — DONE; WEB-01.03 — DONE.  
+**Goal:** заменить одиночный экран-заглушку базовой оболочкой рабочей ГИС.
+**Scope:** семантическая верхняя панель приложения, компактная левая навигация, центральная рабочая область под будущую карту и статусная строка; русские подписи; адаптивное перестроение на узких экранах; доступные имена навигационных элементов и видимый focus. Центральная область должна прямо сообщать, что карта ещё не подключена. Не добавлять правую функциональную панель, интерактивные инструменты, карту, fake scenes, imagery или Sentinel business logic.
+**Тест:** Vue render test проверяет landmarks (banner/header, navigation, main), подписи и placeholder-состояние; существующий scaffold status test сохранить или объединить.
+**Acceptance criteria:** ровно один основной `main`; header/banner, nav и main семантически доступны; названия разделов на русском; центральная рабочая область помечена как место будущей карты и не выдаёт себя за реальную карту; нет выдуманных сцен/координат/статистики; responsive CSS и keyboard focus доступны.
+**Не входит:** CSS token system (WEB-02.01), полноценный desktop layout и панели (WEB-02.02/03), OpenLayers (WEB-02.04), search/RGB workflows.
 
 ## WEB-01.05 — FastAPI scaffold
 Зависимость: WEB-01.01. Создать Python package, app factory, pinned deps, env settings, uvicorn entry. Не подключать БД или rasterio.
