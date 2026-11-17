@@ -39,7 +39,7 @@ G1 — foundation work is temporarily authorized through the first local develop
 ## Next task
 - WEB-01.09 — Docker Compose dev — DONE (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
 - WEB-01.10 — local setup guide and dev-port hardening — DONE (PR #17; exact-head CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`; depends on WEB-01.09).
-- Next: first local frontend/backend development build on the user's computer. After that, pause for Russian-network checks.
+- Next: complete WEB-01.11 frontend dependency audit, then perform the first local frontend/backend development build on the user's computer. After that, pause for Russian-network checks.
 - G1 remains authorized through the first local frontend/backend dev-build. The user's local run is not yet verified. After it succeeds, pause for Russian-network checks before provider/data integration.
 
 ## Important blockers
@@ -47,7 +47,7 @@ G1 — foundation work is temporarily authorized through the first local develop
 2. Real Sentinel-2 asset access from a Russian backend has not been proven.
 3. Permission to cache and redistribute each candidate source's data must be reviewed.
 4. The user-facing path from Russian home/mobile networks without VPN has not been tested.
-5. `npm ci` currently reports 7 moderate-severity dependency advisories; the affected dependency paths have not yet been triaged. No forced audit fix was applied.
+5. `npm ci` previously reported 7 moderate-severity frontend dependency advisories. WEB-01.11 is in progress to obtain a fresh exact-head npm audit report and classify the affected paths. No forced audit fix has been applied.
 
 ## Status policy
 Update this file when a milestone or material project decision changes. Do not mark a task DONE based only on generated code; follow the acceptance criteria in the task card.
