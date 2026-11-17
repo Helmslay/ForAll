@@ -1,0 +1,42 @@
+name: Local Windows tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "tools/**"
+      - ".github/workflows/windows-local-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-windows-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    # This runner is trusted for this repository's main branch only.
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, X64, sentinel-local]
+    timeout-minutes: 15
+    steps:
+      - name: Checkout trusted main branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Run offline unit tests
+        shell: pwsh
+        run: python -m unittest discover -s tools -p "test_*.py" -v
+
+      - name: Compile Python files
+        shell: pwsh
+        run: python -m py_compile tools/check_stac.py tools/test_check_stac.py
