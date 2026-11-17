@@ -1,4 +1,12 @@
 :root {
+  --color-background: #171c26;
+  --color-surface: #202735;
+  --color-surface-raised: #293445;
+  --color-text: #e8edf5;
+  --color-muted: #aab6c7;
+  --color-primary: #a9c5e4;
+  --color-secondary: #c1b5d8;
+  --color-border: #3a4658;
   font-family:
     Inter,
     ui-sans-serif,
@@ -7,8 +15,8 @@
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
-  color: #edf2e9;
-  background: #101713;
+  color: #e8edf5;
+  background: #171c26;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -22,7 +30,7 @@
 html {
   min-width: 320px;
   min-height: 100%;
-  background: #101713;
+  background: #171c26;
 }
 
 body {
@@ -37,7 +45,7 @@ a {
 }
 
 a:focus-visible {
-  outline: 2px solid #c4ed8b;
+  outline: 2px solid #a9c5e4;
   outline-offset: 3px;
 }
 
@@ -45,7 +53,7 @@ a:focus-visible {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  background: radial-gradient(ellipse at 54% -22%, rgb(73 106 67 / 12%), transparent 48%), #101713;
+  background: radial-gradient(ellipse at 54% -22%, rgba(116, 139, 171, 0.12), transparent 48%), #171c26;
 }
 
 .app-header {
@@ -57,8 +65,8 @@ a:focus-visible {
   justify-content: space-between;
   gap: 24px;
   padding: 0 28px;
-  border-bottom: 1px solid rgb(218 232 215 / 12%);
-  background: rgb(19 28 22 / 94%);
+  border-bottom: 1px solid rgba(204, 216, 232, 0.12);
+  background: rgba(32, 39, 53, 0.94);
 }
 
 .brand {
@@ -74,10 +82,10 @@ a:focus-visible {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid rgb(196 237 139 / 28%);
+  border: 1px solid rgba(169, 197, 228, 0.28);
   border-radius: 9px;
-  color: #c4ed8b;
-  background: #202e23;
+  color: #a9c5e4;
+  background: #293445;
   font-size: 22px;
 }
 
@@ -88,7 +96,7 @@ a:focus-visible {
 }
 
 .brand-name span {
-  color: #c4ed8b;
+  color: #a9c5e4;
   font-weight: 540;
 }
 
@@ -96,16 +104,16 @@ a:focus-visible {
   display: flex;
   align-items: center;
   gap: 18px;
-  color: #9eac9f;
+  color: #aab6c7;
   font-size: 12px;
 }
 
 .development-state {
   padding: 6px 10px;
-  border: 1px solid rgb(196 237 139 / 18%);
+  border: 1px solid rgba(169, 197, 228, 0.18);
   border-radius: 6px;
-  color: #c4ed8b;
-  background: rgb(196 237 139 / 6%);
+  color: #a9c5e4;
+  background: rgba(169, 197, 228, 0.06);
   font-size: 11px;
 }
 
@@ -120,13 +128,13 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   padding: 24px 14px 18px;
-  border-right: 1px solid rgb(218 232 215 / 12%);
-  background: rgb(19 28 22 / 72%);
+  border-right: 1px solid rgba(204, 216, 232, 0.12);
+  background: rgba(32, 39, 53, 0.94);
 }
 
 .sidebar-heading {
   margin: 0 10px 14px;
-  color: #778679;
+  color: #8492a6;
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.13em;
@@ -149,36 +157,36 @@ a:focus-visible {
   padding: 0 11px;
   border: 1px solid transparent;
   border-radius: 7px;
-  color: #aab7aa;
+  color: #aab6c7;
   font-size: 12px;
 }
 
 .nav-item.active {
-  border-color: rgb(196 237 139 / 16%);
-  color: #e8f1e4;
-  background: rgb(196 237 139 / 8%);
+  border-color: rgba(169, 197, 228, 0.16);
+  color: #e8edf5;
+  background: rgba(169, 197, 228, 0.08);
 }
 
 .nav-symbol {
   display: inline-grid;
   width: 18px;
   place-items: center;
-  color: #a9c38f;
+  color: #afc4de;
   font-size: 17px;
 }
 
 .nav-item.unavailable {
-  color: #748176;
+  color: #8492a6;
   cursor: default;
 }
 
 .nav-item.unavailable .nav-symbol {
-  color: #748176;
+  color: #8492a6;
 }
 
 .nav-soon {
   margin-left: auto;
-  color: #758277;
+  color: #8492a6;
   font-size: 9px;
 }
 
@@ -187,12 +195,12 @@ a:focus-visible {
   gap: 9px;
   margin: auto 4px 0;
   padding: 13px 10px 2px;
-  border-top: 1px solid rgb(218 232 215 / 10%);
+  border-top: 1px solid rgba(204, 216, 232, 0.1);
 }
 
 .sidebar-note p {
   margin: 0;
-  color: #829083;
+  color: #8492a6;
   font-size: 10px;
   line-height: 1.6;
 }
@@ -204,7 +212,7 @@ a:focus-visible {
   flex: 0 0 auto;
   margin-top: 5px;
   border-radius: 50%;
-  background: #c4ed8b;
+  background: #a9c5e4;
 }
 
 .workspace {
@@ -224,7 +232,7 @@ a:focus-visible {
 
 .eyebrow {
   margin: 0 0 9px;
-  color: #a6c884;
+  color: #afc4de;
   font-size: 9px;
   font-weight: 760;
   letter-spacing: 0.15em;
@@ -241,7 +249,7 @@ h1 {
 .workspace-description {
   max-width: 620px;
   margin: 10px 0 0;
-  color: #9eac9f;
+  color: #aab6c7;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -249,9 +257,9 @@ h1 {
 .workspace-badge {
   flex: 0 0 auto;
   padding: 7px 10px;
-  border: 1px solid rgb(218 232 215 / 13%);
+  border: 1px solid rgba(204, 216, 232, 0.13);
   border-radius: 6px;
-  color: #9eac9f;
+  color: #aab6c7;
   font-size: 10px;
 }
 
@@ -262,9 +270,9 @@ h1 {
   flex: 1;
   overflow: hidden;
   place-items: center;
-  border: 1px solid rgb(218 232 215 / 14%);
+  border: 1px solid rgba(204, 216, 232, 0.14);
   border-radius: 11px;
-  background: radial-gradient(ellipse at 50% 42%, rgb(69 96 65 / 15%), transparent 48%), #141e18;
+  background: radial-gradient(ellipse at 50% 42%, rgba(116, 139, 171, 0.15), transparent 48%), #1d2635;
 }
 
 .placeholder-grid {
@@ -272,8 +280,8 @@ h1 {
   inset: 0;
   opacity: 0.18;
   background-image:
-    linear-gradient(rgb(186 208 176 / 12%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(186 208 176 / 12%) 1px, transparent 1px);
+    linear-gradient(rgba(204, 216, 232, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204, 216, 232, 0.12) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at center, #000 10%, transparent 78%);
 }
@@ -291,10 +299,10 @@ h1 {
   height: 52px;
   place-items: center;
   margin: 0 auto 19px;
-  border: 1px solid rgb(196 237 139 / 22%);
+  border: 1px solid rgba(169, 197, 228, 0.22);
   border-radius: 14px;
-  color: #c4ed8b;
-  background: rgb(196 237 139 / 7%);
+  color: #a9c5e4;
+  background: rgba(169, 197, 228, 0.07);
   font-size: 29px;
 }
 
@@ -307,7 +315,7 @@ h1 {
 
 .placeholder-content p {
   margin: 12px 0 0;
-  color: #97a598;
+  color: #aab6c7;
   font-size: 12px;
   line-height: 1.8;
 }
@@ -317,7 +325,7 @@ h1 {
   right: 15px;
   bottom: 13px;
   left: 15px;
-  color: #68786c;
+  color: #8492a6;
   font-size: 8px;
   letter-spacing: 0.12em;
   text-align: center;
@@ -329,7 +337,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #829083;
+  color: #8492a6;
   font-size: 10px;
 }
 
@@ -403,7 +411,7 @@ h1 {
   .sidebar {
     padding: 8px 12px;
     border-right: 0;
-    border-bottom: 1px solid rgb(218 232 215 / 12%);
+    border-bottom: 1px solid rgba(204, 216, 232, 0.12);
   }
 
   .sidebar-nav ul {
