@@ -5,6 +5,7 @@
 ## С чего начать
 - Лендинг: index.html.
 - Документация: [docs/README.md](docs/README.md).
+- Локальный запуск frontend/backend: [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md).
 - Главный пошаговый план: [docs/EXECUTION_PLAN.md](docs/EXECUTION_PLAN.md).
 - Правила работы лёгких ИИ-моделей: [docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md).
 - Доступность материалов из России: [docs/DATA_ACCESS_RUSSIA.md](docs/DATA_ACCESS_RUSSIA.md).

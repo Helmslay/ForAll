@@ -65,7 +65,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 - WEB-01.07 — health endpoint — **DONE** (PR #14; backend CI run `44113221569` SUCCESS; merge commit `4894f13558ae09db0fc0f0cedb8ce710c218110c`).
 - WEB-01.08 — frontend proxy — **DONE** (PR #15; frontend CI run `44115192957` SUCCESS; merge commit `680c3845a0bc21bce0bb29543073c6262594409f`).
 - WEB-01.09 — Docker Compose dev — **DONE** (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
-- WEB-01.10 — local setup guide — **READY** (WEB-01.09 DONE).
+- WEB-01.10 — local setup guide and dev-port hardening — **IN_REVIEW** (PR #17; updated-head CI pending; WEB-01.09 DONE).
 
 Gate G1: новый разработчик запускает проект по инструкции, health и проверки проходят.
 

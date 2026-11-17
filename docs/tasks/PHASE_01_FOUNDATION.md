@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01—WEB-01.09 — DONE; WEB-01.10 — READY. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01—WEB-01.09 — DONE; WEB-01.10 — IN_REVIEW. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -139,8 +139,26 @@ Scope: request ID для каждого запроса; возвращать е�
 - **PR:** https://github.com/Helmslay/ForAll/pull/16 — merged; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`.
 
 ## WEB-01.10 — local development guide
-Зависимость: WEB-01.09. Создать docs/LOCAL_DEVELOPMENT.md: prerequisites, install, env, run, test, troubleshooting. Не указывать непроверенные команды как verified.
-Приёмка: чистое окружение повторяет setup.
+**Статус:** IN_REVIEW.
+**Зависимость:** WEB-01.09 — DONE.
+**Goal:** дать разработчику воспроизводимую инструкцию запуска текущей dev-среды frontend/backend.
+**Scope:** создать `docs/LOCAL_DEVELOPMENT.md` с prerequisites, clone/update, env, Compose run/stop, health checks, frontend/backend tests и troubleshooting; добавить ссылки из README и docs index. В рамках проверки инструкции исправить обнаруженную публикацию dev-портов на всех интерфейсах: ограничить host binding адресом `127.0.0.1` и закрепить это автоматической CI-проверкой. Сделать frontend CI read-only: убрать автоматическую генерацию/отправку lockfile из workflow, оставить `npm ci` как проверку зафиксированного lockfile. Не добавлять новые runtime зависимости и не менять архитектуру.
+**Проверки:** сверить команды с `compose.yaml`, `app/package.json`, backend requirements и Vite config; проверить форматирование документа CI; проверить `docker compose config` и автоматически подтвердить, что опубликованные host-порты api/web привязаны только к `127.0.0.1`.
+**Приёмка:** инструкция отражает реальные scripts/ports/services; отдельно объясняет отсутствие обязательного .env и секретов; описывает запуск/остановку и проверки frontend/backend; host-порты api/web опубликованы только на `127.0.0.1` и это проверяется CI; frontend CI не меняет PR-ветку и имеет только `contents: read`; явно не выдаёт CI за проверку компьютера пользователя и не утверждает доступность источников из России.
+**Не входит:** установка/настройка production, провайдеры Sentinel, G0 bypass, новые сервисы.
+
+### Результат WEB-01.10 (2026-11-17) — IN_REVIEW
+- Создан `docs/LOCAL_DEVELOPMENT.md`: требования Docker/Compose, получение проекта, environment, запуск, health endpoints, frontend/backend tests, остановка, troubleshooting и ограничения dev-сборки.
+- По итогам проверки безопасности `compose.yaml` изменён так, чтобы frontend/backend публиковались только на loopback `127.0.0.1`; доступ из локальной сети не предоставляется по умолчанию.
+- В frontend CI добавлена проверка итоговой Compose-конфигурации, которая проверяет host IP и соответствие опубликованных/целевых портов для обоих сервисов.
+- Удалён шаг, который генерировал и отправлял `package-lock.json` из CI; workflow теперь только читает репозиторий, а `npm ci` валидирует lockfile без его изменения.
+- Добавлены ссылки на инструкцию в корневой README и карту документации.
+- Frontend CI workflow запускается также при изменении `docs/LOCAL_DEVELOPMENT.md`, чтобы форматирование документа проверялось Prettier.
+- Команды документа сверены с текущими `compose.yaml`, npm scripts, backend requirements и Vite proxy configuration.
+- **Изменённые файлы:** `compose.yaml`, `docs/LOCAL_DEVELOPMENT.md`, `README.md`, `docs/README.md`, `docs/AI_WORKFLOW.md`, `docs/START_HERE.md`, `.github/workflows/frontend-build.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Проверки до CI:** проверена согласованность команд и портов с конфигурациями; после ограничения host binding добавлена автоматическая проверка `127.0.0.1`. Результат обновлённого CI ожидается; lockfile больше не изменяется workflow автоматически. Локально Docker/тесты на машине пользователя не запускались.
+- **Ограничения:** инструкции описывают Docker Compose dev flow. Первый локальный запуск пользователя остаётся неподтверждённым; российская доступность источников данных остаётся отдельным G0 gate. Публикация портов ограничена loopback; удалённый доступ в LAN намеренно не настраивался.
+
 
 
 ### Результат WEB-01.04 (2026-11-17)
