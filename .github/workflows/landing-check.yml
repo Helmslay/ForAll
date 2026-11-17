@@ -1,0 +1,71 @@
+name: Landing page checks
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - ".github/workflows/landing-check.yml"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - ".github/workflows/landing-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  landing-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate landing page structure and navigation
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class LandingParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.hash_links = []
+                  self.h1_count = 0
+                  self.landmarks = set()
+                  self.channel_selects = []
+                  self.in_h1 = False
+
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if "id" in attrs:
+                      self.ids.append(attrs["id"])
+                  if tag == "a" and attrs.get("href", "").startswith("#"):
+                      self.hash_links.append(attrs["href"][1:])
+                  if tag == "h1":
+                      self.h1_count += 1
+                  if tag in {"header", "main", "footer", "nav"}:
+                      self.landmarks.add(tag)
+                  if tag == "nav" and attrs.get("aria-label"):
+                      self.landmarks.add("named-nav")
+                  if tag == "select" and attrs.get("data-channel"):
+                      self.channel_selects.append(attrs["data-channel"])
+
+          source = Path("index.html").read_text(encoding="utf-8")
+          parser = LandingParser()
+          parser.feed(source)
+          parser.close()
+
+          assert source.lower().startswith("<!doctype html>"), "HTML5 doctype is missing"
+          assert 'lang="ru"' in source, "Russian document language is missing"
+          assert parser.h1_count == 1, f"Expected one h1, got {parser.h1_count}"
+          assert {"header", "main", "footer", "nav", "named-nav"} <= parser.landmarks, "Semantic page landmarks are incomplete"
+          assert len(parser.ids) == len(set(parser.ids)), "Duplicate id attributes found"
+          missing = sorted(set(parser.hash_links) - set(parser.ids))
+          assert not missing, f"Broken in-page links: {missing}"
+          assert sorted(parser.channel_selects) == ["B", "G", "R"], "RGB demo must expose three independent channel selectors"
+          assert source.count("<option>") >= 12, "Expected all four band choices in each RGB selector"
+          assert "@media (max-width: 720px)" in source, "Tablet/mobile layout breakpoint is missing"
+          assert "@media (prefers-reduced-motion: reduce)" in source, "Reduced-motion support is missing"
+          assert "Карта, слои, каталог и обработка снимков в браузерном приложении ещё разрабатываются." in source, "Concept disclaimer is missing"
+          print("Landing page checks passed.")
+          PY
