@@ -26,7 +26,7 @@
     G8 Production release
 
 ## 3. Текущий статус
-Код браузерного приложения и backend пока не созданы. WEB-00.01 и WEB-00.02 — DONE; следующая задача G0 — WEB-00.03. По отдельному разрешению пользователя выполнена независимая подготовительная задача WEB-01.01 (структура каталогов и ignore rules); это не означает прохождение G0 и не разрешает imagery implementation. Созданный STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
+WEB-00.01 и WEB-00.02 — DONE; G0 остаётся открытым. По явному разрешению пользователя (ADR-010) разрешено продолжить G1 до первого локального dev-build, не дожидаясь российских сетевых проверок. Это исключение не снимает G0 gate: реальные provider adapters, STAC search, raster/imagery, downloads и no-VPN claims остаются заблокированы до соответствующих доказательств. STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
 
 ## 4. Реестр задач
 
@@ -48,7 +48,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 ### Фаза 01 — foundation
 Карточки: tasks/PHASE_01_FOUNDATION.md
 - WEB-01.01 — структура и ignore rules — **DONE** (выполнена досрочно как независимая подготовительная задача; G0 остаётся открытым).
-- WEB-01.02 — Vue/Vite/TS frontend scaffold.
+- WEB-01.02 — Vue/Vite/TS frontend scaffold — **IN_PROGRESS** (авторизованное продолжение G1 до первого dev-build).
 - WEB-01.03 — frontend lint/format/typecheck/test.
 - WEB-01.04 — базовая оболочка.
 - WEB-01.05 — FastAPI scaffold.
