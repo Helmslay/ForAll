@@ -5,8 +5,9 @@
 ## Repository state
 - Presentation landing page: present at /index.html.
 - Landing page README: updated with documentation links.
-- Browser application source: not created yet.
-- Backend source: not created yet.
+- Browser application source: not created yet; only the empty `app/` foundation directory exists.
+- Backend source: not created yet; only the empty `backend/` foundation directory exists.
+- Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
 - Russian upstream access: not verified.
@@ -24,12 +25,13 @@
 - Roadmap: documented.
 - Phase task cards: documented for phases 00–08.
 - WEB-00.01 and WEB-00.02: completed as documentation/diagnostic tasks; no provider has been validated.
+- WEB-01.01: completed early with explicit user authorization as an independent repository bootstrap; this does not bypass G0.
 
 ## Current milestone
 G0 — prove data access and legal/technical feasibility.
 
 ## Next task
-WEB-00.03 — test STAC search for Perm Krai.
+WEB-00.03 — test STAC search for Perm Krai. WEB-01.01 was completed as a limited exception; further G1 work remains subject to the G0 gate unless separately authorized.
 
 ## Important blockers
 1. No provider has been approved as primary.
