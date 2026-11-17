@@ -6,6 +6,8 @@ on:
       - "**"
     tags:
       - "**"
+  schedule:
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -18,19 +20,53 @@ concurrency:
 jobs:
   mirror:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Mirror all Git refs
+      - name: Mirror Git branches and tags
         env:
           GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
           set +x
+
           if [[ -z "${GITLAB_MIRROR_TOKEN}" ]]; then
-            echo "GITLAB_MIRROR_TOKEN is not configured; skipping mirror."
-            exit 0
+            echo "::error::Required GitHub Actions secret GITLAB_MIRROR_TOKEN is unavailable."
+            exit 1
           fi
+
           git clone --mirror "https://github.com/${GITHUB_REPOSITORY}.git" repository.git
           cd repository.git
-          git remote add gitlab "https://oauth2:${GITLAB_MIRROR_TOKEN}@gitlab.com/kuncevichles-group/forall-backup.git"
-          git push --mirror gitlab
+
+          # Keep GitLab's existing main branch untouched. Mirror GitHub branches
+          # under github/* so the initial sync does not require rewriting a
+          # protected branch with unrelated backup commits.
+          git remote add gitlab "https://gitlab.com/kuncevichles-group/forall-backup.git"
+
+          askpass="$(mktemp)"
+          trap 'rm -f "$askpass"' EXIT
+          cat > "$askpass" <<'ASKPASS'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' "oauth2" ;;
+            *Password*) printf '%s\n' "$GITLAB_MIRROR_TOKEN" ;;
+            *) exit 1 ;;
+          esac
+          ASKPASS
+          chmod 700 "$askpass"
+          export GIT_ASKPASS="$askpass"
+          export GIT_TERMINAL_PROMPT=0
+
+          git push --prune gitlab \
+            "+refs/heads/*:refs/heads/github/*" \
+            "+refs/tags/*:refs/tags/*"
+
+          expected="$(git for-each-ref --format='%(objectname) %(refname)' refs/heads refs/tags | sed 's# refs/heads/# refs/heads/github/#' | sort)"
+          actual="$(git ls-remote gitlab 'refs/heads/github/*' 'refs/tags/*' | awk '$2 !~ /\\^\\{\\}$/ { print $1, $2 }' | sort)"
+          if [[ "$expected" != "$actual" ]]; then
+            echo "::error::GitLab refs do not match the GitHub source after mirroring."
+            diff -u <(printf '%s\n' "$expected") <(printf '%s\n' "$actual") || true
+            exit 1
+          fi
+
+          echo "GitLab mirror verified: all GitHub branches and tags match."
