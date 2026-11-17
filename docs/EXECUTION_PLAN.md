@@ -55,7 +55,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 - WEB-01.01 — структура и ignore rules — **DONE** (выполнена досрочно как независимая подготовительная задача; G0 остаётся открытым).
 - WEB-01.02 — Vue/Vite/TS frontend scaffold — **DONE** (hosted `npm ci`, production build и dev-server smoke-check прошли).
 - WEB-01.03 — frontend lint/format/typecheck/test — **DONE** (ESLint, Prettier, vue-tsc, Vitest; hosted CI passed).
-- WEB-01.04 — базовая оболочка — **IN_REVIEW** (implementation complete; final frontend CI run pending).
+- WEB-01.04 — базовая оболочка — **DONE** (PR #10; frontend CI run `44102025691` SUCCESS).
 - WEB-01.05 — FastAPI scaffold.
 - WEB-01.06 — error contract и request ID.
 - WEB-01.07 — health endpoint.
