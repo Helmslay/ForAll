@@ -17,8 +17,6 @@ concurrency:
 
 jobs:
   mirror:
-    # Skip automatic runs until the destination credential has been configured.
-    if: ${{ secrets.GITLAB_MIRROR_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Mirror all Git refs
@@ -28,6 +26,10 @@ jobs:
         run: |
           set -euo pipefail
           set +x
+          if [[ -z "${GITLAB_MIRROR_TOKEN}" ]]; then
+            echo "GITLAB_MIRROR_TOKEN is not configured; skipping mirror."
+            exit 0
+          fi
           git clone --mirror "https://github.com/${GITHUB_REPOSITORY}.git" repository.git
           cd repository.git
           git remote add gitlab "https://oauth2:${GITLAB_MIRROR_TOKEN}@gitlab.com/kuncevichles-group/forall-backup.git"
