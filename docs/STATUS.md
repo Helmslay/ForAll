@@ -32,7 +32,7 @@
 - WEB-01.04: semantic GIS application shell completed; frontend CI run `44102025691` passed all checks.
 - UX-01: unified soft neutral palette applied to landing and app; frontend CI run `44102877694` and landing CI run `44102877715` passed.
 - WEB-01.10: local development guide and dev-port hardening completed; PR #17 merged, exact-head frontend CI run `44126893666` SUCCESS, merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`.
-- WEB-01.11: dependency audit gate added in PR #19; exact-head frontend CI run `44132980902` SUCCESS. Seven moderate findings were classified as devDependency/transitive paths; zero high/critical findings; no forced updates.
+- WEB-01.11: dependency audit gate added in PR #19; initial audit CI run `44132980902` SUCCESS; final exact-head CI run `44133991243` SUCCESS. Seven moderate findings were classified as devDependency/transitive paths; zero high/critical findings; no forced updates.
 
 ## Current milestone
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
