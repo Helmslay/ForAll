@@ -47,6 +47,20 @@ jobs:
         working-directory: app
         run: npm ci
 
+      - name: Format changed Vue and CSS files
+        working-directory: app
+        shell: bash
+        run: |
+          npx prettier --write src/App.vue src/style.css
+          cd ..
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain -- app/src/App.vue app/src/style.css)" ]; then
+            git add app/src/App.vue app/src/style.css
+            git commit -m "style(web): apply Prettier to app shell"
+            git push origin "HEAD:${GITHUB_HEAD_REF}"
+          fi
+
       - name: Lint frontend
         working-directory: app
         run: npm run lint
