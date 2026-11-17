@@ -61,7 +61,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 - WEB-01.03 — frontend lint/format/typecheck/test — **DONE** (ESLint, Prettier, vue-tsc, Vitest; hosted CI passed).
 - WEB-01.04 — базовая оболочка — **DONE** (PR #10; frontend CI run `44102025691` SUCCESS).
 - WEB-01.05 — FastAPI scaffold — **DONE** (PR #12; backend tests and Uvicorn smoke-check passed in GitHub Actions run `44106506251`).
-- WEB-01.06 — error contract и request ID — **READY**.
+- WEB-01.06 — error contract и request ID — **IN_REVIEW** (PR #13; CI result pending/unavailable in this session).
 - WEB-01.07 — health endpoint.
 - WEB-01.08 — frontend proxy.
 - WEB-01.09 — Docker Compose dev.
