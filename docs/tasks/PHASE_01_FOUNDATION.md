@@ -48,8 +48,13 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.1
 **Ограничения и follow-up:** отдельный запуск с принудительно отключённым сетевым интерфейсом не выполнялся. `npm ci` сообщил о 7 moderate severity vulnerabilities в dependency tree; точные advisory paths ещё не исследованы, `npm audit fix --force` не запускался. Backend, карта, Sentinel data и доступность из России этой задачей не затрагивались.
 
 ## WEB-01.04 — app shell placeholder
-Зависимость: WEB-01.02. Создать header/sidebar/workspace placeholders на русском. Без фиктивных сцен и спутниковых данных. Render test.
-Приёмка: семантические regions корректны.
+**Статус:** DONE.  
+**Зависимость:** WEB-01.02 — DONE; WEB-01.03 — DONE.  
+**Goal:** заменить одиночный экран-заглушку базовой оболочкой рабочей ГИС.
+**Scope:** семантическая верхняя панель приложения, компактная левая навигация, центральная рабочая область под будущую карту и статусная строка; русские подписи; адаптивное перестроение на узких экранах; доступные имена навигационных элементов и видимый focus. Центральная область должна прямо сообщать, что карта ещё не подключена. Не добавлять правую функциональную панель, интерактивные инструменты, карту, fake scenes, imagery или Sentinel business logic.
+**Тест:** Vue render test проверяет landmarks (banner/header, navigation, main), подписи и placeholder-состояние; существующий scaffold status test сохранить или объединить.
+**Acceptance criteria:** ровно один основной `main`; header/banner, nav и main семантически доступны; названия разделов на русском; центральная рабочая область помечена как место будущей карты и не выдаёт себя за реальную карту; нет выдуманных сцен/координат/статистики; responsive CSS и keyboard focus доступны.
+**Не входит:** CSS token system (WEB-02.01), полноценный desktop layout и панели (WEB-02.02/03), OpenLayers (WEB-02.04), search/RGB workflows.
 
 ## WEB-01.05 — FastAPI scaffold
 Зависимость: WEB-01.01. Создать Python package, app factory, pinned deps, env settings, uvicorn entry. Не подключать БД или rasterio.
@@ -79,3 +84,16 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.1
 ## WEB-01.10 — local development guide
 Зависимость: WEB-01.09. Создать docs/LOCAL_DEVELOPMENT.md: prerequisites, install, env, run, test, troubleshooting. Не указывать непроверенные команды как verified.
 Приёмка: чистое окружение повторяет setup.
+
+
+### Результат WEB-01.04 (2026-11-17)
+- Реализована базовая оболочка ГИС: верхняя шапка, компактная левая навигация, центральная рабочая область и статусная строка.
+- Добавлены русские подписи; будущие инструменты явно отмечены как пока недоступные.
+- Центральная область прямо сообщает, что карта, каталог, снимки и геоданные не подключены. Фальшивых сцен, координат и статистики нет.
+- Добавлены responsive layouts для узких экранов и видимый keyboard focus.
+- Render test проверяет header, aside, nav, ровно один main, основные названия разделов и состояние placeholder.
+- **Изменённые файлы:** `app/src/App.vue`, `app/src/style.css`, `app/src/App.spec.ts`, `.github/workflows/frontend-build.yml` (временный formatter step удалён; итоговый workflow без изменения поведения), `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Проверки:** GitHub Actions Frontend build run `44102025691` для HEAD `65bec3ac993469f115eb4dbaf9975887ed4faf51` — SUCCESS: `npm ci`, ESLint, Prettier check, vue-tsc typecheck, Vitest, production build и Vite dev-server HTTP smoke-check прошли.
+- **Acceptance:** все критерии WEB-01.04 подтверждены кодом и успешным frontend CI.
+- **Ограничения:** реальная карта и интерактивные инструменты не входят в WEB-01.04. Ручная проверка браузеров/устройств не выполнялась. В dependency tree сохраняются 7 moderate npm advisories, ранее отмеченные в STATUS.
+- **PR:** https://github.com/Helmslay/ForAll/pull/10. CI пройден; PR готов к merge.

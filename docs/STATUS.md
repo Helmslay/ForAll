@@ -29,12 +29,13 @@
 - WEB-01.01: completed early with explicit user authorization as an independent repository bootstrap; this does not bypass G0.
 - WEB-01.02: frontend scaffold completed and CI-verified.
 - WEB-01.03: frontend quality scripts and one unit test completed and CI-verified.
+- WEB-01.04: semantic GIS application shell completed; frontend CI run `44102025691` passed all checks.
 
 ## Current milestone
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.04 — базовая оболочка приложения (header/sidebar/workspace placeholders and semantic render test). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+WEB-01.04 — базовая оболочка приложения — IN_REVIEW; implementation pushed in PR #10, final frontend CI is pending. G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
