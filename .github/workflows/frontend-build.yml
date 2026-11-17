@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - "app/**"
-      - ".github/workflows/frontend-build.yml"
 
 permissions:
   contents: write
