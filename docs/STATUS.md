@@ -6,6 +6,7 @@
 - Presentation landing page: present at /index.html.
 - Landing page README: updated with documentation links.
 - Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog, backend API or imagery is implemented yet.
+- Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold.
 - Backend source: not created yet; only the empty `backend/` foundation directory exists.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
@@ -26,18 +27,21 @@
 - Phase task cards: documented for phases 00–08.
 - WEB-00.01 and WEB-00.02: completed as documentation/diagnostic tasks; no provider has been validated.
 - WEB-01.01: completed early with explicit user authorization as an independent repository bootstrap; this does not bypass G0.
+- WEB-01.02: frontend scaffold completed and CI-verified.
+- WEB-01.03: frontend quality scripts and one unit test completed and CI-verified.
 
 ## Current milestone
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.03 — frontend lint/format/typecheck/test. G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+WEB-01.04 — базовая оболочка приложения (header/sidebar/workspace placeholders and semantic render test). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
 2. Real Sentinel-2 asset access from a Russian backend has not been proven.
 3. Permission to cache and redistribute each candidate source's data must be reviewed.
 4. The user-facing path from Russian home/mobile networks without VPN has not been tested.
+5. `npm ci` currently reports 7 moderate-severity dependency advisories; the affected dependency paths have not yet been triaged. No forced audit fix was applied.
 
 ## Status policy
 Update this file when a milestone or material project decision changes. Do not mark a task DONE based only on generated code; follow the acceptance criteria in the task card.
