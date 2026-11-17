@@ -7,7 +7,7 @@
 - Landing page README: updated with documentation links.
 - Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog, backend API or imagery is implemented yet.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold.
-- Backend source: minimal FastAPI scaffold is implemented under `backend/`; GitHub Actions Backend tests run `44106506251` passed (2 pytest tests and Uvicorn HTTP smoke-check). No business endpoints, database or raster dependencies are included yet.
+- Backend source: FastAPI scaffold, request ID middleware and normalized error responses are implemented under `backend/`; GitHub Actions run `44112056437` passed pinned dependency installation, backend tests and Uvicorn smoke-check. No health endpoint, database or raster dependencies are included yet.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
@@ -36,7 +36,7 @@
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.06 — error contract and request ID — IN_REVIEW in PR #13. Implementation and TestClient cases are committed; CI result is not yet available, so acceptance is not confirmed. WEB-01.05 FastAPI scaffold is implemented and merged via PR #12 (merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+WEB-01.06 — error contract and request ID — DONE (PR #13 merged; backend CI run `44112056437` SUCCESS; merge commit `f950dd69d69142368203be8637adf990f300a072`). Next: WEB-01.07 — health endpoint (READY). WEB-01.05 FastAPI scaffold is implemented and merged via PR #12 (merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
