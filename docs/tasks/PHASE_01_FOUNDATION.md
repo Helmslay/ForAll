@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; WEB-01.05 — DONE; WEB-01.06 — DONE; WEB-01.07 — READY; WEB-01.08—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01—WEB-01.09 — DONE; WEB-01.10 — READY. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -120,13 +120,23 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Ограничения:** proxy предназначен только для Vite development server; production routing не реализуется этой задачей.
 
 ## WEB-01.09 — Docker Compose dev
-**Статус:** READY (2026-11-17).
+**Статус:** DONE (2026-11-17).
 **Зависимости:** WEB-01.02 — DONE; WEB-01.05 — DONE.
 **Goal:** обеспечить локальный запуск frontend и backend одной командой в согласованной dev-среде.
 **Scope:** добавить минимальный `compose.yaml` для web и API; healthchecks; корректные service dependencies; локальные volumes и env без секретов в image; использовать существующие npm/Python setup. Не добавлять БД, object storage, production reverse proxy, provider integration или новые API endpoints.
 **Тесты:** `docker compose config`; запуск обоих сервисов и проверка frontend и backend health endpoint через compose network.
 **Приёмка:** оба сервиса стартуют одной командой; frontend dev server доступен; backend healthcheck healthy; frontend `/api/v1/health` проходит через Vite proxy внутри compose; secrets отсутствуют в compose и image.
 **Не входит:** production deployment, контейнерная сборка production images, БД, Sentinel providers и G0 bypass.
+
+### Результат WEB-01.09 (2026-11-17) — DONE
+- Добавлен корневой `compose.yaml` с двумя dev-сервисами: `api` (Python 3.12 + FastAPI/Uvicorn) и `web` (Node 24 + Vite).
+- Исходники подключаются bind volumes; `node_modules` хранится в именованном volume. Vite использует локальный `127.0.0.1` по умолчанию, а Compose передаёт `0.0.0.0` и API target `http://api:8000` через environment.
+- Добавлены backend/frontend healthchecks; frontend ожидает `api` в состоянии healthy. Compose использует публичные базовые образы без custom image build и без credentials/secrets.
+- GitHub Actions расширен проверками `docker compose config`, запуска стека с ожиданием healthchecks, frontend HTTP smoke-check через опубликованный порт и реального `/api/v1/health` через Vite proxy из web-контейнера.
+- **Изменённые файлы:** `compose.yaml`, `app/package.json`, `app/vite.config.ts`, `.github/workflows/frontend-build.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Проверки:** GitHub Actions Frontend build run `44118409536` для HEAD `f5d0fcd536ac3a231ffaa1a394ebc3d56a7245f8` — SUCCESS. Успешны npm ci, ESLint, Prettier, vue-tsc, Vitest, production build, существующий Vite/backend smoke-check, `docker compose config --quiet`, запуск обоих сервисов до healthy и frontend/API proxy smoke-check внутри Compose.
+- **Локальные ограничения:** Docker Engine отсутствует в среде разработки этой сессии, поэтому локальный запуск не выполнялся; полноценный запуск и сетевые проверки выполнены на Docker-enabled GitHub Actions runner. Это не подтверждает запуск на компьютере пользователя.
+- **PR:** https://github.com/Helmslay/ForAll/pull/16 — merged; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`.
 
 ## WEB-01.10 — local development guide
 Зависимость: WEB-01.09. Создать docs/LOCAL_DEVELOPMENT.md: prerequisites, install, env, run, test, troubleshooting. Не указывать непроверенные команды как verified.
