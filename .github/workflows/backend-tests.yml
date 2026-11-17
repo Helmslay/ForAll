@@ -45,3 +45,18 @@ jobs:
 
       - name: Run backend tests
         run: python -m pytest -q
+
+      - name: Smoke-check Uvicorn without secrets
+        shell: bash
+        run: |
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8000/openapi.json >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Uvicorn did not become ready"
+          exit 1
