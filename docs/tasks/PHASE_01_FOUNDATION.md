@@ -62,12 +62,22 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; 
 Приёмка: backend стартует без secrets.
 
 ## WEB-01.06 — error contract/request ID
-**Статус:** READY (проверены зависимости и контракт; 2026-11-17).
+**Статус:** IN_REVIEW (2026-11-17); PR #13.
 Зависимость: WEB-01.05 — DONE. API contract: `docs/API_CONTRACTS.md`, разделы 2 и 12.
 Scope: request ID для каждого запроса; возвращать его в `X-Request-ID` и в JSON-ошибках; единый формат ошибок для HTTP, validation и непредвиденных исключений. Непредвиденные исключения логировать на сервере с traceback, клиенту возвращать безопасное сообщение. Не добавлять зависимости.
 Тесты: TestClient проверяет request ID/header/body, HTTP error, validation error и скрытие traceback при внутренней ошибке.
 Приёмка: все ошибки соответствуют `{"error":{"code":"...","message":"...","request_id":"...","details":{}}}`; request ID присутствует в ответе; traceback отсутствует в теле ответа.
 Не входит: health endpoint, structured logging framework, новые API endpoints и Sentinel business logic.
+
+### Результат WEB-01.06 (2026-11-17) — проверка ожидает CI
+- Добавлен middleware, генерирующий уникальный opaque request ID для каждого запроса; ID возвращается в `X-Request-ID`.
+- HTTP, validation и непредвиденные ошибки приводятся к согласованному JSON envelope с `code`, безопасным `message`, `request_id` и пустым `details`.
+- Необработанные исключения логируются на сервере через `logger.exception`; клиенту возвращается общее сообщение без traceback и внутренних деталей.
+- Добавлены TestClient проверки успешного ответа, HTTP 404, validation 422 и внутренней ошибки 500.
+- **Изменённые файлы:** `backend/app/main.py`, `backend/tests/test_app.py`, `docs/EXECUTION_PLAN.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Локальные тесты:** не запускались — в этой сессии нет checkout репозитория/исполняемого backend окружения.
+- **CI:** workflow run для PR #13 пока не возвращён интеграцией; результат не подтверждён. Не считать acceptance criteria подтверждёнными до успешного CI.
+- **Ограничения:** PR открыт, не смержен; WEB-01.06 остаётся IN_REVIEW.
 
 ## WEB-01.07 — health endpoint
 Зависимость: WEB-01.05. GET /api/v1/health: status/version/time. Не проверять upstream при каждом health и не раскрывать private details.
