@@ -30,12 +30,13 @@
 - WEB-01.02: frontend scaffold completed and CI-verified.
 - WEB-01.03: frontend quality scripts and one unit test completed and CI-verified.
 - WEB-01.04: semantic GIS application shell completed; frontend CI run `44102025691` passed all checks.
+- UX-01: unified soft neutral palette applied to landing and app; frontend CI run `44102877694` and landing CI run `44102877715` passed.
 
 ## Current milestone
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-UX-01 — единая мягкая нейтральная палитра лендинга и приложения; после завершения продолжить WEB-01.05 (FastAPI scaffold). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+WEB-01.05 — FastAPI scaffold. UX-01 palette refresh is complete in PR #11. G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
