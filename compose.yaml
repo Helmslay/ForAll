@@ -25,13 +25,14 @@ services:
     working_dir: /workspace
     command: >-
       sh -c "npm ci &&
-      npm run dev -- --host 0.0.0.0 --port 5173"
+      npm run dev -- --port 5173"
     volumes:
       - ./app:/workspace
       - frontend_node_modules:/workspace/node_modules
     ports:
       - "5173:5173"
     environment:
+      SENTINEL_VITE_HOST: 0.0.0.0
       SENTINEL_API_PROXY_TARGET: http://api:8000
     depends_on:
       api:
