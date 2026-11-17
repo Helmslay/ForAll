@@ -48,7 +48,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 ### Фаза 01 — foundation
 Карточки: tasks/PHASE_01_FOUNDATION.md
 - WEB-01.01 — структура и ignore rules — **DONE** (выполнена досрочно как независимая подготовительная задача; G0 остаётся открытым).
-- WEB-01.02 — Vue/Vite/TS frontend scaffold — **IN_PROGRESS** (авторизованное продолжение G1 до первого dev-build).
+- WEB-01.02 — Vue/Vite/TS frontend scaffold — **DONE** (hosted `npm ci`, production build и dev-server smoke-check прошли).
 - WEB-01.03 — frontend lint/format/typecheck/test.
 - WEB-01.04 — базовая оболочка.
 - WEB-01.05 — FastAPI scaffold.
