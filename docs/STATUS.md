@@ -3,7 +3,7 @@
 **Last updated:** 2026-11-17
 
 ## Repository state
-- Presentation landing page: present at `/index.html`; GIS-first redesign LP-01 is under review on branch `feat/landing-gis-redesign`. The concept map is explicitly illustrative; browser GIS functionality is not claimed as implemented.
+- Presentation landing page: present at `/index.html`; GIS-first redesign LP-01 is complete in PR #9. The concept map is explicitly illustrative; browser GIS functionality is not claimed as implemented.
 - Landing page README: updated with documentation links.
 - Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog, backend API or imagery is implemented yet.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold.
