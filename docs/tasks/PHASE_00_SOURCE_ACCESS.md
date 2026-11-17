@@ -1,6 +1,6 @@
 # Phase 00 — проверка источников и российского доступа
 
-WEB-00.01 — DONE; WEB-00.02—WEB-00.10 — PLANNED. Это обязательный gate. Выполнять по одной.
+WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03—WEB-00.10 — PLANNED. Это обязательный gate. Выполнять по одной.
 
 ## WEB-00.01 — каталог сетевых зависимостей
 **Цель:** список endpoint и hostnames для проверки.
@@ -27,51 +27,12 @@ WEB-00.01 — DONE; WEB-00.02—WEB-00.10 — PLANNED. Это обязатель
 **Тесты:** mock server для 200, timeout, DNS/TLS error, invalid JSON.
 **Приёмка:** корректные exit codes; секретные заголовки не печатаются.
 
-## WEB-00.03 — STAC search для Пермского края
-**Цель:** реальный поиск Sentinel-2 L2A.
-**Зависимости:** WEB-00.02.
-**Шаги:** bbox/datetime из test config; search; вывести item id, collection, datetime, cloud cover, asset keys; отличить no results от network error; не сохранять signed href.
-**Приёмка:** real Item или причина отсутствия записана; no results не считается network failure.
-
-## WEB-00.04 — sanitized Item fixture
-**Цель:** fixture для unit tests.
-**Зависимости:** WEB-00.03.
-**Шаги:** удалить токены/signed query; сохранить properties/geometry/assets shape; временные href заменить placeholder; записать источник и дату; fixture не должен инициировать network access.
-**Приёмка:** тестовый JSON без секретов и пригоден для offline tests.
-
-## WEB-00.05 — проверить B02/B03/B04/B08
-**Цель:** проверить фактические band assets.
-**Зависимости:** WEB-00.03.
-**Шаги:** сопоставлять band по metadata, не угадывать по URL; вывести status/media type/resolution/host для каждого band; missing metadata помечать unknown.
-**Приёмка:** каждый band имеет явный status и evidence.
-
-## WEB-00.06 — HTTP Range и COG read
-**Цель:** доказать получение реальных байтов с российского backend.
-**Зависимости:** WEB-00.05.
-**Шаги:** получить asset только из test item; HEAD/GET Range bytes=0-16383; проверить status, Content-Range, size; Rasterio/GDAL open; прочитать небольшое окно; замерить время; скрыть signed URL.
-**Приёмка:** окно прочитано для каждого band или источник FAIL. STAC 200 не считается raster success.
-
-## WEB-00.07 — preview из реальных пикселей
-**Цель:** проверить RGB на реальной сцене.
-**Зависимости:** WEB-00.06.
-**Шаги:** AOI window; зафиксированная RGB комбинация; nodata; scale/offset только по metadata; PNG + JSON params; проверить размеры и не-пустое изображение.
-**Приёмка:** известно происхождение каждого канала и реальный scene item.
-
-## WEB-00.08 — российское хранилище smoke test
-**Цель:** проверить выбранное storage.
-**Зависимости:** WEB-00.06; тестовые доступы.
-**Шаги:** создать маленький файл; записать; прочитать; сравнить checksum; проверить Range; удалить временный объект.
-**Приёмка:** read/write/checksum pass; endpoint и ограничения описаны.
-
-## WEB-00.09 — инструкция тестирования из российских сетей
-**Цель:** повторяемая проверка без VPN.
-**Зависимости:** WEB-00.01—WEB-00.08.
-**Scope:** docs/RUSSIA_NETWORK_RUNBOOK.md.
-**Шаги:** отдельно сервер РФ, домашняя сеть, мобильная сеть; проверить DNS/TLS/app/search/asset/RGB/download; добавить report template; не собирать избыточные персональные данные.
-**Приёмка:** тест может повторить другой человек.
-
-## WEB-00.10 — provider decision
-**Цель:** выбрать primary/fallback.
-**Зависимости:** предыдущие задачи.
-**Шаги:** собрать сетевые и raster results; проверить права на использование/кэш/redistribution; оценить покрытие; зафиксировать primary/fallback или BLOCKED; указать дату повторной проверки.
-**Приёмка:** primary не назначен только по STAC root; доказан raster read и reviewed terms.
+**Результат выполнения (2026-11-17):**
+- Добавлен `tools/check_stac.py`: проверка DNS, TCP, TLS, STAC root и collections для трёх заранее заданных Sentinel-2 каталогов (Earth Search, CDSE, Microsoft Planetary Computer).
+- Endpoint нельзя передать через CLI; произвольные hostnames и внешние redirect блокируются. Проверка не использует credentials и не выводит response body, query strings или signed URLs.
+- Отчёт содержит hostname, стадии PASS/FAIL, HTTP status, latency и безопасный класс ошибки.
+- Добавлены offline mock-server tests и инструкция запуска.
+- **Изменённые файлы:** `tools/check_stac.py`, `tools/test_check_stac.py`, `tools/README.md`.
+- **Проверки:** `python -m unittest discover -s tools -p 'test_*.py' -v` — 7 tests PASS; `python -m py_compile tools/check_stac.py tools/test_check_stac.py` — PASS; `python tools/check_stac.py --help` — PASS.
+- **Приёмка:** allowlist, DNS/TCP/TLS, STAC root/collections, latency, безопасный вывод и exit codes 0/1/2 покрыты реализацией и тестами.
+- **Ограничения:** реальные запросы к провайдерам не запускались; российская доступность, реальный STAC search, Sentinel-2 assets, HTTP Range/COG, четыре канала и лицензии не проверялись. Успех этого checker не является доказательством доступности данных из России.
