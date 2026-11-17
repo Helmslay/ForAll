@@ -34,7 +34,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         code: str,
         message: str,
     ) -> JSONResponse:
-        return JSONResponse(
+        response = JSONResponse(
             status_code=status_code,
             content={
                 "error": {
@@ -45,6 +45,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 }
             },
         )
+        response.headers["X-Request-ID"] = request.state.request_id
+        return response
 
     @app.exception_handler(StarletteHTTPException)
     async def handle_http_error(
