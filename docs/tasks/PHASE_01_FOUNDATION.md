@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; WEB-01.05 — DONE; WEB-01.06—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; WEB-01.05 — DONE; WEB-01.06 — DONE; WEB-01.07 — READY; WEB-01.08—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -62,22 +62,24 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; 
 Приёмка: backend стартует без secrets.
 
 ## WEB-01.06 — error contract/request ID
-**Статус:** IN_REVIEW (2026-11-17); PR #13.
+**Статус:** DONE (2026-11-17); PR #13 merged.
 Зависимость: WEB-01.05 — DONE. API contract: `docs/API_CONTRACTS.md`, разделы 2 и 12.
 Scope: request ID для каждого запроса; возвращать его в `X-Request-ID` и в JSON-ошибках; единый формат ошибок для HTTP, validation и непредвиденных исключений. Непредвиденные исключения логировать на сервере с traceback, клиенту возвращать безопасное сообщение. Не добавлять зависимости.
 Тесты: TestClient проверяет request ID/header/body, HTTP error, validation error и скрытие traceback при внутренней ошибке.
 Приёмка: все ошибки соответствуют `{"error":{"code":"...","message":"...","request_id":"...","details":{}}}`; request ID присутствует в ответе; traceback отсутствует в теле ответа.
 Не входит: health endpoint, structured logging framework, новые API endpoints и Sentinel business logic.
 
-### Результат WEB-01.06 (2026-11-17) — проверка ожидает CI
+### Результат WEB-01.06 (2026-11-17) — DONE
 - Добавлен middleware, генерирующий уникальный opaque request ID для каждого запроса; ID возвращается в `X-Request-ID`.
 - HTTP, validation и непредвиденные ошибки приводятся к согласованному JSON envelope с `code`, безопасным `message`, `request_id` и пустым `details`.
 - Необработанные исключения логируются на сервере через `logger.exception`; клиенту возвращается общее сообщение без traceback и внутренних деталей.
 - Добавлены TestClient проверки успешного ответа, HTTP 404, validation 422 и внутренней ошибки 500.
 - **Изменённые файлы:** `backend/app/main.py`, `backend/tests/test_app.py`, `docs/EXECUTION_PLAN.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
 - **Локальная изолированная проверка:** `pytest -q` — **5 passed**. Для проверки в отдельный временный каталог были помещены текущие исходники приложения и тесты; использовались установленные в среде FastAPI 0.128.2 / Starlette 0.50.0, а не закреплённые проектом версии. Это дополнительная проверка, не замена CI.
-- **CI:** GitHub Actions run для PR #13 через доступную интеграцию пока не обнаружен; pinned dependency environment не подтверждён. Не считать acceptance criteria окончательно подтверждёнными до успешного CI.
-- **Ограничения:** PR открыт, не смержен; WEB-01.06 остаётся IN_REVIEW.
+- **CI:** GitHub Actions Backend tests run `44112056437` для HEAD `9dba7533d113bb5ea9bd4fcdff230569c0c600b2` — SUCCESS. Подтверждены шаги установки pinned dependencies, `Run backend tests` и `Smoke-check Uvicorn without secrets`.
+- **Приёмка:** единый error envelope, request ID в заголовке и теле ошибок, отсутствие traceback/private details в клиентском ответе и серверное логирование подтверждены тестами и успешным CI.
+- **PR:** https://github.com/Helmslay/ForAll/pull/13 — merged; merge commit `f950dd69d69142368203be8637adf990f300a072`.
+- **Ограничения:** российская доступность источников, реальные Sentinel assets и provider integration не проверялись и остаются за G0.
 
 ## WEB-01.07 — health endpoint
 Зависимость: WEB-01.05. GET /api/v1/health: status/version/time. Не проверять upstream при каждом health и не раскрывать private details.
