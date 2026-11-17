@@ -18,7 +18,7 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03—WEB-01.10 — PLANNED. Не 
 - **Оговорка:** задача выполнена досрочно по явному разрешению пользователя; G0 остаётся открытым, а дальнейшая реализация imagery заблокирована до прохождения gate.
 
 ## WEB-01.02 — frontend scaffold
-**Статус:** IN_PROGRESS.  
+**Статус:** DONE.  
 **Зависимость:** WEB-01.01 — DONE.  
 **Goal:** создать минимальный запускаемый frontend без бизнес-логики Sentinel.
 **Scope:** Vue 3 + Vite + TypeScript в каталоге `app/`; strict TypeScript; lockfile; минимальный `App.vue`; локальный dev server и production build. Не добавлять OpenLayers, backend API, mock satellite scenes, external runtime CDN или provider logic.
@@ -29,7 +29,7 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03—WEB-01.10 — PLANNED. Не 
 ### Результат WEB-01.02 (2026-11-17)
 - Создан frontend scaffold на Vue 3.5.45, Vite 8.3.8 и TypeScript 7.0.2; TypeScript strict включён.
 - Добавлен минимальный Vue экран-заглушка на русском без фиктивных спутниковых данных, карты, provider logic или Sentinel business logic.
-- Добавлен `app/package-lock.json`, сгенерированный npm 11.19.1 в CI и сохранённый в ветке.
+- Добавлен `app/package-lock.json`, сгенерированный npm 11.19.1 в CI и зафиксированный в `main`.
 - Добавлен GitHub-hosted workflow: `npm ci`, production build и HTTP smoke-check dev server.
 - **Изменённые файлы:** `app/package.json`, `app/package-lock.json`, `app/tsconfig.json`, `app/vite.config.ts`, `app/index.html`, `app/src/main.ts`, `app/src/App.vue`, `app/src/style.css`, `.github/workflows/frontend-build.yml`, `docs/DECISIONS.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`, `README.md`.
 - **Проверки:** GitHub Actions run #12 — `npm ci` PASS (37 packages, 0 vulnerabilities); `npm run build` PASS (Vite 8.3.8, 12 modules transformed); dev server PASS (HTTP 200, HTML содержит `#app`). Локальный npm install в текущей среде недоступен из-за timeout до registry, поэтому сборка проверена на GitHub-hosted runner.
