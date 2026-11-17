@@ -37,7 +37,7 @@ G1 — foundation work is temporarily authorized through the first local develop
 
 ## Next task
 - WEB-01.09 — Docker Compose dev — DONE (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
-- Next: WEB-01.10 — local setup guide — READY (depends on WEB-01.09).
+- Current: WEB-01.10 — local setup guide — IN_REVIEW (PR pending CI; depends on WEB-01.09).
 - G1 remains authorized through the first local frontend/backend dev-build. After the user has the first local dev-build, pause for Russian-network checks before provider/data integration.
 
 ## Important blockers
