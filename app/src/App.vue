@@ -30,12 +30,7 @@ const navigationItems = [
         <nav class="sidebar-nav" aria-label="Основная навигация">
           <ul>
             <li v-for="item in navigationItems" :key="item.label">
-              <a
-                v-if="item.active"
-                class="nav-item active"
-                href="#workspace"
-                aria-current="page"
-              >
+              <a v-if="item.active" class="nav-item active" href="#workspace" aria-current="page">
                 <span class="nav-symbol" aria-hidden="true">{{ item.symbol }}</span>
                 <span>{{ item.label }}</span>
               </a>
@@ -72,8 +67,8 @@ const navigationItems = [
             <span class="placeholder-icon" aria-hidden="true">⌖</span>
             <h2 id="map-placeholder-title">Карта будет подключена на следующем этапе</h2>
             <p>
-              Сейчас подготовлена только оболочка приложения. Спутниковые снимки, базовая карта,
-              каталог и геоданные ещё не подключены.
+              Сейчас подготовлена только оболочка приложения. Спутниковые снимки, базовая карта, каталог и геоданные ещё
+              не подключены.
             </p>
           </div>
           <span class="placeholder-caption">РАБОЧИЙ ХОЛСТ · ОЖИДАЕТ ПОДКЛЮЧЕНИЯ КАРТЫ</span>

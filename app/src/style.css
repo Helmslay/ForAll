@@ -45,9 +45,7 @@ a:focus-visible {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  background:
-    radial-gradient(ellipse at 54% -22%, rgb(73 106 67 / 12%), transparent 48%),
-    #101713;
+  background: radial-gradient(ellipse at 54% -22%, rgb(73 106 67 / 12%), transparent 48%), #101713;
 }
 
 .app-header {
@@ -266,9 +264,7 @@ h1 {
   place-items: center;
   border: 1px solid rgb(218 232 215 / 14%);
   border-radius: 11px;
-  background:
-    radial-gradient(ellipse at 50% 42%, rgb(69 96 65 / 15%), transparent 48%),
-    #141e18;
+  background: radial-gradient(ellipse at 50% 42%, rgb(69 96 65 / 15%), transparent 48%), #141e18;
 }
 
 .placeholder-grid {
