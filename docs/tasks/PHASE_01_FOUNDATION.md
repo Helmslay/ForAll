@@ -184,3 +184,44 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Acceptance criteria:** Python package и app factory созданы; runtime/test зависимости закреплены; environment settings работают; ASGI entry point импортируется; TestClient проходит; Uvicorn фактически стартует без secrets. Все критерии подтверждены hosted CI.
 - **Ограничения:** endpoints бизнес-логики, health, error contract/request ID, БД, Rasterio/GDAL, provider adapters и Sentinel-функции не добавлялись — это следующие/заблокированные задачи. Локальный запуск на машине пользователя отдельно не выполнялся. G0 остаётся открытым.
 - **PR:** https://github.com/Helmslay/ForAll/pull/12 — merged; merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`.
+
+
+## WEB-01.11 — frontend dependency audit and severity gate
+
+**Статус:** DONE.  
+**Зависимости:** WEB-01.03 — DONE; WEB-01.10 — DONE.  
+**Goal:** получить актуальный отчёт npm audit для зафиксированного frontend lockfile, классифицировать advisories и не допустить незамеченных high/critical уязвимостей в последующих PR.
+
+**Scope:**
+- Добавить в frontend CI команду `npm audit --audit-level=high` после `npm ci`. Команда должна показывать полный отчёт advisories и завершать CI ошибкой при наличии high/critical.
+- На exact-head CI получить актуальный отчёт и установить затронутые пакеты, advisory paths, severity, production/development dependency scope и наличие безопасного semver-совместимого исправления.
+- Не запускать `npm audit fix --force`, не обновлять весь стек и не менять runtime зависимости без подтверждённой необходимости.
+- Зафиксировать результат и оставшиеся риски в карточке и STATUS.
+
+**Проверки:** exact-head frontend CI; анализ вывода `npm audit`; при изменении lockfile — полный frontend CI.
+
+**Acceptance criteria:**
+- CI выполняет audit на lockfile после `npm ci`.
+- High/critical advisories приводят к failed CI; moderate/low отображаются в отчёте и не скрываются.
+- Все текущие advisories классифицированы по затронутым пакетам и dependency paths.
+- Никакие несовместимые или принудительные обновления не применены.
+- Карточка и STATUS содержат точный результат, дату/CI run и ограничения.
+
+**Не входит:** массовое обновление зависимостей, миграция сборщика/TypeScript, backend dependency audit, runtime-функции приложения.
+
+
+
+### Результат WEB-01.11 (2026-11-17) — DONE
+- Frontend CI теперь выполняет `npm audit --audit-level=high` сразу после `npm ci`. Полный npm audit report остаётся в CI log; high/critical приводят к failed step, moderate/low видны и не скрываются.
+- Exact-head frontend CI run `44132980902` для PR HEAD `4deaca5e3e871ee323d1550479c5701d9d2995da` — **SUCCESS**. Audit step завершился SUCCESS, все последующие проверки также прошли: ESLint, Prettier, vue-tsc, Vitest, production build, Vite/backend health proxy, Compose config, loopback host binding, запуск Compose и smoke-check frontend/API.
+- Актуальный отчёт: 7 moderate findings, 0 high, 0 critical. Они относятся только к devDependencies и их транзитивным цепочкам; единственная production dependency в `app/package.json` — Vue 3.5.45, она не указана как уязвимая в audit report.
+- Advisory groups:
+  - `@vitest/mocker` через `vitest@4.1.11`: GHSA-qxg6-89mg-rqv8 и GHSA-xp26-3454-mjgp; предложенное исправление требует перехода на Vitest 4.1.12 за пределами текущего точного pin.
+  - `glob` через `js-beautify`: GHSA-3g3m-2fjr-6pw4; npm сообщает о доступном non-force fix.
+  - `minimatch` через `editorconfig`, `glob` и `eslint`: GHSA-g3hv-75wg-m249; автоматическое предложение npm требует force upgrade ESLint до 10.15.0 за пределами текущего точного pin.
+- В отчёте npm 7 moderate findings сгруппированы в эти транзитивные advisory paths; high/critical отсутствуют. Это не означает отсутствия рисков вообще: dev toolchain сохраняет moderate advisories.
+- Принудительные и массовые обновления не выполнялись; package.json и package-lock.json не менялись. Целевые обновления инструментов можно провести отдельной задачей после первого локального запуска с отдельным полным CI.
+- **Изменённые файлы:** `.github/workflows/frontend-build.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Acceptance criteria:** audit встроен в CI; high/critical блокируют CI; moderate/low остаются видимыми; все текущие advisory paths классифицированы; несовместимые/force обновления не применялись; точный результат и ограничения задокументированы. Все критерии подтверждены.
+- **Ограничения:** аудит выполнялся на GitHub-hosted runner 2026-11-17 и зависит от актуальной базы npm advisories. Он не является локальным сканированием компьютера пользователя и не подтверждает российскую сетевую доступность.
+- **PR:** https://github.com/Helmslay/ForAll/pull/19 — exact-head CI run `44132980902` SUCCESS; merge ожидает синхронизации итоговой документации и финальной проверки.
