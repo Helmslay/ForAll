@@ -5,7 +5,7 @@
 ## Repository state
 - Presentation landing page: present at /index.html.
 - Landing page README: updated with documentation links.
-- Browser application source: WEB-01.02 frontend scaffold is in progress on `feat/web-01-02-frontend-scaffold`; no dev-build has been verified yet.
+- Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog, backend API or imagery is implemented yet.
 - Backend source: not created yet; only the empty `backend/` foundation directory exists.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
@@ -31,7 +31,7 @@
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.02 — Vue/Vite/TypeScript frontend scaffold (in progress). After the first dev-build, pause for the user's Russian-network checks before continuing to provider/data integration.
+WEB-01.03 — frontend lint/format/typecheck/test. G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
