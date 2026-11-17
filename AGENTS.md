@@ -25,3 +25,15 @@ Do not load all documentation into context. Execute exactly one READY task per s
 
 ## Completion
 Run the task's required checks. Mark DONE only when every acceptance criterion is verified. Update docs/EXECUTION_PLAN.md, docs/STATUS.md when material status changes, and the task card. Report exact commands/results, limitations and next task as specified in docs/START_HERE.md.
+
+## Pull request merge authorization
+The project owner has authorized coding agents to merge pull requests without asking for separate approval, but only when all of the following conditions are satisfied:
+- All required CI checks have completed successfully for the exact PR head commit.
+- The PR is confirmed mergeable, with no merge conflicts.
+- There are no unresolved blocking review comments or requested changes.
+- The proposed changes remain within the approved task scope and do not silently alter architecture or API contracts.
+
+Before merging, use the current PR head SHA as an expected-head guard. Use the repository's established merge method. After merging, verify the PR is merged and record the merge commit SHA in the task card and relevant project status/plan documentation.
+
+Never merge while CI is pending, has not started, is missing, or has failed. Do not treat an empty workflow-run list or a pending status with zero completed checks as success. Diagnose the missing checks or report the blocker and wait; do not bypass required checks. If any safety condition is uncertain, do not merge and report why.
+
