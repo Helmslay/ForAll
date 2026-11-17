@@ -62,7 +62,7 @@ Gate G0: законный source проходит catalog + real raster read с 
 - WEB-01.04 — базовая оболочка — **DONE** (PR #10; frontend CI run `44102025691` SUCCESS).
 - WEB-01.05 — FastAPI scaffold — **DONE** (PR #12; backend tests and Uvicorn smoke-check passed in GitHub Actions run `44106506251`).
 - WEB-01.06 — error contract и request ID — **DONE** (PR #13 merged; backend CI run `44112056437` SUCCESS; merge commit `f950dd69d69142368203be8637adf990f300a072`).
-- WEB-01.07 — health endpoint — **READY** (зависимость WEB-01.05 DONE; контракт определён в API_CONTRACTS).
+- WEB-01.07 — health endpoint — **IN_REVIEW** (реализован `GET /api/v1/health`; CI ожидается).
 - WEB-01.08 — frontend proxy.
 - WEB-01.09 — Docker Compose dev.
 - WEB-01.10 — local setup guide.
