@@ -26,6 +26,8 @@ WEB-01.01 — DONE; WEB-01.02 — IN_PROGRESS; WEB-01.03—WEB-01.10 — PLANNED
 **Acceptance criteria:** package/config/entry созданы; TypeScript strict включён; lockfile зафиксирован; production build проходит; dev server отдаёт приложение; runtime assets собираются локально.
 **Ограничение:** успешная сборка не подтверждает доступность приложения/источников из России. Российские проверки выполняются пользователем после выдачи dev-build; G0 остаётся открыт.
 
+**Промежуточная проверка (2026-11-17):** GitHub-hosted run #6 выполнил `npm ci` (37 packages added; 0 vulnerabilities) и `npm run build` (Vite 8.3.8, 12 modules transformed, build passed). Lockfile был сгенерирован и зафиксирован отдельным CI commit. Dev-server smoke-check добавлен в CI и ожидает повторного запуска.
+
 ## WEB-01.03 — frontend quality scripts
 Зависимость: WEB-01.02. Добавить formatter/linter, Vitest, scripts lint/format-check/typecheck/test. Один простой unit test.
 Приёмка: каждый script запускается без сети после install.
