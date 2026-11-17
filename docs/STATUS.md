@@ -36,7 +36,9 @@
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.05 — FastAPI scaffold — DONE (PR #12; merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`). WEB-01.06 — error contract/request ID — DONE (PR #13; CI `44112056437` SUCCESS; merge commit `f950dd69d69142368203be8637adf990f300a072`). WEB-01.07 — health endpoint — DONE (PR #14; CI `44113221569` SUCCESS; merge commit `4894f13558ae09db0fc0f0cedb8ce710c218110c`). Next: WEB-01.09 — Docker Compose dev (READY). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+- WEB-01.09 — Docker Compose dev — DONE (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
+- Next: WEB-01.10 — local setup guide — READY (depends on WEB-01.09).
+- G1 remains authorized through the first local frontend/backend dev-build. After the user has the first local dev-build, pause for Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
