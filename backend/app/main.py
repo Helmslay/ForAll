@@ -1,15 +1,99 @@
-from fastapi import FastAPI
+import logging
+from uuid import uuid4
+
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import Settings, get_settings
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Build the API application without connecting to external services."""
     app_settings = settings or get_settings()
-    return FastAPI(
+    app = FastAPI(
         title=app_settings.app_name,
         version=app_settings.app_version,
     )
+
+    @app.middleware("http")
+    async def add_request_id(request: Request, call_next):
+        request_id = uuid4().hex
+        request.state.request_id = request_id
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
+        return response
+
+    def error_response(
+        request: Request,
+        *,
+        status_code: int,
+        code: str,
+        message: str,
+    ) -> JSONResponse:
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "error": {
+                    "code": code,
+                    "message": message,
+                    "request_id": request.state.request_id,
+                    "details": {},
+                }
+            },
+        )
+
+    @app.exception_handler(StarletteHTTPException)
+    async def handle_http_error(
+        request: Request, exc: StarletteHTTPException
+    ) -> JSONResponse:
+        messages = {
+            400: "Некорректный запрос",
+            401: "Требуется авторизация",
+            403: "Доступ запрещён",
+            404: "Ресурс не найден",
+            405: "Метод не поддерживается",
+        }
+        response = error_response(
+            request,
+            status_code=exc.status_code,
+            code=f"HTTP_{exc.status_code}",
+            message=messages.get(exc.status_code, "Не удалось выполнить запрос"),
+        )
+        if exc.headers:
+            response.headers.update(exc.headers)
+        return response
+
+    @app.exception_handler(RequestValidationError)
+    async def handle_validation_error(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
+        return error_response(
+            request,
+            status_code=422,
+            code="VALIDATION_ERROR",
+            message="Некорректные параметры запроса",
+        )
+
+    @app.exception_handler(Exception)
+    async def handle_unexpected_error(
+        request: Request, exc: Exception
+    ) -> JSONResponse:
+        logger.exception(
+            "Unhandled request error",
+            extra={"request_id": request.state.request_id},
+        )
+        return error_response(
+            request,
+            status_code=500,
+            code="INTERNAL_SERVER_ERROR",
+            message="Внутренняя ошибка сервера",
+        )
+
+    return app
 
 
 app = create_app()
