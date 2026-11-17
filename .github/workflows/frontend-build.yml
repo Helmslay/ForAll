@@ -9,7 +9,7 @@ on:
       - ".github/workflows/frontend-build.yml"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: frontend-build-${{ github.event.pull_request.number }}
@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -41,20 +42,6 @@ jobs:
 
       - name: Install backend runtime dependencies
         run: python -m pip install -r backend/requirements.txt
-
-      - name: Generate and commit npm lockfile
-        working-directory: app
-        shell: bash
-        run: |
-          npm install --package-lock-only --ignore-scripts
-          cd ..
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain -- app/package-lock.json)" ]; then
-            git add app/package-lock.json
-            git commit -m "chore(web): generate npm lockfile"
-            git push origin "HEAD:${GITHUB_HEAD_REF}"
-          fi
 
       - name: Install locked dependencies
         working-directory: app
