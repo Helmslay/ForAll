@@ -50,3 +50,17 @@ jobs:
       - name: Build production frontend
         working-directory: app
         run: npm run build
+      - name: Smoke-check Vite development server
+        working-directory: app
+        shell: bash
+        run: |
+          npm run dev -- --port 4173 --strictPort > /tmp/sentinel-vite.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /tmp/sentinel-dev.html; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q '<div id="app"></div>' /tmp/sentinel-dev.html
