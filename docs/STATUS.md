@@ -7,7 +7,7 @@
 - Landing page README: updated with documentation links.
 - Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog, backend API or imagery is implemented yet.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold.
-- Backend source: FastAPI scaffold, request ID middleware, normalized error responses and `GET /api/v1/health` are implemented under `backend/`; health endpoint CI is pending. No database or raster dependencies are included yet.
+- Backend source: FastAPI scaffold, request ID middleware, normalized error responses and `GET /api/v1/health` are implemented under `backend/`; health endpoint passed CI (run `44113221569`). No database or raster dependencies are included yet.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
@@ -36,7 +36,7 @@
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.06 — error contract and request ID — DONE (PR #13 merged; backend CI run `44112056437` SUCCESS; merge commit `f950dd69d69142368203be8637adf990f300a072`). WEB-01.07 — health endpoint — IN_REVIEW; PR and CI pending. WEB-01.05 FastAPI scaffold is implemented and merged via PR #12 (merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+WEB-01.05 — FastAPI scaffold — DONE (PR #12; merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`). WEB-01.06 — error contract/request ID — DONE (PR #13; CI `44112056437` SUCCESS; merge commit `f950dd69d69142368203be8637adf990f300a072`). WEB-01.07 — health endpoint — DONE (PR #14; CI `44113221569` SUCCESS; merge commit `4894f13558ae09db0fc0f0cedb8ce710c218110c`). Next: WEB-01.08 — Vite proxy (READY). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
