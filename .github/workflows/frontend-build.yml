@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - "app/**"
-      - ".github/workflows/frontend-build.yml"
 
 permissions:
   contents: write
@@ -38,7 +37,7 @@ jobs:
           cd ..
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet -- app/package-lock.json; then
+          if [ -n "$(git status --porcelain -- app/package-lock.json)" ]; then
             git add app/package-lock.json
             git commit -m "chore(web): generate npm lockfile"
             git push origin "HEAD:${GITHUB_HEAD_REF}"
