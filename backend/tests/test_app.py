@@ -1,4 +1,5 @@
 import logging
+from datetime import UTC, datetime
 
 from fastapi.testclient import TestClient
 
@@ -26,6 +27,21 @@ def test_settings_can_be_overridden_without_environment_secrets() -> None:
     assert application.version == "9.9.9"
 
 
+def test_health_endpoint_returns_status_version_and_utc_timestamp() -> None:
+    application = create_app(Settings(app_version="2.3.4"))
+
+    with TestClient(application) as client:
+        response = client.get("/api/v1/health")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["app_version"] == "2.3.4"
+    timestamp = datetime.fromisoformat(body["timestamp"].replace("Z", "+00:00"))
+    assert timestamp.tzinfo == UTC
+    assert response.headers["X-Request-ID"]
+
+
 def test_http_errors_use_the_api_error_contract() -> None:
     with TestClient(create_app()) as client:
         response = client.get("/missing")
@@ -43,6 +59,7 @@ def test_http_errors_use_the_api_error_contract() -> None:
 
 def test_validation_errors_use_the_api_error_contract() -> None:
     application = create_app()
+
     def list_items(count: int) -> dict[str, int]:
         return {"count": count}
 
