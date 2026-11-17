@@ -1,12 +1,21 @@
 # Phase 01 — каркас
 
-Все задачи PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01 — DONE; WEB-01.02—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
 Создать app/, backend/, scripts/, deployment/. Игнорировать node_modules, build, venv, cache, temporary uploads и .env. Добавить .env.example без секретов.
 Проверка: фиктивный .env и build не появляются в git status.
 Приёмка: секреты/сборка игнорируются; структура минимальна.
+
+### Результат WEB-01.01 (2026-11-17)
+- Созданы `app/`, `backend/`, `scripts/`, `deployment/` с `.gitkeep`, чтобы Git сохранял пустые каталоги.
+- Добавлен корневой `.gitignore` для Node/Python dependencies, build output, virtual environments, caches, logs, temporary uploads, local `.env` и editor/OS artifacts.
+- Добавлен `.env.example` без credentials, tokens и signed URLs; конкретные переменные будут добавляться вместе с компонентами, которые их используют.
+- **Изменённые файлы:** `.gitignore`, `.env.example`, `app/.gitkeep`, `backend/.gitkeep`, `scripts/.gitkeep`, `deployment/.gitkeep`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Проверки:** статическая проверка содержимого ignore rules и шаблона окружения; автоматическая проверка `git check-ignore` — будет указана после выполнения в рабочем окружении. Проверка приложения не применима: исходники frontend/backend этой задачей не создавались.
+- **Приёмка:** каталоги созданы; правила для `.env`, build, dependencies, caches и временных uploads добавлены; `.env.example` не содержит секретов. Ограничение: фактический запуск frontend/backend не входит в WEB-01.01.
+- **Оговорка:** задача выполнена досрочно по явному разрешению пользователя; G0 остаётся открытым, а дальнейшая реализация imagery заблокирована до прохождения gate.
 
 ## WEB-01.02 — frontend scaffold
 Зависимость: WEB-01.01. Scope: app package/config/entry.
