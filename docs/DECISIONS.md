@@ -34,3 +34,10 @@ Use this log for decisions affecting more than one module. Format: status, conte
 **Context:** The user will perform Russian-network acceptance checks after the first development build. Completing the frontend/backend development foundation does not require implementing satellite-data access.  
 **Decision:** Continue G1 foundation tasks through the first local development build while G0 remains open. Do not implement provider adapters, real STAC search, raster access, imagery rendering, downloads, or claim no-VPN availability before the applicable G0 checks pass. Russian-network tests are deferred until the user receives the dev-build.  
 **Consequences:** G1 work is temporarily authorized as a sequencing exception. G0 remains an independent hard gate for all real data/provider functionality and release claims.
+
+
+## ADR-011 — единая мягкая нейтральная палитра интерфейса
+**Status:** Accepted by explicit user direction (2026-11-17).
+**Context:** Пользователь отклонил зелёную тему и попросил более мягкие цвета во всём проекте.
+**Decision:** Использовать единую холодную графитово-сине-серую палитру с приглушённым голубым основным акцентом и лавандовым дополнительным акцентом для публичного лендинга и браузерного приложения. Не использовать зелёный в UI.
+**Consequences:** Цвета реальных спутниковых изображений и тематических геоданных не перекрашиваются. Состояния warning/error сохраняют семантически различимые оттенки; контраст проверяется по WCAG для текста и интерактивных состояний.
