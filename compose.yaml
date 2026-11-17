@@ -21,7 +21,7 @@ services:
       start_period: 10s
 
   web:
-    image: node:24-alpine
+    image: node:24-bookworm-slim
     working_dir: /workspace
     command: >-
       sh -c "npm ci &&
