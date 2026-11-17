@@ -101,13 +101,22 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Ограничения:** endpoint сообщает только о доступности самого API-процесса; он намеренно не проверяет внешние каталоги, хранилища или provider services.
 
 ## WEB-01.08 — Vite proxy
-**Статус:** READY (2026-11-17).
+**Статус:** IN_PROGRESS (2026-11-17).
 **Зависимости:** WEB-01.02 — DONE; WEB-01.07 — DONE.
 **Goal:** обеспечить frontend dev-server доступ к backend API через same-origin `/api` proxy.
 **Scope:** настроить Vite proxy для `/api`; добавить типизированную конфигурацию API base path и один health API client. Не добавлять UI для диагностики, новые backend endpoints, auth или provider logic.
-**Тесты:** frontend unit test для health client/config; проверка Vite dev server с backend health endpoint через proxy.
+**Тесты:** frontend unit test для health client/config; GitHub Actions должен проверить frontend dev server и реальный backend health endpoint через proxy.
 **Приёмка:** frontend вызывает относительный `/api/v1/health`, запрос проксируется к backend; UI-компоненты не содержат жёсткий `localhost` или backend origin.
 **Не входит:** production reverse proxy, Docker Compose, deployment и реальные Sentinel API.
+
+### Текущая реализация WEB-01.08
+- Vite dev server проксирует `/api` на `SENTINEL_API_PROXY_TARGET`; локальное значение по умолчанию — `http://127.0.0.1:8000`.
+- Добавлены типизированный `API_BASE_PATH` (`/api/v1`) и `HealthResponse`, а также `getHealth()` с относительным same-origin URL.
+- Добавлены unit tests для успешного ответа и HTTP error.
+- Frontend CI расширен: поднимает backend Uvicorn и проверяет `GET /api/v1/health` через Vite proxy.
+- **Изменённые файлы:** `app/vite.config.ts`, `app/src/api/config.ts`, `app/src/api/health.ts`, `app/src/api/health.spec.ts`, `.github/workflows/frontend-build.yml`.
+- **Проверки:** ожидается GitHub Actions frontend CI; локальный запуск тестов в текущей среде не выполнялся.
+- **Ограничения:** proxy предназначен только для Vite development server; production routing не реализуется этой задачей.
 
 ## WEB-01.09 — Docker Compose dev
 Зависимости: WEB-01.02, WEB-01.05. Web + API, healthchecks, volumes, env local ignored; no secrets in image.
