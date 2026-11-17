@@ -62,9 +62,12 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; 
 Приёмка: backend стартует без secrets.
 
 ## WEB-01.06 — error contract/request ID
-Зависимость: WEB-01.05. Middleware request ID и error JSON из API_CONTRACTS. Stack trace только в серверном логировании.
-Тест: endpoint с ошибкой и проверка response.
-Приёмка: no traceback в клиентском ответе.
+**Статус:** READY (проверены зависимости и контракт; 2026-11-17).
+Зависимость: WEB-01.05 — DONE. API contract: `docs/API_CONTRACTS.md`, разделы 2 и 12.
+Scope: request ID для каждого запроса; возвращать его в `X-Request-ID` и в JSON-ошибках; единый формат ошибок для HTTP, validation и непредвиденных исключений. Непредвиденные исключения логировать на сервере с traceback, клиенту возвращать безопасное сообщение. Не добавлять зависимости.
+Тесты: TestClient проверяет request ID/header/body, HTTP error, validation error и скрытие traceback при внутренней ошибке.
+Приёмка: все ошибки соответствуют `{"error":{"code":"...","message":"...","request_id":"...","details":{}}}`; request ID присутствует в ответе; traceback отсутствует в теле ответа.
+Не входит: health endpoint, structured logging framework, новые API endpoints и Sentinel business logic.
 
 ## WEB-01.07 — health endpoint
 Зависимость: WEB-01.05. GET /api/v1/health: status/version/time. Не проверять upstream при каждом health и не раскрывать private details.
