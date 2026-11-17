@@ -8,8 +8,6 @@ describe('App', () => {
 
     expect(wrapper.get('h1').text()).toBe('Sentinel Explorer')
     expect(wrapper.get('.eyebrow').text()).toBe('Браузерная ГИС · разработка')
-    expect(wrapper.get('[role="status"]').text()).toContain(
-      'Функции карты и спутниковых данных ещё не подключены.',
-    )
+    expect(wrapper.get('[role="status"]').text()).toContain('Функции карты и спутниковых данных ещё не подключены.')
   })
 })
