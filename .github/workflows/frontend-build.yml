@@ -107,6 +107,27 @@ jobs:
       - name: Validate Docker Compose configuration
         run: docker compose -f compose.yaml config --quiet
 
+      - name: Verify development ports are bound to localhost
+        run: |
+          docker compose -f compose.yaml config --format json > /tmp/sentinel-compose.json
+          python - <<'PY'
+          import json
+
+          with open("/tmp/sentinel-compose.json", encoding="utf-8") as config_file:
+              config = json.load(config_file)
+
+          expected_ports = {"api": 8000, "web": 5173}
+          for service_name, expected_port in expected_ports.items():
+              ports = config["services"][service_name].get("ports", [])
+              assert len(ports) == 1, f"{service_name}: expected exactly one published port"
+              port = ports[0]
+              assert port.get("host_ip") == "127.0.0.1", (
+                  f"{service_name}: port must bind to localhost, got {port.get('host_ip')!r}"
+              )
+              assert int(port["published"]) == expected_port
+              assert int(port["target"]) == expected_port
+          PY
+
       - name: Start Docker Compose development stack
         run: docker compose -f compose.yaml up -d --wait --wait-timeout 180
 
