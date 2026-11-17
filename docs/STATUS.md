@@ -36,7 +36,7 @@
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.06 — error contract and request ID. WEB-01.05 FastAPI scaffold is implemented and CI-verified in PR #12; merge is pending. G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+WEB-01.06 — error contract and request ID. WEB-01.05 FastAPI scaffold is implemented and merged via PR #12 (merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
