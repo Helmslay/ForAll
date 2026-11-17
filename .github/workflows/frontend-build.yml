@@ -5,6 +5,7 @@ on:
     paths:
       - "app/**"
       - "compose.yaml"
+      - "docs/LOCAL_DEVELOPMENT.md"
       - ".github/workflows/frontend-build.yml"
 
 permissions:
