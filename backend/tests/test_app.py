@@ -43,7 +43,10 @@ def test_http_errors_use_the_api_error_contract() -> None:
 
 def test_validation_errors_use_the_api_error_contract() -> None:
     application = create_app()
-    application.add_api_route("/items", lambda count: {"count": count}, methods=["GET"])
+    def list_items(count: int) -> dict[str, int]:
+        return {"count": count}
+
+    application.add_api_route("/items", list_items, methods=["GET"])
 
     with TestClient(application) as client:
         response = client.get("/items", params={"count": "not-an-integer"})
