@@ -82,9 +82,22 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Ограничения:** российская доступность источников, реальные Sentinel assets и provider integration не проверялись и остаются за G0.
 
 ## WEB-01.07 — health endpoint
-Зависимость: WEB-01.05. GET /api/v1/health: status/version/time. Не проверять upstream при каждом health и не раскрывать private details.
-Тест: TestClient.
-Приёмка: работает без внешней сети.
+**Статус:** IN_REVIEW (2026-11-17).
+**Зависимость:** WEB-01.05 — DONE; error contract/request ID WEB-01.06 — DONE.
+**Контракт:** `docs/API_CONTRACTS.md`, раздел 3.
+**Scope:** добавить `GET /api/v1/health`, возвращающий `status`, `app_version` и UTC `timestamp`. Endpoint не обращается к upstream, не раскрывает host details и не требует secrets.
+**Тесты:** TestClient проверяет HTTP 200, поля ответа, конфигурируемую версию и UTC timestamp; CI запускает Uvicorn и обращается к health endpoint.
+**Приёмка:** endpoint работает без внешней сети и secrets; response соответствует контракту; request ID middleware применяется.
+**Не входит:** provider health, БД, внешние проверки доступности, метрики и мониторинг.
+
+### Результат WEB-01.07 (2026-11-17) — реализация ожидает CI
+- Добавлен `GET /api/v1/health` с `status: ok`, версией из `Settings` и текущим UTC timestamp в ISO 8601.
+- Endpoint не выполняет сетевых запросов и не раскрывает сведения о хосте или окружении.
+- Добавлен TestClient тест на HTTP 200, версию, UTC timestamp и `X-Request-ID`.
+- Uvicorn smoke-check в GitHub Actions переключён с `/openapi.json` на реальный health endpoint.
+- **Изменённые файлы:** `backend/app/main.py`, `backend/tests/test_app.py`, `.github/workflows/backend-tests.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Проверки:** ожидается pinned-dependency CI для PR; до его завершения задача остаётся IN_REVIEW.
+- **Ограничения:** endpoint сообщает только о доступности самого API-процесса; он намеренно не проверяет внешние каталоги, хранилища или provider services.
 
 ## WEB-01.08 — Vite proxy
 Зависимости: WEB-01.02, WEB-01.07. Настроить /api proxy; typed API config; один health client.
