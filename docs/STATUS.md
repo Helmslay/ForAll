@@ -5,7 +5,7 @@
 ## Repository state
 - Presentation landing page: present at /index.html.
 - Landing page README: updated with documentation links.
-- Browser application source: not created yet; only the empty `app/` foundation directory exists.
+- Browser application source: WEB-01.02 frontend scaffold is in progress on `feat/web-01-02-frontend-scaffold`; no dev-build has been verified yet.
 - Backend source: not created yet; only the empty `backend/` foundation directory exists.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
@@ -28,10 +28,10 @@
 - WEB-01.01: completed early with explicit user authorization as an independent repository bootstrap; this does not bypass G0.
 
 ## Current milestone
-G0 — prove data access and legal/technical feasibility.
+G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-00.03 — test STAC search for Perm Krai. WEB-01.01 was completed as a limited exception; further G1 work remains subject to the G0 gate unless separately authorized.
+WEB-01.02 — Vue/Vite/TypeScript frontend scaffold (in progress). After the first dev-build, pause for the user's Russian-network checks before continuing to provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
