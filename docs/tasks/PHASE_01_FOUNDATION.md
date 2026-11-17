@@ -82,7 +82,7 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Ограничения:** российская доступность источников, реальные Sentinel assets и provider integration не проверялись и остаются за G0.
 
 ## WEB-01.07 — health endpoint
-**Статус:** IN_REVIEW (2026-11-17).
+**Статус:** DONE (2026-11-17).
 **Зависимость:** WEB-01.05 — DONE; error contract/request ID WEB-01.06 — DONE.
 **Контракт:** `docs/API_CONTRACTS.md`, раздел 3.
 **Scope:** добавить `GET /api/v1/health`, возвращающий `status`, `app_version` и UTC `timestamp`. Endpoint не обращается к upstream, не раскрывает host details и не требует secrets.
@@ -90,19 +90,24 @@ Scope: request ID для каждого запроса; возвращать е�
 **Приёмка:** endpoint работает без внешней сети и secrets; response соответствует контракту; request ID middleware применяется.
 **Не входит:** provider health, БД, внешние проверки доступности, метрики и мониторинг.
 
-### Результат WEB-01.07 (2026-11-17) — реализация ожидает CI
+### Результат WEB-01.07 (2026-11-17) — DONE
 - Добавлен `GET /api/v1/health` с `status: ok`, версией из `Settings` и текущим UTC timestamp в ISO 8601.
 - Endpoint не выполняет сетевых запросов и не раскрывает сведения о хосте или окружении.
 - Добавлен TestClient тест на HTTP 200, версию, UTC timestamp и `X-Request-ID`.
 - Uvicorn smoke-check в GitHub Actions переключён с `/openapi.json` на реальный health endpoint.
 - **Изменённые файлы:** `backend/app/main.py`, `backend/tests/test_app.py`, `.github/workflows/backend-tests.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
-- **Проверки:** ожидается pinned-dependency CI для PR; до его завершения задача остаётся IN_REVIEW.
+- **Проверки:** GitHub Actions Backend tests run `44113221569` для HEAD `b287a89de93282dac67710930770fbc52d1288b6` — SUCCESS; подтверждены установка pinned dependencies, backend tests и Uvicorn health smoke-check.
+- **PR:** https://github.com/Helmslay/ForAll/pull/14 — merged; merge commit `4894f13558ae09db0fc0f0cedb8ce710c218110c`.
 - **Ограничения:** endpoint сообщает только о доступности самого API-процесса; он намеренно не проверяет внешние каталоги, хранилища или provider services.
 
 ## WEB-01.08 — Vite proxy
-Зависимости: WEB-01.02, WEB-01.07. Настроить /api proxy; typed API config; один health client.
-Тест: frontend dev server получает backend health.
-Приёмка: UI component не содержит жёсткий localhost.
+**Статус:** READY (2026-11-17).
+**Зависимости:** WEB-01.02 — DONE; WEB-01.07 — DONE.
+**Goal:** обеспечить frontend dev-server доступ к backend API через same-origin `/api` proxy.
+**Scope:** настроить Vite proxy для `/api`; добавить типизированную конфигурацию API base path и один health API client. Не добавлять UI для диагностики, новые backend endpoints, auth или provider logic.
+**Тесты:** frontend unit test для health client/config; проверка Vite dev server с backend health endpoint через proxy.
+**Приёмка:** frontend вызывает относительный `/api/v1/health`, запрос проксируется к backend; UI-компоненты не содержат жёсткий `localhost` или backend origin.
+**Не входит:** production reverse proxy, Docker Compose, deployment и реальные Sentinel API.
 
 ## WEB-01.09 — Docker Compose dev
 Зависимости: WEB-01.02, WEB-01.05. Web + API, healthchecks, volumes, env local ignored; no secrets in image.
