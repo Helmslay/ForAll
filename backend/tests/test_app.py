@@ -65,7 +65,7 @@ def test_unexpected_errors_hide_traceback_and_are_logged(caplog) -> None:
 
     application.add_api_route("/failure", fail, methods=["GET"])
 
-    with caplog.at_level(logging.ERROR), TestClient(application) as client:
+    with caplog.at_level(logging.ERROR), TestClient(application, raise_server_exceptions=False) as client:
         response = client.get("/failure")
 
     assert response.status_code == 500
