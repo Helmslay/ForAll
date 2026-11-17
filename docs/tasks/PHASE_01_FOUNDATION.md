@@ -101,7 +101,7 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Ограничения:** endpoint сообщает только о доступности самого API-процесса; он намеренно не проверяет внешние каталоги, хранилища или provider services.
 
 ## WEB-01.08 — Vite proxy
-**Статус:** IN_PROGRESS (2026-11-17).
+**Статус:** DONE (2026-11-17).
 **Зависимости:** WEB-01.02 — DONE; WEB-01.07 — DONE.
 **Goal:** обеспечить frontend dev-server доступ к backend API через same-origin `/api` proxy.
 **Scope:** настроить Vite proxy для `/api`; добавить типизированную конфигурацию API base path и один health API client. Не добавлять UI для диагностики, новые backend endpoints, auth или provider logic.
@@ -115,13 +115,18 @@ Scope: request ID для каждого запроса; возвращать е�
 - Добавлены unit tests для успешного ответа и HTTP error.
 - Frontend CI расширен: поднимает backend Uvicorn и проверяет `GET /api/v1/health` через Vite proxy.
 - **Изменённые файлы:** `app/vite.config.ts`, `app/src/api/config.ts`, `app/src/api/health.ts`, `app/src/api/health.spec.ts`, `.github/workflows/frontend-build.yml`.
-- **Проверки:** ожидается GitHub Actions frontend CI; локальный запуск тестов в текущей среде не выполнялся.
+- **Проверки:** GitHub Actions Frontend build run `44115192957` для HEAD `50a6e7b490d19e6552e2a60f663bb4e955c92200` — SUCCESS. Успешны npm ci, ESLint, Prettier, vue-tsc, Vitest, production build и smoke-check backend health через Vite proxy. Локальный запуск тестов в текущей среде не выполнялся.
+- **PR:** https://github.com/Helmslay/ForAll/pull/15 — merged; merge commit `680c3845a0bc21bce0bb29543073c6262594409f`.
 - **Ограничения:** proxy предназначен только для Vite development server; production routing не реализуется этой задачей.
 
 ## WEB-01.09 — Docker Compose dev
-Зависимости: WEB-01.02, WEB-01.05. Web + API, healthchecks, volumes, env local ignored; no secrets in image.
-Тест: compose config/up.
-Приёмка: оба сервиса запускаются одной командой.
+**Статус:** READY (2026-11-17).
+**Зависимости:** WEB-01.02 — DONE; WEB-01.05 — DONE.
+**Goal:** обеспечить локальный запуск frontend и backend одной командой в согласованной dev-среде.
+**Scope:** добавить минимальный `compose.yaml` для web и API; healthchecks; корректные service dependencies; локальные volumes и env без секретов в image; использовать существующие npm/Python setup. Не добавлять БД, object storage, production reverse proxy, provider integration или новые API endpoints.
+**Тесты:** `docker compose config`; запуск обоих сервисов и проверка frontend и backend health endpoint через compose network.
+**Приёмка:** оба сервиса стартуют одной командой; frontend dev server доступен; backend healthcheck healthy; frontend `/api/v1/health` проходит через Vite proxy внутри compose; secrets отсутствуют в compose и image.
+**Не входит:** production deployment, контейнерная сборка production images, БД, Sentinel providers и G0 bypass.
 
 ## WEB-01.10 — local development guide
 Зависимость: WEB-01.09. Создать docs/LOCAL_DEVELOPMENT.md: prerequisites, install, env, run, test, troubleshooting. Не указывать непроверенные команды как verified.
