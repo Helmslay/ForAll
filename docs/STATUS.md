@@ -35,7 +35,7 @@
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-WEB-01.04 — базовая оболочка приложения — IN_REVIEW; implementation pushed in PR #10, final frontend CI is pending. G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
+UX-01 — единая мягкая нейтральная палитра лендинга и приложения; после завершения продолжить WEB-01.05 (FastAPI scaffold). G1 remains authorized through the first local frontend/backend dev-build; after that build, pause for the user's Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.
