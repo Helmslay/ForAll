@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -37,8 +37,15 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03—WEB-01.10 — PLANNED. Не 
 - **Ограничения:** сетевой интерфейс не отключался специально для отдельного offline build test; подтверждено отсутствие внешнего runtime CDN, но не проведён тест в network-isolated runner. Backend, карта, каталог, спутниковые assets и российская доступность не реализованы/не проверялись. G0 остаётся открытым.
 
 ## WEB-01.03 — frontend quality scripts
-Зависимость: WEB-01.02. Добавить formatter/linter, Vitest, scripts lint/format-check/typecheck/test. Один простой unit test.
-Приёмка: каждый script запускается без сети после install.
+**Статус:** DONE.  
+**Зависимость:** WEB-01.02 — DONE.  
+**Goal:** добавить локальные проверки качества frontend и один unit test без Sentinel business logic.
+**Scope:** ESLint + eslint-config-prettier, Prettier, vue-tsc, Vitest + Vue Test Utils + jsdom; scripts `lint`, `format:check`, `typecheck`, `test`. Подключить команды к frontend GitHub Actions. Добавить один render test для существующего App. Не менять архитектуру приложения.
+**Совместимость:** TypeScript закреплён на 6.0.3, так как проверка выявила несовместимость `vue-tsc@3.3.14` с TypeScript 7.0.2: CLI завершался с `ERR_PACKAGE_PATH_NOT_EXPORTED` до выполнения проверки. Возврат на TS 6 — временное техническое ограничение до поддержки TS 7 инструментами Vue.
+**Изменённые файлы:** `app/package.json`, `app/package-lock.json`, `app/eslint.config.js`, `app/.prettierrc.json`, `app/vite.config.ts`, `app/src/App.spec.ts`, `app/src/App.vue`, `app/src/style.css`, `.github/workflows/frontend-build.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+**Проверки:** GitHub Actions run #25 — `npm ci` PASS (250 packages installed); `npm run lint` PASS без warnings; `npm run format:check` PASS; `npm run typecheck` PASS; `npm test` PASS (1 test); `npm run build` PASS (Vite 8.3.8, 12 modules); dev-server HTTP smoke-check PASS. Lockfile обновлён npm 11.19.1.
+**Acceptance criteria:** все четыре scripts запускаются после установки зависимостей; Vue/TS typecheck проходит; unit test успешно проверяет имя приложения, eyebrow и status; проверки включены в CI. Скрипты используют локально установленные binaries и не обращаются к внешним сервисам по своей конфигурации.
+**Ограничения и follow-up:** отдельный запуск с принудительно отключённым сетевым интерфейсом не выполнялся. `npm ci` сообщил о 7 moderate severity vulnerabilities в dependency tree; точные advisory paths ещё не исследованы, `npm audit fix --force` не запускался. Backend, карта, Sentinel data и доступность из России этой задачей не затрагивались.
 
 ## WEB-01.04 — app shell placeholder
 Зависимость: WEB-01.02. Создать header/sidebar/workspace placeholders на русском. Без фиктивных сцен и спутниковых данных. Render test.
