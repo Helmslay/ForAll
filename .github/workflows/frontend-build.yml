@@ -51,6 +51,13 @@ jobs:
         working-directory: app
         run: npm run lint
 
+      - name: Capture canonical formatting for existing scaffold
+        working-directory: app
+        shell: bash
+        run: |
+          npx prettier --write src/App.spec.ts src/App.vue src/style.css
+          git diff -- src/App.spec.ts src/App.vue src/style.css
+
       - name: Check formatting
         working-directory: app
         run: npm run format:check
