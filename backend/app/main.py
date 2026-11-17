@@ -1,4 +1,5 @@
 import logging
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
@@ -94,6 +95,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             code="INTERNAL_SERVER_ERROR",
             message="Внутренняя ошибка сервера",
         )
+
+    @app.get("/api/v1/health")
+    async def health() -> dict[str, str]:
+        return {
+            "status": "ok",
+            "app_version": app_settings.app_version,
+            "timestamp": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        }
 
     return app
 
