@@ -224,4 +224,4 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Изменённые файлы:** `.github/workflows/frontend-build.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
 - **Acceptance criteria:** audit встроен в CI; high/critical блокируют CI; moderate/low остаются видимыми; все текущие advisory paths классифицированы; несовместимые/force обновления не применялись; точный результат и ограничения задокументированы. Все критерии подтверждены.
 - **Ограничения:** аудит выполнялся на GitHub-hosted runner 2026-11-17 и зависит от актуальной базы npm advisories. Он не является локальным сканированием компьютера пользователя и не подтверждает российскую сетевую доступность.
-- **PR:** https://github.com/Helmslay/ForAll/pull/19 — exact-head CI run `44132980902` SUCCESS; merge ожидает синхронизации итоговой документации и финальной проверки.
+- **PR:** https://github.com/Helmslay/ForAll/pull/19 — merged; initial audit CI run `44132980902` SUCCESS; final exact-head CI run `44133991243` SUCCESS; merge commit `61676aced8f5e24e1f63a53e78c6096b0e7a6d21`.
