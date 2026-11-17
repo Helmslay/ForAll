@@ -28,7 +28,11 @@
 ## 3. Текущий статус
 WEB-00.01 и WEB-00.02 — DONE; G0 остаётся открытым. По явному разрешению пользователя (ADR-010) разрешено продолжить G1 до первого локального dev-build, не дожидаясь российских сетевых проверок. Это исключение не снимает G0 gate: реальные provider adapters, STAC search, raster/imagery, downloads и no-VPN claims остаются заблокированы до соответствующих доказательств. STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
 
-## 4. Реестр задач
+## 4. Сквозные UX-задачи
+Карточка: tasks/UX_01_SOFT_NEUTRAL_PALETTE.md.
+- UX-01 — единая мягкая нейтральная палитра для лендинга и приложения — **IN_PROGRESS** (по согласованию пользователя; ADR-011).
+
+## 5. Реестр задач
 
 ### Публичный лендинг
 Карточка: `tasks/LANDING_PAGE.md`.
@@ -182,7 +186,7 @@ Gate G7: offline tested without network; analytic outputs checked against fixtur
 
 Gate G8: release checklist and data-access report are complete.
 
-## 5. Зависимости, которые нельзя обходить
+## 6. Зависимости, которые нельзя обходить
 - WEB-03.05 зависит от WEB-00.10.
 - Внешний raster reader зависит от WEB-00.06.
 - Tile endpoint зависит от asset model, safe resolver и RGB tests.
@@ -190,14 +194,14 @@ Gate G8: release checklist and data-access report are complete.
 - Offline claim зависит от теста после полного отключения сети.
 - No-VPN claim зависит от WEB-08.09.
 
-## 6. Definition of Ready
+## 7. Definition of Ready
 Dependencies DONE; карточка ясна; input contracts существуют; список затрагиваемых модулей определён; критерии измеримы; fixtures/test env известны.
 
-## 7. Definition of Done
+## 8. Definition of Done
 Scope выполнен; архитектура соблюдена; lint/typecheck/tests pass; критерии карточки pass; нет secrets/mock в production; docs обновлены при смене контрактов; diff просмотрен; commit SHA записан.
 
-## 8. Размер задачи
+## 9. Размер задачи
 Одна задача — одна законченная функция/компонент/adapter/test. Ориентир 1–3 production files плюс тесты. Лёгкой модели выдавать только одну карточку.
 
-## 9. Инструменты разработки
+## 10. Инструменты разработки
 - DEV-00.01 — локальный Windows Runner для автоматических тестов — **IN_PROGRESS** (зависимость WEB-00.02 DONE; требуется однократная регистрация Windows x64 runner и первый успешный запуск).
