@@ -1,15 +1,45 @@
 # Data source test matrix
 
-Initial status of every source is UNKNOWN. Change only with reproducible evidence, report path and date.
+**Scope:** Sentinel-2 L2A pilot, Perm Krai. Catalog discovery and raster asset access are tracked separately.  
+**Rule:** all operational statuses start as `UNKNOWN`; legal/terms review starts as `PENDING`. Change a status only with reproducible evidence, report path and verification date. Public documentation of an endpoint is not evidence of reachability from a Russian backend.
 
-| Provider | Catalog from RU backend | L2A pilot coverage | B02/B03/B04/B08 assets | Range/COG read | Terms reviewed | Decision |
+## Candidate catalog endpoints
+
+| Provider | Purpose | Catalog hostname | Catalog endpoint | Catalog auth (documented) | Catalog status from RU | Notes / evidence |
 |---|---|---|---|---|---|---|
-| Earth Search / Element 84 | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | PENDING | Candidate |
-| Copernicus Data Space | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | PENDING | Candidate |
-| Microsoft Planetary Computer | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | PENDING | Candidate |
-| Other reviewed source | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | PENDING | Not selected |
+| Earth Search / Element 84 | STAC catalog and search | `earth-search.aws.element84.com` | `https://earth-search.aws.element84.com/v1/` | Public endpoint documented; actual access from RU untested | UNKNOWN | [Official API documentation](https://earth-search.aws.element84.com/v1/api.html); [Element 84 endpoint reference](https://element84.com/earth-search/examples/) |
+| Copernicus Data Space Ecosystem (CDSE) | STAC catalog and search | `stac.dataspace.copernicus.eu` | `https://stac.dataspace.copernicus.eu/v1/` | Not yet verified for every required operation; test anonymously first, then document any auth challenge | UNKNOWN | [Official STAC documentation](https://documentation.dataspace.copernicus.eu/APIs/STAC.html). The legacy `catalogue.dataspace.copernicus.eu/stac` endpoint is deprecated. |
+| Microsoft Planetary Computer | STAC catalog and search | `planetarycomputer.microsoft.com` | `https://planetarycomputer.microsoft.com/api/stac/v1` | Official docs describe public anonymous STAC access; RU reachability untested | UNKNOWN | [Official documentation](https://planetarycomputer.microsoft.com/docs/). Asset access may have separate signing/throttling requirements. |
 
-## Required report fields
-provider id; endpoint category; hostname without token/query secret; RU server region or RU ISP/region; test timestamp UTC; DNS; TLS; HTTP status; latency; bytes requested/received; Range status/Content-Range; STAC collection/item if safe; band key/media type; raster read result; checksum; caching/legal status; PASS/FAIL/UNKNOWN; error class; script version.
+## Raster asset endpoints — deliberately separate from catalogs
 
-Never mark a source PASS based only on HTTP 200 from the STAC root.
+| Provider | Purpose | Hostname / endpoint | Auth and URL lifetime | B02 | B03 | B04 | B08 | HTTP Range / COG read | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| Earth Search / Element 84 | Read Sentinel-2 L2A assets | Not fixed here: obtain actual `assets.*.href` from a test Item; record hostname only after inspection | UNKNOWN; inspect returned href and any signing/expiry behavior | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| CDSE | Read Sentinel-2 L2A assets | Not fixed here: inspect actual Item asset hrefs and official download path | UNKNOWN; determine whether OAuth/token is required and how long URLs remain valid | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| Microsoft Planetary Computer | Read Sentinel-2 L2A assets | Not fixed here: inspect actual Item asset hrefs; do not assume catalog hostname is the asset host | UNKNOWN; determine signing/token requirements, expiry and throttling | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+| Other reviewed source | Catalog and raster assets | Not identified | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN | UNKNOWN |
+
+## Storage and application path
+
+| Dependency | Purpose | Hostname / endpoint | Status | Evidence required |
+|---|---|---|---|---|
+| Russian backend → provider catalog | DNS, TCP, TLS, STAC root/collections/search | Per catalog row above | UNKNOWN | Timestamped tests from the intended Russian server |
+| Russian backend → provider assets | HEAD and GET Range; read real raster window | Per actual Item asset href | UNKNOWN | HTTP status, Content-Range, bytes, GDAL/Rasterio read and timing |
+| Backend → Russian object/file storage | Store permitted test output and serve it back | Not selected / not provisioned | UNKNOWN | Write, read, checksum, Range and delete test |
+| User in Russia → application | Website, API, preview and download | Not deployed | UNKNOWN | Tests from independent Russian home and mobile networks without VPN |
+
+## Rights and operational review
+
+| Provider | Sentinel-2 L2A coverage for Perm Krai | Caching allowed | Redistribution / user downloads allowed | Attribution / limits | Legal status | Decision |
+|---|---|---|---|---|---|---|
+| Earth Search / Element 84 | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Candidate only |
+| Copernicus Data Space | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Candidate only |
+| Microsoft Planetary Computer | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Candidate only |
+| Other reviewed source | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Not selected |
+
+## Required test report fields
+
+Provider ID; endpoint category (`catalog` / `asset` / `storage` / `user-app`); hostname without token or signed query; RU server region or RU ISP/region; test timestamp UTC; DNS; TCP; TLS; HTTP status; latency; bytes requested/received; Range status and Content-Range; STAC collection/item if safe; band key and media type; raster read result; checksum; auth and signed-URL expiry behavior; caching/legal status; PASS/FAIL/UNKNOWN; error class; script version; report path.
+
+Never store credentials, access tokens or signed asset query strings in this matrix or reports. Do not infer asset hostnames from catalog hostnames. Never mark a source PASS based only on HTTP 200 from a STAC root or successful search. A band is confirmed only after asset metadata is inspected; a raster read is confirmed only after real bytes are read and the raster is opened.
