@@ -32,6 +32,7 @@
 - WEB-01.04: semantic GIS application shell completed; frontend CI run `44102025691` passed all checks.
 - UX-01: unified soft neutral palette applied to landing and app; frontend CI run `44102877694` and landing CI run `44102877715` passed.
 - WEB-01.10: local development guide and dev-port hardening completed; PR #17 merged, exact-head frontend CI run `44126893666` SUCCESS, merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`.
+- WEB-01.11: dependency audit gate added in PR #19; exact-head frontend CI run `44132980902` SUCCESS. Seven moderate findings were classified as devDependency/transitive paths; zero high/critical findings; no forced updates.
 
 ## Current milestone
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
@@ -39,7 +40,8 @@ G1 — foundation work is temporarily authorized through the first local develop
 ## Next task
 - WEB-01.09 — Docker Compose dev — DONE (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
 - WEB-01.10 — local setup guide and dev-port hardening — DONE (PR #17; exact-head CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`; depends on WEB-01.09).
-- Next: complete WEB-01.11 frontend dependency audit, then perform the first local frontend/backend development build on the user's computer. After that, pause for Russian-network checks.
+- WEB-01.11 — frontend dependency audit — DONE (PR #19; exact-head CI run `44132980902` SUCCESS).
+- Next: perform the first local frontend/backend development build on the user's computer. After that, pause for Russian-network checks.
 - G1 remains authorized through the first local frontend/backend dev-build. The user's local run is not yet verified. After it succeeds, pause for Russian-network checks before provider/data integration.
 
 ## Important blockers
@@ -47,7 +49,7 @@ G1 — foundation work is temporarily authorized through the first local develop
 2. Real Sentinel-2 asset access from a Russian backend has not been proven.
 3. Permission to cache and redistribute each candidate source's data must be reviewed.
 4. The user-facing path from Russian home/mobile networks without VPN has not been tested.
-5. `npm ci` previously reported 7 moderate-severity frontend dependency advisories. WEB-01.11 is in progress to obtain a fresh exact-head npm audit report and classify the affected paths. No forced audit fix has been applied.
+5. Frontend dependency audit reports 7 moderate findings (0 high/critical), all in development-tool/transitive dependency paths (`@vitest/mocker`, `glob`, `minimatch`); Vue is the only production dependency and is not flagged. No forced upgrades were applied. The audit gate is now part of CI; targeted dev-tool upgrades remain optional follow-up work.
 
 ## Status policy
 Update this file when a milestone or material project decision changes. Do not mark a task DONE based only on generated code; follow the acceptance criteria in the task card.
