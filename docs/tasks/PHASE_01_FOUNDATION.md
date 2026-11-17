@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; WEB-01.05 — IN_REVIEW; WEB-01.06—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
