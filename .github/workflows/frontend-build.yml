@@ -29,6 +29,16 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend runtime dependencies
+        run: python -m pip install -r backend/requirements.txt
+
       - name: Generate and commit npm lockfile
         working-directory: app
         shell: bash
@@ -67,13 +77,15 @@ jobs:
         working-directory: app
         run: npm run build
 
-      - name: Smoke-check Vite development server
+      - name: Smoke-check Vite proxy against backend health
         working-directory: app
         shell: bash
         run: |
+          python -m uvicorn app.main:app --app-dir ../backend --host 127.0.0.1 --port 8000 > /tmp/sentinel-api.log 2>&1 &
+          api_pid=$!
           npm run dev -- --port 4173 --strictPort > /tmp/sentinel-vite.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          vite_pid=$!
+          trap 'kill "$vite_pid" "$api_pid" 2>/dev/null || true' EXIT
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:4173/ > /tmp/sentinel-dev.html; then
               break
@@ -81,3 +93,11 @@ jobs:
             sleep 1
           done
           grep -q '<div id="app"></div>' /tmp/sentinel-dev.html
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/api/v1/health > /tmp/sentinel-health.json; then
+              break
+            fi
+            sleep 1
+          done
+          python -c "import json; data=json.load(open('/tmp/sentinel-health.json')); assert data['status'] == 'ok' and data['app_version']"
+
