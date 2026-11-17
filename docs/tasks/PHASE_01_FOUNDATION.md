@@ -109,4 +109,4 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; 
 - **Проверки:** GitHub Actions Backend tests run `44106506251` для commit `1411317e0090a1a49f04cb10af33c43308098fa3` — SUCCESS. `python -m pytest -q`: 2 passed; один upstream DeprecationWarning от связки Starlette/AnyIO. Smoke-check `uvicorn app.main:app --host 127.0.0.1 --port 8000` — сервер запустился без secrets, `GET /openapi.json` вернул HTTP 200.
 - **Acceptance criteria:** Python package и app factory созданы; runtime/test зависимости закреплены; environment settings работают; ASGI entry point импортируется; TestClient проходит; Uvicorn фактически стартует без secrets. Все критерии подтверждены hosted CI.
 - **Ограничения:** endpoints бизнес-логики, health, error contract/request ID, БД, Rasterio/GDAL, provider adapters и Sentinel-функции не добавлялись — это следующие/заблокированные задачи. Локальный запуск на машине пользователя отдельно не выполнялся. G0 остаётся открытым.
-- **PR:** https://github.com/Helmslay/ForAll/pull/12.
+- **PR:** https://github.com/Helmslay/ForAll/pull/12 — merged; merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`.
