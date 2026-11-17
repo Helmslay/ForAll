@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [vue()],
     server: {
+      host: env.SENTINEL_VITE_HOST || '127.0.0.1',
       proxy: {
         '/api': {
           target: env.SENTINEL_API_PROXY_TARGET || 'http://127.0.0.1:8000',
