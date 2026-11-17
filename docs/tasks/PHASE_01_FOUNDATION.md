@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01 — DONE; WEB-01.02—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01 — DONE; WEB-01.02 — IN_PROGRESS; WEB-01.03—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -18,10 +18,13 @@ WEB-01.01 — DONE; WEB-01.02—WEB-01.10 — PLANNED. Не добавлять S
 - **Оговорка:** задача выполнена досрочно по явному разрешению пользователя; G0 остаётся открытым, а дальнейшая реализация imagery заблокирована до прохождения gate.
 
 ## WEB-01.02 — frontend scaffold
-Зависимость: WEB-01.01. Scope: app package/config/entry.
-Создать Vue 3 + Vite + TypeScript, strict TS, lockfile, минимальный App.vue. Не добавлять OpenLayers.
-Тест: install, dev, production build.
-Приёмка: проект собирается offline после установки зависимостей и не использует external runtime CDN.
+**Статус:** IN_PROGRESS.  
+**Зависимость:** WEB-01.01 — DONE.  
+**Goal:** создать минимальный запускаемый frontend без бизнес-логики Sentinel.
+**Scope:** Vue 3 + Vite + TypeScript в каталоге `app/`; strict TypeScript; lockfile; минимальный `App.vue`; локальный dev server и production build. Не добавлять OpenLayers, backend API, mock satellite scenes, external runtime CDN или provider logic.
+**План проверки:** `npm ci`; `npm run build`; smoke-check dev server через HTTP; проверить, что production bundle не зависит от внешнего runtime CDN. Если локальная среда не имеет доступа к npm registry, выполнить те же проверки на GitHub-hosted runner и сохранить lockfile, созданный npm.
+**Acceptance criteria:** package/config/entry созданы; TypeScript strict включён; lockfile зафиксирован; production build проходит; dev server отдаёт приложение; runtime assets собираются локально.
+**Ограничение:** успешная сборка не подтверждает доступность приложения/источников из России. Российские проверки выполняются пользователем после выдачи dev-build; G0 остаётся открыт.
 
 ## WEB-01.03 — frontend quality scripts
 Зависимость: WEB-01.02. Добавить formatter/linter, Vitest, scripts lint/format-check/typecheck/test. Один простой unit test.
