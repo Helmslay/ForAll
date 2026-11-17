@@ -7,7 +7,7 @@
 - Landing page README: updated with documentation links.
 - Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog or imagery is implemented yet; WEB-01.08 now connects the frontend development server to the backend health endpoint through a proxy.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold.
-- Backend source: FastAPI scaffold, request ID middleware, normalized error responses and `GET /api/v1/health` are implemented under `backend/`; WEB-01.08 added the Vite development proxy and typed health client (PR #15 merged; CI run `44115192957` SUCCESS). WEB-01.09 added a two-service Docker Compose development stack (PR #16 merged; CI run `44118409536` SUCCESS), including healthy dependencies and a successful frontend-to-API proxy smoke-check. PR #17 hardens host port publication to localhost only and adds a CI assertion. No database or raster dependencies are included yet.
+- Backend source: FastAPI scaffold, request ID middleware, normalized error responses and `GET /api/v1/health` are implemented under `backend/`; WEB-01.08 added the Vite development proxy and typed health client (PR #15 merged; CI run `44115192957` SUCCESS). WEB-01.09 added a two-service Docker Compose development stack (PR #16 merged; CI run `44118409536` SUCCESS), including healthy dependencies and a successful frontend-to-API proxy smoke-check. WEB-01.10 (PR #17 merged; frontend CI run `44126893666` SUCCESS) hardens host port publication to localhost only and adds a CI assertion; the local development guide is available in `docs/LOCAL_DEVELOPMENT.md`. No database or raster dependencies are included yet.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
@@ -31,14 +31,16 @@
 - WEB-01.03: frontend quality scripts and one unit test completed and CI-verified.
 - WEB-01.04: semantic GIS application shell completed; frontend CI run `44102025691` passed all checks.
 - UX-01: unified soft neutral palette applied to landing and app; frontend CI run `44102877694` and landing CI run `44102877715` passed.
+- WEB-01.10: local development guide and dev-port hardening completed; PR #17 merged, exact-head frontend CI run `44126893666` SUCCESS, merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`.
 
 ## Current milestone
 G1 — foundation work is temporarily authorized through the first local development build by ADR-010. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
 - WEB-01.09 — Docker Compose dev — DONE (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
-- Current: WEB-01.10 — local setup guide — IN_REVIEW (PR #17; updated-head CI pending; depends on WEB-01.09).
-- G1 remains authorized through the first local frontend/backend dev-build. After the user has the first local dev-build, pause for Russian-network checks before provider/data integration.
+- WEB-01.10 — local setup guide and dev-port hardening — DONE (PR #17; exact-head CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`; depends on WEB-01.09).
+- Next: first local frontend/backend development build on the user's computer. After that, pause for Russian-network checks.
+- G1 remains authorized through the first local frontend/backend dev-build. The user's local run is not yet verified. After it succeeds, pause for Russian-network checks before provider/data integration.
 
 ## Important blockers
 1. No provider has been approved as primary.

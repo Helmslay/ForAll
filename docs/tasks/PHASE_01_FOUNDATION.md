@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01—WEB-01.09 — DONE; WEB-01.10 — IN_REVIEW. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01—WEB-01.10 — DONE. WEB-01.10 was merged in PR #17; first local user-side dev-build is still pending. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -139,7 +139,7 @@ Scope: request ID для каждого запроса; возвращать е�
 - **PR:** https://github.com/Helmslay/ForAll/pull/16 — merged; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`.
 
 ## WEB-01.10 — local development guide
-**Статус:** IN_REVIEW.
+**Статус:** DONE (2026-11-17; PR #17 merged).
 **Зависимость:** WEB-01.09 — DONE.
 **Goal:** дать разработчику воспроизводимую инструкцию запуска текущей dev-среды frontend/backend.
 **Scope:** создать `docs/LOCAL_DEVELOPMENT.md` с prerequisites, clone/update, env, Compose run/stop, health checks, frontend/backend tests и troubleshooting; добавить ссылки из README и docs index. В рамках проверки инструкции исправить обнаруженную публикацию dev-портов на всех интерфейсах: ограничить host binding адресом `127.0.0.1` и закрепить это автоматической CI-проверкой. Сделать frontend CI read-only: убрать автоматическую генерацию/отправку lockfile из workflow, оставить `npm ci` как проверку зафиксированного lockfile. Не добавлять новые runtime зависимости и не менять архитектуру.
@@ -147,19 +147,18 @@ Scope: request ID для каждого запроса; возвращать е�
 **Приёмка:** инструкция отражает реальные scripts/ports/services; отдельно объясняет отсутствие обязательного .env и секретов; описывает запуск/остановку и проверки frontend/backend; host-порты api/web опубликованы только на `127.0.0.1` и это проверяется CI; frontend CI не меняет PR-ветку и имеет только `contents: read`; явно не выдаёт CI за проверку компьютера пользователя и не утверждает доступность источников из России.
 **Не входит:** установка/настройка production, провайдеры Sentinel, G0 bypass, новые сервисы.
 
-### Результат WEB-01.10 (2026-11-17) — IN_REVIEW
+### Результат WEB-01.10 (2026-11-17) — DONE
 - Создан `docs/LOCAL_DEVELOPMENT.md`: требования Docker/Compose, получение проекта, environment, запуск, health endpoints, frontend/backend tests, остановка, troubleshooting и ограничения dev-сборки.
-- По итогам проверки безопасности `compose.yaml` изменён так, чтобы frontend/backend публиковались только на loopback `127.0.0.1`; доступ из локальной сети не предоставляется по умолчанию.
-- В frontend CI добавлена проверка итоговой Compose-конфигурации, которая проверяет host IP и соответствие опубликованных/целевых портов для обоих сервисов.
-- Удалён шаг, который генерировал и отправлял `package-lock.json` из CI; workflow теперь только читает репозиторий, а `npm ci` валидирует lockfile без его изменения.
-- Добавлены ссылки на инструкцию в корневой README и карту документации.
-- Frontend CI workflow запускается также при изменении `docs/LOCAL_DEVELOPMENT.md`, чтобы форматирование документа проверялось Prettier.
-- Команды документа сверены с текущими `compose.yaml`, npm scripts, backend requirements и Vite proxy configuration.
+- `compose.yaml` ограничивает публикацию frontend/backend портов адресом `127.0.0.1`; доступ из локальной сети не предоставляется по умолчанию.
+- Frontend CI проверяет итоговую Compose-конфигурацию: host IP и соответствие опубликованных/целевых портов обоих сервисов.
+- Frontend CI больше не генерирует и не отправляет `package-lock.json`; workflow read-only, а `npm ci` проверяет зафиксированный lockfile.
+- Добавлены ссылки на инструкцию в корневой README и карту документации; workflow запускается при изменении `docs/LOCAL_DEVELOPMENT.md`, чтобы Prettier проверял инструкцию.
+- Команды инструкции сверены с `compose.yaml`, npm scripts, backend requirements и Vite proxy configuration.
 - **Изменённые файлы:** `compose.yaml`, `docs/LOCAL_DEVELOPMENT.md`, `README.md`, `docs/README.md`, `docs/AI_WORKFLOW.md`, `docs/START_HERE.md`, `.github/workflows/frontend-build.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
-- **Проверки до CI:** проверена согласованность команд и портов с конфигурациями; после ограничения host binding добавлена автоматическая проверка `127.0.0.1`. Результат обновлённого CI ожидается; lockfile больше не изменяется workflow автоматически. Локально Docker/тесты на машине пользователя не запускались.
-- **Ограничения:** инструкции описывают Docker Compose dev flow. Первый локальный запуск пользователя остаётся неподтверждённым; российская доступность источников данных остаётся отдельным G0 gate. Публикация портов ограничена loopback; удалённый доступ в LAN намеренно не настраивался.
-
-
+- **Проверки:** GitHub Actions Frontend build run `44126893666` для точного PR HEAD `6ba5b3a99ae1c5b7b377bf4cfd630dde5d1d3449` — **SUCCESS**; все 17 шагов прошли, включая npm ci, ESLint, Prettier, vue-tsc, Vitest, production build, Vite/backend smoke-check, `docker compose config`, запуск сервисов до healthy, frontend/API proxy smoke-check и проверку loopback host bindings.
+- **Acceptance criteria:** инструкция соответствует текущим конфигурациям; секреты не требуются; команды запуска/остановки и проверки описаны; оба host-порта ограничены `127.0.0.1` и проверяются CI; CI read-only; российская доступность и локальный запуск пользователя не выдаются за проверенные. Все критерии задачи подтверждены содержимым PR и exact-head CI.
+- **Ограничения:** Docker Engine и браузер на компьютере пользователя отдельно не проверялись; первый локальный запуск остаётся следующим шагом. Доступность источников из России не проверялась и остаётся отдельным G0 gate.
+- **PR:** https://github.com/Helmslay/ForAll/pull/17 — merged; PR HEAD `6ba5b3a99ae1c5b7b377bf4cfd630dde5d1d3449`; exact-head CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`.
 
 ### Результат WEB-01.04 (2026-11-17)
 - Реализована базовая оболочка ГИС: верхняя шапка, компактная левая навигация, центральная рабочая область и статусная строка.
