@@ -7,6 +7,7 @@
 - Landing page README: updated with documentation links.
 - Browser application source: not created yet.
 - Backend source: not created yet.
+- A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
 - Russian upstream access: not verified.
 - User-side access from Russian networks without VPN: not verified.
@@ -22,12 +23,13 @@
 - AI task workflow: documented.
 - Roadmap: documented.
 - Phase task cards: documented for phases 00–08.
+- WEB-00.01 and WEB-00.02: completed as documentation/diagnostic tasks; no provider has been validated.
 
 ## Current milestone
 G0 — prove data access and legal/technical feasibility.
 
 ## Next task
-WEB-00.01 — create and maintain the data source test matrix.
+WEB-00.03 — test STAC search for Perm Krai.
 
 ## Important blockers
 1. No provider has been approved as primary.
