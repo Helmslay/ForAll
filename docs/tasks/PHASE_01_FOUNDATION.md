@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04 — DONE; WEB-01.05 — DONE; WEB-01.06—WEB-01.10 — PLANNED. Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -97,3 +97,16 @@ WEB-01.01 — DONE; WEB-01.02 — DONE; WEB-01.03 — DONE; WEB-01.04—WEB-01.1
 - **Acceptance:** все критерии WEB-01.04 подтверждены кодом и успешным frontend CI.
 - **Ограничения:** реальная карта и интерактивные инструменты не входят в WEB-01.04. Ручная проверка браузеров/устройств не выполнялась. В dependency tree сохраняются 7 moderate npm advisories, ранее отмеченные в STATUS.
 - **PR:** https://github.com/Helmslay/ForAll/pull/10. CI пройден; PR готов к merge.
+
+
+### Результат WEB-01.05 (2026-11-17)
+- Создан минимальный backend package на FastAPI: `backend/app/`, фабрика `create_app()` и экспортируемый ASGI entry point `app.main:app`.
+- Добавлены настройки Pydantic Settings с префиксом `SENTINEL_`, необязательным локальным `.env` и безопасными значениями по умолчанию; для старта секреты не требуются.
+- Runtime и test зависимости закреплены точными версиями в `backend/requirements.txt` и `backend/requirements-dev.txt`.
+- Добавлены два теста: импорт/работа через TestClient без secrets и настройка метаданных через Settings.
+- Добавлен отдельный GitHub Actions workflow для Python 3.12: установка зависимостей, pytest и реальный запуск Uvicorn с HTTP smoke-check.
+- **Изменённые файлы:** `backend/requirements.txt`, `backend/requirements-dev.txt`, `backend/app/__init__.py`, `backend/app/config.py`, `backend/app/main.py`, `backend/tests/test_app.py`, `.github/workflows/backend-tests.yml`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`, `docs/tasks/PHASE_01_FOUNDATION.md`.
+- **Проверки:** GitHub Actions Backend tests run `44106506251` для commit `1411317e0090a1a49f04cb10af33c43308098fa3` — SUCCESS. `python -m pytest -q`: 2 passed; один upstream DeprecationWarning от связки Starlette/AnyIO. Smoke-check `uvicorn app.main:app --host 127.0.0.1 --port 8000` — сервер запустился без secrets, `GET /openapi.json` вернул HTTP 200.
+- **Acceptance criteria:** Python package и app factory созданы; runtime/test зависимости закреплены; environment settings работают; ASGI entry point импортируется; TestClient проходит; Uvicorn фактически стартует без secrets. Все критерии подтверждены hosted CI.
+- **Ограничения:** endpoints бизнес-логики, health, error contract/request ID, БД, Rasterio/GDAL, provider adapters и Sentinel-функции не добавлялись — это следующие/заблокированные задачи. Локальный запуск на машине пользователя отдельно не выполнялся. G0 остаётся открытым.
+- **PR:** https://github.com/Helmslay/ForAll/pull/12.
