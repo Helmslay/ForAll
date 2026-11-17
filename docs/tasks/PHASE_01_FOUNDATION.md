@@ -184,3 +184,28 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Acceptance criteria:** Python package и app factory созданы; runtime/test зависимости закреплены; environment settings работают; ASGI entry point импортируется; TestClient проходит; Uvicorn фактически стартует без secrets. Все критерии подтверждены hosted CI.
 - **Ограничения:** endpoints бизнес-логики, health, error contract/request ID, БД, Rasterio/GDAL, provider adapters и Sentinel-функции не добавлялись — это следующие/заблокированные задачи. Локальный запуск на машине пользователя отдельно не выполнялся. G0 остаётся открытым.
 - **PR:** https://github.com/Helmslay/ForAll/pull/12 — merged; merge commit `b2a8898c006380ad89df8e6c84a84bad3a0aed04`.
+
+
+## WEB-01.11 — frontend dependency audit and severity gate
+
+**Статус:** IN_PROGRESS.  
+**Зависимости:** WEB-01.03 — DONE; WEB-01.10 — DONE.  
+**Goal:** получить актуальный отчёт npm audit для зафиксированного frontend lockfile, классифицировать advisories и не допустить незамеченных high/critical уязвимостей в последующих PR.
+
+**Scope:**
+- Добавить в frontend CI команду `npm audit --audit-level=high` после `npm ci`. Команда должна показывать полный отчёт advisories и завершать CI ошибкой при наличии high/critical.
+- На exact-head CI получить актуальный отчёт и установить затронутые пакеты, advisory paths, severity, production/development dependency scope и наличие безопасного semver-совместимого исправления.
+- Не запускать `npm audit fix --force`, не обновлять весь стек и не менять runtime зависимости без подтверждённой необходимости.
+- Зафиксировать результат и оставшиеся риски в карточке и STATUS.
+
+**Проверки:** exact-head frontend CI; анализ вывода `npm audit`; при изменении lockfile — полный frontend CI.
+
+**Acceptance criteria:**
+- CI выполняет audit на lockfile после `npm ci`.
+- High/critical advisories приводят к failed CI; moderate/low отображаются в отчёте и не скрываются.
+- Все текущие advisories классифицированы по затронутым пакетам и dependency paths.
+- Никакие несовместимые или принудительные обновления не применены.
+- Карточка и STATUS содержат точный результат, дату/CI run и ограничения.
+
+**Не входит:** массовое обновление зависимостей, миграция сборщика/TypeScript, backend dependency audit, runtime-функции приложения.
+
