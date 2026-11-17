@@ -7,7 +7,7 @@
 - Landing page README: updated with documentation links.
 - Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog, backend API or imagery is implemented yet.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold.
-- Backend source: not created yet; only the empty `backend/` foundation directory exists.
+- Backend source: minimal FastAPI scaffold added on branch `feat/web-01-05-fastapi-scaffold`; PR/CI review pending. No business endpoints, database or raster dependencies are included yet.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
