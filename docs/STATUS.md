@@ -46,7 +46,9 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 - WEB-02.03 — responsive panels: DONE (PR #30; exact-head frontend CI run `44332026191` SUCCESS; merge commit `39161d5c1cbedea6756e10ed711c139681313c24`).
 
-- WEB-02.04 — OpenLayers lifecycle — DONE (PR #32; exact-head CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).\n\n- Next task candidate: WEB-02.05 — base map provider abstraction remains gated by G0/source network and licensing checks. Before taking it, verify readiness and dependencies; do not add an unverified tile provider. WEB-02.06 — coordinates/scale is a separate planned task and may be considered only after its readiness check.
+- WEB-02.04 — OpenLayers lifecycle — DONE (PR #32; exact-head CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).
+
+- Next task candidate: WEB-02.05 — base map provider abstraction remains gated by G0/source network and licensing checks. Before taking it, verify readiness and dependencies; do not add an unverified tile provider. WEB-02.06 — coordinates/scale is a separate planned task and may be considered only after its readiness check.
 
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
