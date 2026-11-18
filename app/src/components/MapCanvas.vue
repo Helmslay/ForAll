@@ -6,7 +6,7 @@ const target = ref<HTMLDivElement | null>(null)
 const readout = ref(null)
 let cleanup: () => void = () => {}
 
-function formatResolution(resolutionMeters: number): string {
+function formatResolution(resolutionMeters): string {
   return resolutionMeters >= 1000
     ? `${(resolutionMeters / 1000).toFixed(2)} км/px`
     : `${resolutionMeters.toFixed(1)} м/px`
