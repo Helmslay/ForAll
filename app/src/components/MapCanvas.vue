@@ -2,11 +2,11 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
-const target = ref<HTMLDivElement | null>(null)
+const target = ref(null)
 const readout = ref(null)
-let cleanup: () => void = () => {}
+let cleanup = () => {}
 
-function formatResolution(resolutionMeters): string {
+function formatResolution(resolutionMeters) {
   return resolutionMeters >= 1000
     ? `${(resolutionMeters / 1000).toFixed(2)} км/px`
     : `${resolutionMeters.toFixed(1)} м/px`
