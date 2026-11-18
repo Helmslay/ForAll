@@ -50,7 +50,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 2. Real Sentinel-2 asset access from a Russian backend has not been proven.
 3. Permission to cache and redistribute each candidate source's data must be reviewed.
 4. The user-facing path from Russian home/mobile networks without VPN has not been tested.
-5. Frontend dependency audit reports 7 moderate findings (0 high/critical), all in development-tool/transitive dependency paths (`@vitest/mocker`, `glob`, `minimatch`); Vue is the only production dependency and is not flagged. No forced upgrades were applied. The audit gate is now part of CI; targeted dev-tool upgrades remain optional follow-up work.
+5. Frontend dependency audit state changed on 2026-11-18: PR #21 exact-head CI run `44291002102` reports 13 findings (6 moderate, 7 high) and fails the existing high-severity gate. The visible high finding is `picomatch@4.0.7` (GHSA-fc5q-39xc-vjpf); the advisory has no stated patched release at the time of review. The finding is in the development/build toolchain; the production dependency list currently contains Vue only. Do not bypass the audit gate or force-upgrade the toolchain. Reassess when upstream publishes a fix and verify all dependency paths with a fresh `npm audit`.
 
 ## Status policy
 Update this file when a milestone or material project decision changes. Do not mark a task DONE based only on generated code; follow the acceptance criteria in the task card.
