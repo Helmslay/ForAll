@@ -51,7 +51,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 - WEB-02.05 — base map provider abstraction is BLOCKED by G0/source network and licensing checks; do not add an unverified tile provider.
 - WEB-02.06 — cursor coordinates and map resolution — DONE (PR #35 merged as `b3870808b0b6ada015d5f1cc158abedd86c9621c`; exact-head Frontend build CI run `44358215174` SUCCESS for `3b03c7cbd18a9c5165e2d498c9aca637f28ee900`; tools offline tests run `44357847194` SUCCESS). WGS84 longitude/latitude, local ground resolution and pointerleave empty state are implemented. The audit command was aligned with the existing high/critical threshold; moderate dev-tool findings remain reported.
-- Next task candidate: WEB-02.07 — AOI rectangle draw/clear. Verify readiness and dependencies before starting. WEB-02.05 remains blocked by G0 and source licensing/network checks.
+- Current task: WEB-02.07 — AOI rectangle draw/clear — IN_REVIEW. Local Draw interaction, single AOI feature, WGS84 bbox `[west,south,east,north]`, cancel/clear and zero-area validation are implemented; exact-head frontend CI pending. This work does not bypass G0. WEB-02.05 remains blocked by G0 and source licensing/network checks.
 
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
