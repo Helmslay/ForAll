@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01 — DONE; WEB-02.02 — READY; WEB-02.03—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01 — DONE; WEB-02.02 — DONE; WEB-02.03 — READY; WEB-02.04—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 **Статус:** DONE (2026-11-18).
@@ -16,6 +16,14 @@
 ## WEB-02.02 — desktop app shell
 Зависимость: WEB-02.01. Header, compact navigation rail, workspace, right panel, status bar. Без карты/поиска. Приёмка: карта placeholder получает максимум места и focus видим.
 
+**Статус:** DONE (2026-11-18).
+**Зависимость:** WEB-02.01 — DONE.
+**Результат:** desktop shell собран из верхней панели, компактной 68 px навигационной полосы, центральной рабочей области, контекстной правой панели (280 px) и нижней строки состояния. Карта остаётся главным холстом; placeholder получает keyboard focus и видимый focus ring. На ширине до 900 px правая панель скрывается; на узком экране shell перестраивается в вертикальную компоновку. Функциональность карты/поиска не добавлялась.
+**Изменённые файлы:** `app/src/App.vue`, `app/src/style.css`, `app/src/App.spec.ts`.
+**Проверки:** PR #29 exact-head commit `4c4b3de3fa3f02c90185e7aa1bea4a527984923d`; Frontend build CI run `44331108330` — SUCCESS: npm audit policy, lint, Prettier, typecheck, unit tests, production build, Vite/backend proxy smoke, Compose config, localhost port assertion, Compose start and frontend/API smoke.
+**Приёмка:** все элементы desktop shell присутствуют; центральный placeholder занимает гибкую основную область; keyboard focus доступен; CI прошёл.
+**Ограничения:** визуальная проверка в реальном браузере не выполнялась; карта, поиск, network status, coordinates и scale остаются не реализованы. Это только оболочка.
+**PR:** #29 merged; merge commit `3dc70e8df8e271ec2bacf60b70341a53b01eb9a7`.
 ## WEB-02.03 — responsive panels
 Зависимость: WEB-02.02. Desktop side panel; tablet drawer; mobile bottom sheet. Никаких hover-only controls. Проверить narrow viewport и touch. Приёмка: основные действия доступны на телефоне.
 
