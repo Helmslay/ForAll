@@ -173,6 +173,7 @@ Gate G7: offline tested without network; analytic outputs checked against fixtur
 
 ### Фаза 08 — release
 Карточки: tasks/PHASE_08_RELEASE.md
+- WEB-08.00 — read-only preflight текущего VPS для изолированного публичного demo — **READY** (карточка `tasks/WEB-08.00_STAGING_PREFLIGHT.md`; не открывает порты и не меняет VPS).
 - WEB-08.01 — production Docker config.
 - WEB-08.02 — Nginx reverse proxy.
 - WEB-08.03 — HTTPS/security headers.
