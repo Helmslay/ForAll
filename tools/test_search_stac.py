@@ -1,4 +1,7 @@
+import subprocess
+import sys
 import unittest
+from pathlib import Path
 from datetime import datetime, timezone
 
 from check_stac import CheckError, Provider
@@ -18,6 +21,17 @@ NOW = datetime(2026, 11, 18, 9, 0, tzinfo=timezone.utc)
 
 
 class SearchStacTests(unittest.TestCase):
+    def test_cli_help_exits_successfully(self):
+        script = Path(__file__).with_name("search_stac.py")
+        result = subprocess.run(
+            [sys.executable, str(script), "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--provider", result.stdout)
+
     def collections(self, _url, _host, _timeout):
         return 200, {
             "collections": [
