@@ -57,3 +57,15 @@
 - следующая задача.
 
 Статус `DONE` — только когда все критерии приёмки проверены. Иначе `IN_REVIEW` или `BLOCKED`.
+
+
+## 7. Ещё не реализованные этапы автоматизации
+Не считать эти возможности доступными, пока соответствующие задачи не закрыты и не проверены:
+
+1. **Реальный systemd rollback drill** в отдельной временной staging unit на VPS — ещё не выполнен. Текущие staging-тесты подменяют systemctl/systemd-run.
+2. **AGENT-TERM-READY-01** — закрыть readiness gates: guarded deploy/rollback, диагностика VPS, совместимость state, проверка GitHub repo ID, numeric actor ID и минимальных permissions отдельной очереди.
+3. **AGENT-TERM-01** — только после READY реализовать отдельный terminal worker под sentinel-ops, GitHub Issues command queue, ограниченные shell-сессии, аудит и fail-closed.
+4. **Root broker** — отдельное независимое одноразовое подтверждение root-команд; GitHub Issue/comment не является вторым фактором. WebAuthn/passkey требует отдельного согласования.
+5. После реализации — staging, rollback, проверка ограничений и end-to-end тест с мобильного клиента. До этого не заявлять, что ChatGPT имеет прямой VPS shell.
+
+Порядок продолжения: реальный systemd rollback → завершить AGENT-DEPLOY-02 → AGENT-TERM-READY-01 → AGENT-TERM-01. Не перескакивать через зависимости.
