@@ -76,8 +76,8 @@ Gate G1: новый разработчик запускает проект по 
 - WEB-02.02 — desktop app shell — **DONE** (PR #29 merged; exact-head frontend CI run `44331108330` SUCCESS; merge commit `3dc70e8df8e271ec2bacf60b70341a53b01eb9a7`).
 - WEB-02.03 — responsive panels — **DONE** (PR #30 merged; exact-head frontend CI run `44332026191` SUCCESS; merge commit `39161d5c1cbedea6756e10ed711c139681313c24`).
 - WEB-02.04 — OpenLayers lifecycle — **DONE** (PR #32 merged; exact-head Frontend build CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).
-- WEB-02.05 — base map provider abstraction.
-- WEB-02.06 — координаты и масштаб.
+- WEB-02.05 — base map provider abstraction — **BLOCKED** (G0/source network and licensing gate remains open).
+- WEB-02.06 — cursor coordinates and map resolution — **DONE** (PR #35; exact-head Frontend build CI run `44357847121` SUCCESS; tools offline tests run `44357847194` SUCCESS).
 - WEB-02.07 — AOI draw/clear.
 - WEB-02.08 — search form shell.
 

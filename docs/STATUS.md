@@ -49,7 +49,9 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 - WEB-02.04 — OpenLayers lifecycle — DONE (PR #32; exact-head CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).
 
-- Next task candidate: WEB-02.05 — base map provider abstraction remains gated by G0/source network and licensing checks. Before taking it, verify readiness and dependencies; do not add an unverified tile provider. WEB-02.06 — coordinates/scale is a separate planned task and may be considered only after its readiness check.
+- WEB-02.05 — base map provider abstraction is BLOCKED by G0/source network and licensing checks; do not add an unverified tile provider.
+- WEB-02.06 — cursor coordinates and map resolution — DONE (PR #35; exact-head Frontend build CI run `44357847121` SUCCESS; tools offline tests run `44357847194` SUCCESS). WGS84 longitude/latitude, local ground resolution and pointerleave empty state are implemented. The audit command was aligned with the existing high/critical threshold; moderate dev-tool findings remain reported.
+- Next task candidate: WEB-02.07 — AOI rectangle draw/clear. Verify readiness and dependencies before starting. WEB-02.05 remains blocked by G0 and source licensing/network checks.
 
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 

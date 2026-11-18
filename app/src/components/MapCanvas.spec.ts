@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import MapCanvas from './MapCanvas.vue'
 
@@ -7,6 +8,9 @@ const mapMocks = vi.hoisted(() => ({
     updateSize: ReturnType<typeof vi.fn>
     setTarget: ReturnType<typeof vi.fn>
     dispose: ReturnType<typeof vi.fn>
+    on: ReturnType<typeof vi.fn>
+    getView: ReturnType<typeof vi.fn>
+    pointerMoveHandler?: (event: { coordinate: number[] }) => void
   }>,
 }))
 
@@ -15,6 +19,15 @@ vi.mock('ol/Map.js', () => ({
     updateSize = vi.fn()
     setTarget = vi.fn()
     dispose = vi.fn()
+    getView = vi.fn(() => ({
+      getResolution: () => 12.34,
+      getProjection: () => 'EPSG:3857',
+    }))
+    on = vi.fn((_type: string, handler: (event: { coordinate: number[] }) => void) => {
+      this.pointerMoveHandler = handler
+      return { target: this }
+    })
+    pointerMoveHandler?: (event: { coordinate: number[] }) => void
 
     constructor(_options: { target: HTMLElement }) {
       mapMocks.instances.push(this)
@@ -26,6 +39,10 @@ vi.mock('ol/View.js', () => ({
   default: class MockView {
     constructor(_options: { center: number[]; zoom: number }) {}
   },
+}))
+
+vi.mock('ol/Observable.js', () => ({
+  unByKey: vi.fn(),
 }))
 
 const resizeObservers: MockResizeObserver[] = []
@@ -48,6 +65,7 @@ afterEach(() => {
   mapMocks.instances.length = 0
   resizeObservers.length = 0
   vi.unstubAllGlobals()
+  vi.clearAllMocks()
   vi.restoreAllMocks()
 })
 
@@ -67,18 +85,39 @@ describe('MapCanvas', () => {
     wrapper.unmount()
   })
 
-  it('disconnects the observer, detaches and disposes the map on unmount', () => {
+  it('disconnects the observer, map event, pointer listener and map on unmount', async () => {
     vi.stubGlobal('ResizeObserver', MockResizeObserver)
-
+    const { unByKey } = await import('ol/Observable.js')
     const wrapper = mount(MapCanvas)
     const map = mapMocks.instances[0]
     const observer = resizeObservers[0]
+    const target = wrapper.get('.map-canvas-target').element
+    const removeListener = vi.spyOn(target, 'removeEventListener')
 
     wrapper.unmount()
 
     expect(observer?.disconnect).toHaveBeenCalledOnce()
+    expect(unByKey).toHaveBeenCalledOnce()
+    expect(removeListener).toHaveBeenCalledWith('pointerleave', expect.any(Function))
     expect(map?.setTarget).toHaveBeenCalledWith(undefined)
     expect(map?.dispose).toHaveBeenCalledOnce()
+  })
+
+  it('shows WGS84 longitude/latitude and local map resolution for the cursor', async () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+
+    const wrapper = mount(MapCanvas)
+    mapMocks.instances[0]?.pointerMoveHandler?.({ coordinate: [1113194.9, 2273030.9] })
+    await nextTick()
+
+    expect(wrapper.get('.map-readout').text()).toContain('Lon 10.00000, Lat 20.00000')
+    expect(wrapper.get('.map-readout').text()).toContain('м/px')
+
+    wrapper.get('.map-canvas-target').element.dispatchEvent(new Event('pointerleave'))
+    await nextTick()
+    expect(wrapper.get('.map-readout').text()).toBe('Курсор вне карты')
+
+    wrapper.unmount()
   })
 
   it('creates an independent map instance after a remount without console errors', () => {

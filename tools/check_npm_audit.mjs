@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { evaluateAuditReport } from "./npm_audit_policy.mjs";
 
-const result = spawnSync("npm", ["audit", "--json"], {
+const result = spawnSync("npm", ["audit", "--audit-level=high", "--json"], {
   encoding: "utf8",
   maxBuffer: 10 * 1024 * 1024,
 });
