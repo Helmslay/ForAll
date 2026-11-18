@@ -101,6 +101,33 @@ class SearchStacTests(unittest.TestCase):
         )
         self.assertEqual(report["error_stage"], "SEARCH_SCHEMA")
 
+
+    def test_http_error_is_reported_safely(self):
+        def fail(*_args):
+            raise CheckError("SEARCH_HTTP", "HTTPError", 503)
+
+        report = search_provider(
+            PROVIDER, now=NOW, json_getter=self.collections, request_json=fail,
+        )
+        self.assertEqual(report["error_stage"], "SEARCH_HTTP")
+        self.assertEqual(report["error_http_status"], 503)
+
+    def test_timeout_is_reported_safely(self):
+        def fail(*_args):
+            raise CheckError("SEARCH_HTTP", "TimeoutError")
+
+        report = search_provider(
+            PROVIDER, now=NOW, json_getter=self.collections, request_json=fail,
+        )
+        self.assertEqual(report["error_class"], "TimeoutError")
+
+    def test_invalid_collections_schema_fails(self):
+        report = search_provider(
+            PROVIDER, now=NOW,
+            json_getter=lambda *_args: (200, {"not_collections": []}, 1.0),
+        )
+        self.assertEqual(report["error_stage"], "COLLECTIONS_SCHEMA")
+
     def test_external_next_link_is_blocked(self):
         report = search_provider(
             PROVIDER, now=NOW, json_getter=self.collections,
