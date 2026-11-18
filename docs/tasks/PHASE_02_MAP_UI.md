@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.04 — DONE; WEB-02.05—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.04 — DONE; WEB-02.05 — BLOCKED by G0; WEB-02.06 — READY; WEB-02.07—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 **Статус:** DONE (2026-11-18).
@@ -51,7 +51,15 @@
 Зависимость: WEB-02.04 и сетевой gate для источника подложки. URL не хардкодить в component; attribution/license; tile error state. Приёмка: provider заменяем и проверен из РФ.
 
 ## WEB-02.06 — cursor coordinates/scale
-Зависимость: WEB-02.04. Координаты WGS84 и масштаб/разрешение; корректный lon/lat order; empty state вне карты. Тест известной координаты.
+
+**Статус:** READY (2026-11-18).
+**Зависимости:** WEB-02.04 — DONE; G0 не требуется, так как задача не подключает внешние источники.
+**Цель:** показывать координаты курсора в WGS84 и текущее разрешение карты, не завися от наличия базовой подложки.
+**Scope:** обработка pointer move на OpenLayers map; преобразование координат из проекции карты в WGS84 с явным порядком longitude/latitude; отображение координат и разрешения в доступной строке состояния; явное пустое состояние, когда курсор вне карты; очистка обработчиков при unmount.
+**Тесты:** известная projected coordinate преобразуется в ожидаемые longitude/latitude; форматирование координат и разрешения проверяется; pointerleave очищает координаты; cleanup удаляет события; существующие lifecycle tests остаются зелёными.
+**Критерии приёмки:** координаты всегда отображаются в порядке lon, lat; разрешение выводится в метрах на пиксель с корректной локальной point-resolution; вне карты отображается пустое состояние; подписки и DOM listeners снимаются при unmount; полный frontend CI проходит.
+**Не входит:** базовая карта, imagery, provider URLs, AOI, измерительные инструменты, backend/API и сетевые запросы.
+**Readiness:** OpenLayers Map, DOM target, projection utilities и Vitest/jsdom доступны; задача независима от G0 и может выполняться на пустом холсте.
 
 ## WEB-02.07 — AOI rectangle draw/clear
 Зависимость: WEB-02.04. Rectangle interaction, geometry and WGS84 bbox, clear, validate non-empty area, remove interaction after mode exits. Приёмка: bbox имеет [west,south,east,north].
