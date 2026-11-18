@@ -78,7 +78,7 @@ Gate G1: новый разработчик запускает проект по 
 - WEB-02.04 — OpenLayers lifecycle — **DONE** (PR #32 merged; exact-head Frontend build CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).
 - WEB-02.05 — base map provider abstraction — **BLOCKED** (G0/source network and licensing gate remains open).
 - WEB-02.06 — cursor coordinates and map resolution — **DONE** (PR #35 merged; exact-head Frontend build CI run `44358215174` SUCCESS for `3b03c7cbd18a9c5165e2d498c9aca637f28ee900`; tools offline tests run `44357847194` SUCCESS; merge commit `b3870808b0b6ada015d5f1cc158abedd86c9621c`).
-- WEB-02.07 — AOI draw/clear.
+- WEB-02.07 — AOI rectangle draw/clear — **READY** (WEB-02.04 and WEB-02.06 DONE; local-only, no G0/provider dependency).
 - WEB-02.08 — search form shell.
 
 Gate G2: пользователь создаёт AOI и видит bbox.
