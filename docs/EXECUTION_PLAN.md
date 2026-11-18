@@ -72,7 +72,7 @@ Gate G1: новый разработчик запускает проект по 
 
 ### Фаза 02 — карта и UI
 Карточки: tasks/PHASE_02_MAP_UI.md
-- WEB-02.01 — CSS design tokens — **IN_PROGRESS** (semantic palette/spacing/radius/typography tokens; focus and contrast checks in progress).
+- WEB-02.01 — CSS design tokens — **BLOCKED** (implementation and static contrast/token checks prepared in PR #25; exact-head frontend CI run `44311648232` stopped at existing npm audit gate: 7 high + 6 moderate advisories; UI checks did not run. Resolve dependency-security blocker without force upgrades, then rerun full CI).
 - WEB-02.02 — desktop app shell.
 - WEB-02.03 — responsive panels.
 - WEB-02.04 — OpenLayers lifecycle.
