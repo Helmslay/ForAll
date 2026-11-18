@@ -50,7 +50,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 - WEB-02.04 — OpenLayers lifecycle — DONE (PR #32; exact-head CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).
 
 - WEB-02.05 — base map provider abstraction is BLOCKED by G0/source network and licensing checks; do not add an unverified tile provider.
-- Next task: WEB-02.06 — cursor coordinates and map resolution — READY. Dependency WEB-02.04 is DONE; implementation can use the empty OpenLayers canvas without bypassing G0.
+- Current task: WEB-02.06 — cursor coordinates and map resolution — IN_REVIEW. WGS84 pointer coordinates, local point resolution and pointerleave empty state are implemented; exact-head frontend CI is pending. This work uses the empty canvas and does not bypass G0.
 
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
