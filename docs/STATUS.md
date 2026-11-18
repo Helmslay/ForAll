@@ -43,7 +43,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 - WEB-01.10 — local setup guide and dev-port hardening — DONE (PR #17; exact-head CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`; depends on WEB-01.09).
 - WEB-01.11 — frontend dependency audit — DONE (PR #19; exact-head CI run `44132980902` SUCCESS).
 - First local frontend/backend development build on the user's Windows computer: VERIFIED 2026-11-18 (manual smoke test). G1 local-run milestone is complete for the current scaffold.
-- Next: begin G0 network validation with the existing allowlisted `tools/check_stac.py` from the user's Windows computer with VPN/proxy disabled. This is only a user-network baseline; a separate test from an actual Russian-hosted backend is still required before selecting a provider or implementing imagery.
+- Current task: WEB-00.03 — implement and validate bounded STAC Search for the Berezniki pilot AOI (100 km radius, rolling 30-day UTC window, Sentinel-2 L2A). The diagnostic script and offline tests have been added; test execution is pending. Next user-side step after offline tests pass: run `python tools/search_stac.py --all` from the Windows computer in Russia with VPN/proxy disabled. This remains user-network evidence only; a separate Russian-backend test and asset/raster/legal checks are still required before provider selection or imagery implementation.
 
 ## Important blockers
 1. No provider has been approved as primary.
