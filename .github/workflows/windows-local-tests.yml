@@ -39,4 +39,4 @@ jobs:
 
       - name: Compile Python files
         shell: pwsh
-        run: python -m py_compile tools/check_stac.py tools/test_check_stac.py
+        run: python -m py_compile tools/check_stac.py tools/test_check_stac.py tools/search_stac.py tools/test_search_stac.py

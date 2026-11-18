@@ -13,7 +13,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from check_stac import PROVIDERS, Provider, CheckError, get_json, USER_AGENT, AllowlistedRedirectHandler
+from check_stac import PROVIDERS, Provider, CheckError, get_json, USER_AGENT
 
 CENTER_LON = 56.8204
 CENTER_LAT = 59.4091
@@ -21,6 +21,30 @@ RADIUS_KM = 100
 PAGE_LIMIT = 100
 MAX_PAGES = 3
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
+
+
+class SameHostHTTPSRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Allow redirects only to the exact provider HTTPS origin."""
+
+    def __init__(self, allowed_hostname: str):
+        super().__init__()
+        self.allowed_hostname = allowed_hostname
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        try:
+            parsed = urllib.parse.urlsplit(newurl)
+            port = parsed.port
+        except ValueError:
+            raise urllib.error.URLError("redirect blocked") from None
+        if (
+            parsed.scheme != "https"
+            or parsed.hostname != self.allowed_hostname
+            or port not in (None, 443)
+            or parsed.username
+            or parsed.password
+        ):
+            raise urllib.error.URLError("redirect blocked") from None
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def make_circle_polygon(lon: float = CENTER_LON, lat: float = CENTER_LAT,
@@ -54,8 +78,18 @@ def is_l2a_collection(collection: dict[str, Any]) -> bool:
 
 
 def _safe_url(url: str, hostname: str) -> str:
-    parsed = urllib.parse.urlsplit(url)
-    if parsed.scheme != "https" or parsed.hostname != hostname or parsed.port not in (None, 443) or parsed.username or parsed.password:
+    try:
+        parsed = urllib.parse.urlsplit(url)
+        port = parsed.port
+    except ValueError:
+        raise CheckError("PAGINATION", "ExternalOrUnsafeLinkBlocked") from None
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != hostname
+        or port not in (None, 443)
+        or parsed.username
+        or parsed.password
+    ):
         raise CheckError("PAGINATION", "ExternalOrUnsafeLinkBlocked")
     return url
 
@@ -70,7 +104,7 @@ def _request_json(url: str, hostname: str, timeout: float, method: str,
     request = urllib.request.Request(url, data=data, headers=headers, method=method)
     started = time.monotonic()
     try:
-        opener = urllib.request.build_opener(AllowlistedRedirectHandler(hostname))
+        opener = urllib.request.build_opener(SameHostHTTPSRedirectHandler(hostname))
         with opener.open(request, timeout=timeout) as response:
             body = response.read(MAX_RESPONSE_BYTES + 1)
             status = response.status
@@ -155,11 +189,16 @@ def search_provider(provider: Provider, timeout: float = 20.0,
             elapsed_total += elapsed
             if not isinstance(page, dict) or page.get("type") != "FeatureCollection" or not isinstance(page.get("features"), list):
                 raise CheckError("SEARCH_SCHEMA", "InvalidFeatureCollection")
+            if len(page["features"]) > PAGE_LIMIT:
+                raise CheckError("SEARCH_LIMIT", "PageItemLimitExceeded")
+            links = page.get("links", [])
+            if not isinstance(links, list):
+                raise CheckError("PAGINATION", "InvalidLinksSchema")
             pages += 1
             for feature in page["features"]:
                 if isinstance(feature, dict):
                     summaries.append(_item_summary(feature))
-            next_link = next((link for link in page.get("links", [])
+            next_link = next((link for link in links
                               if isinstance(link, dict) and link.get("rel") == "next"), None)
             if not next_link:
                 break
@@ -171,7 +210,12 @@ def search_provider(provider: Provider, timeout: float = 20.0,
             method = str(next_link.get("method", "GET")).upper()
             if method not in {"GET", "POST"}:
                 raise CheckError("PAGINATION", "UnsupportedNextMethod")
-            payload = next_link.get("body") if method == "POST" else None
+            if method == "POST":
+                payload = next_link.get("body")
+                if not isinstance(payload, dict):
+                    raise CheckError("PAGINATION", "InvalidNextBody")
+            else:
+                payload = None
         report["pages_checked"] = pages
         report["item_count"] = len(summaries)
         report["items"] = summaries

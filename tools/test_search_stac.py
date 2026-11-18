@@ -1,6 +1,8 @@
 import subprocess
 import sys
 import unittest
+import urllib.error
+import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -9,6 +11,7 @@ from search_stac import (
     is_l2a_collection,
     make_circle_polygon,
     search_provider,
+    SameHostHTTPSRedirectHandler,
 )
 
 
@@ -149,6 +152,52 @@ class SearchStacTests(unittest.TestCase):
         )
         self.assertEqual(report["error_stage"], "PAGINATION")
         self.assertEqual(report["error_class"], "ExternalOrUnsafeLinkBlocked")
+
+    def test_redirect_rejects_nonstandard_port_and_userinfo(self):
+        handler = SameHostHTTPSRedirectHandler("mock.example")
+        request = urllib.request.Request("https://mock.example/start")
+        for target in (
+            "https://mock.example:8443/redirect",
+            "https://user@mock.example/redirect",
+        ):
+            with self.subTest(target=target):
+                with self.assertRaises(urllib.error.URLError):
+                    handler.redirect_request(request, None, 302, "Found", {}, target)
+
+    def test_page_item_limit_is_enforced(self):
+        features = [{"type": "Feature", "id": f"ITEM_{index}"} for index in range(101)]
+        report = search_provider(
+            PROVIDER, now=NOW, json_getter=self.collections,
+            request_json=self.search_fn(features),
+        )
+        self.assertEqual(report["error_stage"], "SEARCH_LIMIT")
+        self.assertEqual(report["error_class"], "PageItemLimitExceeded")
+
+    def test_invalid_links_schema_fails(self):
+        report = search_provider(
+            PROVIDER, now=NOW, json_getter=self.collections,
+            request_json=lambda *_args: (200, {
+                "type": "FeatureCollection", "features": [], "links": "invalid",
+            }, 1.0),
+        )
+        self.assertEqual(report["error_stage"], "PAGINATION")
+        self.assertEqual(report["error_class"], "InvalidLinksSchema")
+
+    def test_post_next_link_requires_object_body(self):
+        report = search_provider(
+            PROVIDER, now=NOW, json_getter=self.collections,
+            request_json=lambda *_args: (200, {
+                "type": "FeatureCollection", "features": [],
+                "links": [{
+                    "rel": "next",
+                    "href": "https://mock.example/stac/v1/search?page=next",
+                    "method": "POST",
+                    "body": [],
+                }],
+            }, 1.0),
+        )
+        self.assertEqual(report["error_stage"], "PAGINATION")
+        self.assertEqual(report["error_class"], "InvalidNextBody")
 
     def test_pagination_is_bounded(self):
         calls = []

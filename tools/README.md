@@ -17,6 +17,10 @@ python -m unittest discover -s tools -p 'test_*.py' -v
 
 Exit codes: `0` all requested checks passed; `1` at least one connectivity/HTTP/STAC check failed; `2` invalid command-line arguments. Reports contain hostnames and status/latency only; do not add credentials or signed URLs.
 
+## CI offline tests
+
+The offline tools suite also runs on a GitHub-hosted Ubuntu runner for pull requests and pushes to `main` via `.github/workflows/tools-offline-tests.yml`. It does not contact external STAC providers. The self-hosted Windows workflow remains an additional check on the user's Windows environment and is restricted to `main`.
+
 ## Автоматический запуск тестов на Windows-компьютере
 
 Для запуска тестов на собственном компьютере используется self-hosted GitHub Actions Runner с меткой `sentinel-local`.
