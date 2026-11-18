@@ -16,7 +16,7 @@ export type MapReadout = {
 export type AOIBbox = [west: number, south: number, east: number, north: number] | null
 
 export type OpenLayersMapController = {
-  setAoiDrawing: (enabled: boolean) => void
+  setAoiDrawing: (enabled?: boolean) => void
   clearAoi: () => void
   dispose: () => void
 }
