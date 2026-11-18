@@ -2,9 +2,13 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import App from './App.vue'
 
+function mountApp() {
+  return mount(App, { global: { stubs: { MapCanvas: true } } })
+}
+
 describe('App', () => {
   it('renders the desktop GIS shell and its semantic landmarks', () => {
-    const wrapper = mount(App)
+    const wrapper = mountApp()
 
     expect(wrapper.get('header').text()).toContain('Sentinel Explorer')
     expect(wrapper.get('aside[aria-label="Боковая панель приложения"]').element.tagName).toBe('ASIDE')
@@ -16,13 +20,12 @@ describe('App', () => {
     expect(wrapper.text()).toContain('Слои')
     expect(wrapper.text()).toContain('Измерения')
     expect(wrapper.get('.context-panel').text()).toContain('Панель инструментов')
-    expect(wrapper.get('[role="status"]').text()).toContain('Карта не подключена')
-    expect(wrapper.get('#map-placeholder-title').text()).toContain('Карта будет подключена')
-    expect(wrapper.get('.map-placeholder').attributes('tabindex')).toBe('0')
+    expect(wrapper.get('[role="status"]').text()).toContain('Пустой холст OpenLayers')
+    expect(wrapper.find('map-canvas-stub').exists()).toBe(true)
   })
 
   it('opens and closes the contextual panel using touch-sized controls', async () => {
-    const wrapper = mount(App)
+    const wrapper = mountApp()
     const toggle = wrapper.get('.panel-toggle')
 
     expect(toggle.attributes('aria-expanded')).toBe('false')
@@ -40,7 +43,7 @@ describe('App', () => {
   })
 
   it('closes the contextual panel when its backdrop is activated', async () => {
-    const wrapper = mount(App)
+    const wrapper = mountApp()
 
     await wrapper.get('.panel-toggle').trigger('click')
     await wrapper.get('.panel-backdrop').trigger('click')
