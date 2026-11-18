@@ -20,6 +20,7 @@ CENTER_LAT = 59.4091
 RADIUS_KM = 100
 PAGE_LIMIT = 100
 MAX_PAGES = 3
+MAX_ITEMS = PAGE_LIMIT * MAX_PAGES
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
 
@@ -55,9 +56,21 @@ def is_l2a_collection(collection: dict[str, Any]) -> bool:
 
 def _safe_url(url: str, hostname: str) -> str:
     parsed = urllib.parse.urlsplit(url)
-    if parsed.scheme != "https" or parsed.hostname != hostname or parsed.port not in (None, 443) or parsed.username or parsed.password:
+    if (parsed.scheme != "https" or parsed.hostname != hostname
+            or parsed.port not in (None, 443) or parsed.username or parsed.password):
         raise CheckError("PAGINATION", "ExternalOrUnsafeLinkBlocked")
     return url
+
+
+class _SearchRedirectHandler(AllowlistedRedirectHandler):
+    """Allow redirects only to the same allowlisted HTTPS origin on port 443."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        try:
+            _safe_url(newurl, self.allowed_hostname)
+        except (CheckError, ValueError):
+            raise urllib.error.URLError("redirect blocked") from None
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def _request_json(url: str, hostname: str, timeout: float, method: str,
@@ -70,7 +83,7 @@ def _request_json(url: str, hostname: str, timeout: float, method: str,
     request = urllib.request.Request(url, data=data, headers=headers, method=method)
     started = time.monotonic()
     try:
-        opener = urllib.request.build_opener(AllowlistedRedirectHandler(hostname))
+        opener = urllib.request.build_opener(_SearchRedirectHandler(hostname))
         with opener.open(request, timeout=timeout) as response:
             body = response.read(MAX_RESPONSE_BYTES + 1)
             status = response.status
@@ -92,13 +105,14 @@ def _request_json(url: str, hostname: str, timeout: float, method: str,
 
 def _item_summary(item: dict[str, Any]) -> dict[str, Any]:
     properties = item.get("properties") if isinstance(item.get("properties"), dict) else {}
+    item_datetime = properties.get("datetime") or properties.get("start_datetime")
     summary: dict[str, Any] = {
         "id": item.get("id") if isinstance(item.get("id"), str) else None,
         "collection": item.get("collection") if isinstance(item.get("collection"), str) else None,
-        "datetime": properties.get("datetime") or properties.get("start_datetime"),
+        "datetime": item_datetime if isinstance(item_datetime, str) else None,
     }
     cloud = properties.get("eo:cloud_cover")
-    if isinstance(cloud, (int, float)) and not isinstance(cloud, bool):
+    if isinstance(cloud, (int, float)) and not isinstance(cloud, bool) and math.isfinite(cloud):
         summary["cloud_cover"] = cloud
     return summary
 
@@ -150,28 +164,43 @@ def search_provider(provider: Provider, timeout: float = 20.0,
         pages = 0
         elapsed_total = 0.0
         method = "POST"
+        next_link = None
         while pages < MAX_PAGES:
             _, page, elapsed = request_json(search_url, provider.hostname, timeout, method, payload)
             elapsed_total += elapsed
-            if not isinstance(page, dict) or page.get("type") != "FeatureCollection" or not isinstance(page.get("features"), list):
+            if (not isinstance(page, dict) or page.get("type") != "FeatureCollection"
+                    or not isinstance(page.get("features"), list)
+                    or not isinstance(page.get("links"), list)):
                 raise CheckError("SEARCH_SCHEMA", "InvalidFeatureCollection")
+            features = page["features"]
+            if len(features) > PAGE_LIMIT or len(summaries) + len(features) > MAX_ITEMS:
+                raise CheckError("SEARCH_LIMIT", "ItemLimitExceeded")
+            if any(not isinstance(feature, dict) for feature in features):
+                raise CheckError("SEARCH_SCHEMA", "InvalidFeature")
             pages += 1
-            for feature in page["features"]:
-                if isinstance(feature, dict):
-                    summaries.append(_item_summary(feature))
-            next_link = next((link for link in page.get("links", [])
+            summaries.extend(_item_summary(feature) for feature in features)
+
+            next_link = next((link for link in page["links"]
                               if isinstance(link, dict) and link.get("rel") == "next"), None)
             if not next_link:
                 break
-            report["has_more"] = True
             href = next_link.get("href")
             if not isinstance(href, str):
                 raise CheckError("PAGINATION", "InvalidNextLink")
             search_url = _safe_url(urllib.parse.urljoin(search_url, href), provider.hostname)
-            method = str(next_link.get("method", "GET")).upper()
+            next_method = next_link.get("method", "GET")
+            if not isinstance(next_method, str):
+                raise CheckError("PAGINATION", "UnsupportedNextMethod")
+            method = next_method.upper()
             if method not in {"GET", "POST"}:
                 raise CheckError("PAGINATION", "UnsupportedNextMethod")
-            payload = next_link.get("body") if method == "POST" else None
+            if method == "POST":
+                payload = next_link.get("body")
+                if not isinstance(payload, dict):
+                    raise CheckError("PAGINATION", "InvalidNextBody")
+            else:
+                payload = None
+
         report["pages_checked"] = pages
         report["item_count"] = len(summaries)
         report["items"] = summaries
