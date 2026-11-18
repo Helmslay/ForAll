@@ -75,7 +75,7 @@ Gate G1: новый разработчик запускает проект по 
 - WEB-02.01 — CSS design tokens — **DONE** (PR #28 merged; exact-head frontend CI run `44329428142` SUCCESS; merge commit `d7a13244e6d06615995f48561523149bb21f9c79`).
 - WEB-02.02 — desktop app shell — **DONE** (PR #29 merged; exact-head frontend CI run `44331108330` SUCCESS; merge commit `3dc70e8df8e271ec2bacf60b70341a53b01eb9a7`).
 - WEB-02.03 — responsive panels — **DONE** (PR #30 merged; exact-head frontend CI run `44332026191` SUCCESS; merge commit `39161d5c1cbedea6756e10ed711c139681313c24`).
-- WEB-02.04 — OpenLayers lifecycle.
+- WEB-02.04 — OpenLayers lifecycle — **READY** (DoR verified; task card defines component boundary, cleanup, resize behavior, jsdom tests and non-goals).
 - WEB-02.05 — base map provider abstraction.
 - WEB-02.06 — координаты и масштаб.
 - WEB-02.07 — AOI draw/clear.
