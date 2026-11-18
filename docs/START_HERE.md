@@ -89,6 +89,8 @@
 - жизненный цикл пустого OpenLayers canvas реализован (WEB-02.04 DONE); базовая подложка, каталог Sentinel-2, raster viewer и загрузка снимков ещё не реализованы;
 - первичный провайдер Sentinel-2 не выбран; доступ к реальным asset-файлам из российского backend и пользовательских сетей без VPN не подтверждён; выбор базовой подложки также остаётся gated до проверки источника и лицензии;
 - milestone G1 временно разрешён по ADR-010 до первого локального frontend/backend dev-build; G0 остаётся открытым и блокирует provider/raster implementation;
-- WEB-01.10 — DONE: PR #17 merged (merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`); frontend CI run `44126893666` для точного PR HEAD `6ba5b3a99ae1c5b7b377bf4cfd630dde5d1d3449` — SUCCESS.\n- WEB-02.04 — DONE: PR #32 merged (merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`); exact-head Frontend build CI run `44339512145` — SUCCESS. Реализованы пустой MapCanvas, минимальный View, ResizeObserver updateSize и cleanup; imagery/provider не добавлялись.\n- WEB-02.05 (base map provider abstraction) остаётся gated до проверки сетевой доступности и лицензии. Проверяй `docs/STATUS.md` для следующей задачи и readiness.
+- WEB-01.10 — DONE: PR #17 merged (merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`); frontend CI run `44126893666` для точного PR HEAD `6ba5b3a99ae1c5b7b377bf4cfd630dde5d1d3449` — SUCCESS.
+- WEB-02.04 — DONE: PR #32 merged (merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`); exact-head Frontend build CI run `44339512145` — SUCCESS. Реализованы пустой MapCanvas, минимальный View, ResizeObserver updateSize и cleanup; imagery/provider не добавлялись.
+- WEB-02.05 (base map provider abstraction) остаётся gated до проверки сетевой доступности и лицензии. Проверяй `docs/STATUS.md` для следующей задачи и readiness.
 
 Перед началом всегда перепроверь `docs/STATUS.md` и ветку репозитория: состояние могло измениться.
