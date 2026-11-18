@@ -77,7 +77,7 @@ Gate G1: новый разработчик запускает проект по 
 - WEB-02.03 — responsive panels — **DONE** (PR #30 merged; exact-head frontend CI run `44332026191` SUCCESS; merge commit `39161d5c1cbedea6756e10ed711c139681313c24`).
 - WEB-02.04 — OpenLayers lifecycle — **DONE** (PR #32 merged; exact-head Frontend build CI run `44339512145` SUCCESS; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`).
 - WEB-02.05 — base map provider abstraction — **BLOCKED** (G0/source network and licensing gate remains open).
-- WEB-02.06 — cursor coordinates and map resolution — **READY** (depends on WEB-02.04 DONE; no external data/provider dependency).
+- WEB-02.06 — cursor coordinates and map resolution — **IN_REVIEW** (WGS84 pointer readout and local map resolution implemented; exact-head CI pending).
 - WEB-02.07 — AOI draw/clear.
 - WEB-02.08 — search form shell.
 
