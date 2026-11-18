@@ -1,9 +1,17 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. Все задачи PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01 — DONE; WEB-02.02 — READY; WEB-02.03—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
-Зависимость: WEB-01.04. Один CSS token file: background/surfaces/text/primary/warning/error/spacing/radius/type. Проверить контраст и prefers-reduced-motion. Приёмка: компоненты используют tokens.
+**Статус:** DONE (2026-11-18).
+**Зависимость:** WEB-01.04 — DONE.
+**Goal:** семантические CSS-токены для цветов, spacing, radius и typography.
+**Результат:** в `app/src/style.css` добавлены 71 semantic tokens; существующие компоненты переведены на токены без изменения палитры ADR-011; добавлен общий `:focus-visible`; `prefers-reduced-motion` сохранён.
+**Проверки:** статический scan — нет recursive token declarations и hard-coded color literals вне `:root`; WCAG contrast ratios для основных text/background пар выше 4.5:1. Exact-head Frontend build CI run `44329428142` для commit `747b4ae1dd803263884cc8729a61047252d7b438` — SUCCESS: npm ci, temporary audit-policy tests, audit, lint, format check, typecheck, unit tests, production build, backend proxy smoke, Compose config, localhost port assertion, Compose start and frontend/API smoke all passed.
+**Изменённые файлы:** `app/src/style.css`.
+**Приёмка:** токены применены; контраст проверен; reduced-motion сохранён; полный frontend CI пройден.
+**Ограничения:** задача не добавляет карту, каталоги, imagery, provider adapters или backend functionality; G0 остаётся открытым.
+**PR:** #28 merged; merge commit `d7a13244e6d06615995f48561523149bb21f9c79`.
 
 ## WEB-02.02 — desktop app shell
 Зависимость: WEB-02.01. Header, compact navigation rail, workspace, right panel, status bar. Без карты/поиска. Приёмка: карта placeholder получает максимум места и focus видим.
