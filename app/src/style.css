@@ -55,14 +55,7 @@
   --radius-xl: 11px;
   --radius-2xl: 14px;
 
-  --font-family-sans:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-size-xs: 8px;
   --font-size-sm: 9px;
   --font-size-md: 10px;
@@ -123,12 +116,7 @@ a:focus-visible,
   min-height: 100vh;
   flex-direction: column;
   background:
-    radial-gradient(
-      ellipse at 54% -22%,
-      rgba(var(--color-glow-rgb), 0.12),
-      transparent 48%
-    ),
-    var(--color-background);
+    radial-gradient(ellipse at 54% -22%, rgba(var(--color-glow-rgb), 0.12), transparent 48%), var(--color-background);
 }
 
 .app-header {
@@ -348,12 +336,7 @@ h1 {
   border: 1px solid rgba(var(--color-border-rgb), 0.14);
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(
-      ellipse at 50% 42%,
-      rgba(var(--color-glow-rgb), 0.15),
-      transparent 48%
-    ),
-    var(--color-map-surface);
+    radial-gradient(ellipse at 50% 42%, rgba(var(--color-glow-rgb), 0.15), transparent 48%), var(--color-map-surface);
 }
 
 .placeholder-grid {
