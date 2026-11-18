@@ -5,7 +5,7 @@
 ## Repository state
 - Presentation landing page: present at `/index.html`; GIS-first redesign LP-01 is complete in PR #9. The concept map is explicitly illustrative; browser GIS functionality is not claimed as implemented.
 - Landing page README: updated with documentation links.
-- Browser application source: minimal Vue 3/Vite/TypeScript scaffold is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. No map, catalog or imagery is implemented yet; WEB-01.08 now connects the frontend development server to the backend health endpoint through a proxy.
+- Browser application source: Vue 3/Vite/TypeScript shell is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. The map area is still a placeholder; OpenLayers lifecycle is the next READY task. Catalog and imagery are not implemented. WEB-01.08 connects the frontend development server to the backend health endpoint through a proxy.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold. npm audit retains a fail-closed high/critical gate with one temporary, exact dev-tool advisory exception (ADR-013).
 - Backend source: FastAPI scaffold, request ID middleware, normalized error responses and `GET /api/v1/health` are implemented under `backend/`; WEB-01.08 added the Vite development proxy and typed health client (PR #15 merged; CI run `44115192957` SUCCESS). WEB-01.09 added a two-service Docker Compose development stack (PR #16 merged; CI run `44118409536` SUCCESS), including healthy dependencies and a successful frontend-to-API proxy smoke-check. WEB-01.10 (PR #17 merged; frontend CI run `44126893666` SUCCESS) hardens host port publication to localhost only and adds a CI assertion; the local development guide is available in `docs/LOCAL_DEVELOPMENT.md`. No database or raster dependencies are included yet.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
@@ -46,7 +46,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 - WEB-02.03 — responsive panels: DONE (PR #30; exact-head frontend CI run `44332026191` SUCCESS; merge commit `39161d5c1cbedea6756e10ed711c139681313c24`).
 
-- Next roadmap candidate: WEB-02.04 — OpenLayers lifecycle. It remains PLANNED; before starting, verify its dependencies, task card, Definition of Ready and actual frontend structure. Do not add a base-map provider or imagery at this stage.
+- Next task: WEB-02.04 — OpenLayers lifecycle — READY. Dependencies WEB-02.02 and WEB-02.03 are DONE; task card now defines component ownership, ResizeObserver cleanup, jsdom lifecycle tests and explicit non-goals. Do not add a base-map provider or imagery at this stage.
 
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
