@@ -35,3 +35,5 @@
 - Контраст токенов на background/surface проверен по WCAG formula: text 14.52/12.73, muted 8.31/7.29, primary 9.58/8.41, info 9.57/8.39, warning 10.26/9.00, error 8.08/7.08; subtle 5.40/4.73 (background/surface соответственно). Все превышают 4.5:1.
 - Полный frontend CI ещё не завершён; задача не DONE до успешных exact-head checks.
 - G0 остаётся открытым; изменения не подключают карту, provider или внешние данные.
+
+- **CI blocker:** exact-head Frontend build run `44311648232` for `d5aaba2a44935f97d0a90ebed936762070e81215` failed at `npm audit --audit-level=high` before lint/format/typecheck/unit/build steps. Audit reported 13 advisories (7 high, 6 moderate), including high `picomatch` through Vite/Vue tooling. No CSS-related failure was reached. Do not bypass audit or use `npm audit fix --force`; WEB-02.01 is BLOCKED pending a separately reviewed dependency remediation and rerun of exact-head frontend CI.
