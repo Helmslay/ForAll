@@ -102,3 +102,5 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - Проверки в изолированной Python-среде по коду, полученному из ветки: 16 тестов PASS; compile для `search_stac.py` и `test_search_stac.py` PASS. Для изолированного запуска импорт `check_stac` предоставлялся минимальным тестовым stub; полный запуск из checkout репозитория ещё не подтверждён.
 - Реальные запросы к провайдерам не выполнялись. Российский STAC Search без VPN/proxy остаётся обязательным пользовательским испытанием.
 - Статус WEB-00.03 остаётся IN_PROGRESS; критерии приёмки по реальным Item и пользовательской сети не закрыты.
+
+- Чтобы офлайн-проверки выполнялись на каждом PR, добавлен GitHub-hosted workflow `.github/workflows/tools-offline-tests.yml` (Ubuntu, Python 3.12, только offline suite и py_compile); Windows workflow также компилирует STAC Search script/tests. Workflow не обращается к провайдерам. Результат CI для текущего PR ожидается отдельно.
