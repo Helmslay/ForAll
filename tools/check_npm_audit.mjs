@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { evaluateAuditReport } from "./npm_audit_policy.mjs";
 
 const result = spawnSync("npm", ["audit", "--json"], {
@@ -20,7 +21,8 @@ try {
   process.exit(2);
 }
 
-const { accepted, blocked } = evaluateAuditReport(report);
+const lockfile = JSON.parse(readFileSync("package-lock.json", "utf8"));
+const { accepted, blocked } = evaluateAuditReport(report, lockfile);
 const counts = report.metadata?.vulnerabilities ?? {};
 console.log("npm audit severity counts:", JSON.stringify(counts));
 
