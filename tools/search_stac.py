@@ -55,9 +55,13 @@ def is_l2a_collection(collection: dict[str, Any]) -> bool:
 
 
 def _safe_url(url: str, hostname: str) -> str:
-    parsed = urllib.parse.urlsplit(url)
+    try:
+        parsed = urllib.parse.urlsplit(url)
+        port = parsed.port
+    except ValueError:
+        raise CheckError("PAGINATION", "ExternalOrUnsafeLinkBlocked") from None
     if (parsed.scheme != "https" or parsed.hostname != hostname
-            or parsed.port not in (None, 443) or parsed.username or parsed.password):
+            or port not in (None, 443) or parsed.username or parsed.password):
         raise CheckError("PAGINATION", "ExternalOrUnsafeLinkBlocked")
     return url
 
