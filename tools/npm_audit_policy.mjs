@@ -2,7 +2,7 @@ export const TEMPORARY_ALLOWED_ADVISORY = "https://github.com/advisories/GHSA-fc
 export const TEMPORARY_ALLOWED_PACKAGE = "picomatch";
 export const TEMPORARY_ALLOWED_VERSION = "4.0.7";
 
-export function evaluateAuditReport(report) {
+export function evaluateAuditReport(report, lockfile) {
   if (!report || typeof report !== "object" || !report.vulnerabilities) {
     throw new TypeError("npm audit report has no vulnerabilities object");
   }
@@ -16,7 +16,7 @@ export function evaluateAuditReport(report) {
     const nodes = Array.isArray(vulnerability.nodes) ? vulnerability.nodes : [];
     const via = Array.isArray(vulnerability.via) ? vulnerability.via : [];
     const packagePath = nodes.length === 1 ? nodes[0] : null;
-    const installed = packagePath ? report.packages?.[packagePath] : null;
+    const installed = packagePath ? lockfile?.packages?.[packagePath] : null;
     const exactException =
       name === TEMPORARY_ALLOWED_PACKAGE &&
       vulnerability.dev === true &&
