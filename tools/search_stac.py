@@ -69,7 +69,8 @@ def _request_json(url: str, hostname: str, timeout: float, method: str,
     request = urllib.request.Request(url, data=data, headers=headers, method=method)
     started = time.monotonic()
     try:
-        opener = urllib.request.build_opener(AllowlistedRedirectHandler(hostname))\n        with opener.open(request, timeout=timeout) as response:
+        opener = urllib.request.build_opener(AllowlistedRedirectHandler(hostname))
+        with opener.open(request, timeout=timeout) as response:
             body = response.read(MAX_RESPONSE_BYTES + 1)
             status = response.status
     except urllib.error.HTTPError as exc:
