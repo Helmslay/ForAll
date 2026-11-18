@@ -28,8 +28,8 @@ console.log("npm audit severity counts:", JSON.stringify(counts));
 
 if (accepted.length) {
   console.warn(
-    "TEMPORARY RISK ACCEPTANCE: allowing only devDependency picomatch@4.0.7 " +
-      "for GHSA-fc5q-39xc-vjpf. This is not a remediation; review and remove " +
+    "TEMPORARY RISK ACCEPTANCE: allowing only the exact dev-only dependency paths propagated from " +
+      "picomatch@4.0.7 / GHSA-fc5q-39xc-vjpf. This is not remediation; review and remove " +
       "the exception when an upstream fix is available.",
   );
 }
