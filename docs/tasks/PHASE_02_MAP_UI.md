@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01 — IN_PROGRESS; WEB-02.02—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01 — BLOCKED; WEB-02.02—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 Зависимость: WEB-01.04. Один CSS token file: background/surfaces/text/primary/warning/error/spacing/radius/type. Проверить контраст и prefers-reduced-motion. Приёмка: компоненты используют tokens.
