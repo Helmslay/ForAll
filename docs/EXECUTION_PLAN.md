@@ -26,7 +26,7 @@
     G8 Production release
 
 ## 3. Текущий статус
-WEB-00.01 и WEB-00.02 — DONE; G0 остаётся открытым. Первый локальный Windows dev-build пользователя успешно проверен 2026-11-18 и зафиксирован в `docs/STATUS.md`. По явному разрешению пользователя (ADR-010) разрешено продолжить G1 до первого локального dev-build, не дожидаясь российских сетевых проверок. Это исключение не снимает G0 gate: реальные provider adapters, STAC search, raster/imagery, downloads и no-VPN claims остаются заблокированы до соответствующих доказательств. STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
+WEB-00.01 и WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS (безопасный STAC Search для тестового AOI Березников); G0 остаётся открытым. Первый локальный Windows dev-build пользователя успешно проверен 2026-11-18 и зафиксирован в `docs/STATUS.md`. По явному разрешению пользователя (ADR-010) разрешено продолжить G1 до первого локального dev-build, не дожидаясь российских сетевых проверок. Это исключение не снимает G0 gate: реальные provider adapters, STAC search, raster/imagery, downloads и no-VPN claims остаются заблокированы до соответствующих доказательств. STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
 
 ## 4. Сквозные UX-задачи
 Карточка: tasks/UX_01_SOFT_NEUTRAL_PALETTE.md.
@@ -43,7 +43,7 @@ WEB-00.01 и WEB-00.02 — DONE; G0 остаётся открытым. Перв�
 Карточки: tasks/PHASE_00_SOURCE_ACCESS.md
 - WEB-00.01 — каталог сетевых зависимостей — **DONE**.
 - WEB-00.02 — безопасная проверка STAC root/collections — **DONE**.
-- WEB-00.03 — тестовый STAC search для Пермского края (следующая задача; начать с простого baseline запуска существующего checker из Windows без VPN, затем добавить безопасный STAC search test).
+- WEB-00.03 — тестовый STAC Search для Березников (радиус 100 км, последние 30 суток UTC, Sentinel-2 L2A; три allowlisted каталога) — **IN_PROGRESS**. Реализовать безопасный поиск и offline tests, затем получить реальный отчёт с Windows-компьютера пользователя в России без VPN/proxy. Карточка: `tasks/PHASE_00_SOURCE_ACCESS.md`.
 - WEB-00.04 — безопасный snapshot test item.
 - WEB-00.05 — проверка четырёх каналов и asset metadata.
 - WEB-00.06 — HTTP Range и COG read.
