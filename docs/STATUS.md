@@ -33,7 +33,7 @@
 - WEB-01.04: semantic GIS application shell completed; frontend CI run `44102025691` passed all checks.
 - UX-01: unified soft neutral palette applied to landing and app; frontend CI run `44102877694` and landing CI run `44102877715` passed.
 - WEB-01.10: local development guide and dev-port hardening completed; PR #17 merged, exact-head frontend CI run `44126893666` SUCCESS, merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`.
-- WEB-01.11: dependency audit gate added in PR #19; initial audit CI run `44132980902` SUCCESS; final exact-head CI run `44133991243` SUCCESS. Seven moderate findings were classified as devDependency/transitive paths; zero high/critical findings; no forced updates.
+- WEB-01.11: dependency audit gate added in PR #19; exact-head CI run `44133991243` passed on 2026-11-17 with 7 moderate and 0 high/critical findings. On 2026-11-18, frontend CI run `44291002102` for PR #21 failed at `npm audit --audit-level=high`: current registry report shows 13 findings (6 moderate, 7 high). The visible high advisory is GHSA-fc5q-39xc-vjpf affecting `picomatch@4.0.7`; the advisory currently has no stated patched version. This is a newly surfaced advisory state, not a code change in PR #21. No forced dependency upgrades or audit bypass were applied.
 
 ## Current milestone
 G1 — first local frontend/backend development build verified on the user's Windows computer on 2026-11-18. G0 remains open and blocks real provider/raster implementation.
