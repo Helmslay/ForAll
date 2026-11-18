@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
 const target = ref(null)
 const readout = ref(/** @type {import('./openLayersMap').MapReadout} */ null)
 let cleanup = () => {}
 
-/** @param {number} resolutionMeters */
-function formatResolution(resolutionMeters) {
+function formatResolution(resolutionMeters = readout.resolutionMeters) {
   return resolutionMeters >= 1000
     ? `${(resolutionMeters / 1000).toFixed(2)} км/px`
     : `${resolutionMeters.toFixed(1)} м/px`
@@ -16,7 +15,10 @@ function formatResolution(resolutionMeters) {
 onMounted(() => {
   if (target.value) {
     cleanup = createOpenLayersMap(target.value, (nextReadout) => {
-      readout.value = nextReadout
+      readout.longitude = nextReadout?.longitude ?? 0
+      readout.latitude = nextReadout?.latitude ?? 0
+      readout.resolutionMeters = nextReadout?.resolutionMeters ?? 0
+      readout.hasCursor = nextReadout !== null
     })
   }
 })
@@ -36,7 +38,7 @@ onBeforeUnmount(() => {
       <p>OpenLayers инициализирован. Базовая карта, спутниковые снимки и геоданные пока не подключены.</p>
     </div>
     <div class="map-readout" aria-label="Координаты курсора и разрешение карты">
-      <template v-if="readout">
+      <template v-if="readout.hasCursor">
         <span>Lon {{ readout.longitude.toFixed(5) }}, Lat {{ readout.latitude.toFixed(5) }}</span>
         <span>{{ formatResolution(readout.resolutionMeters) }}</span>
       </template>
