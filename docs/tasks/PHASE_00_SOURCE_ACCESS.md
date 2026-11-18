@@ -84,5 +84,11 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 
 **Промежуточный результат (2026-11-18):**
 - Задача формализована по ранее согласованным параметрам. Предварительный root/collections baseline с компьютера пользователя в России без VPN: Planetary Computer PASS; Earth Search root PASS / collections timeout; CDSE RemoteDisconnected. Это не является STAC Search.
-- Реализация и offline tests ещё не выполнены. Реальные STAC Search results ожидаются после запуска на пользовательском компьютере.
+- Добавлен диагностический `tools/search_stac.py`: AOI polygon 64 vertices, rolling UTC 30-day window, L2A collection discovery из фактического `/collections`, STAC POST Search, ограничение 3 страниц × 100 Items, same-host HTTPS pagination/redirect checks и отчёт без asset hrefs.
+- Добавлен `tools/test_search_stac.py` с тестами геометрии, обнаружения коллекций, safe Item summary, пустого поиска, HTTP/timeout/schema errors, внешнего next-link rejection и pagination cap.
+- Обновлён `tools/README.md` с командами и ограничениями.
+- **Изменённые файлы:** `tools/search_stac.py`, `tools/test_search_stac.py`, `tools/README.md`, эта карточка и `docs/EXECUTION_PLAN.md`.
+- **Проверки:** автоматические тесты и py_compile ещё не запускались: в текущей рабочей среде нет сетевого доступа к GitHub для получения checkout репозитория. Требуется запуск пользователем из локальной копии: `python -m unittest discover -s tools -p 'test_*.py' -v`, затем `python -m py_compile tools/search_stac.py tools/test_search_stac.py`.
+- **Следующий шаг:** получить результат offline tests; исправить ошибки, если будут. После этого запустить `python tools/search_stac.py --all` на Windows-компьютере в России при выключенных VPN/proxy и сохранить фактический отчёт.
+- **Статус приёмки:** реализация добавлена, но не проверена исполнением; реальные STAC Search results ещё не получены.
 
