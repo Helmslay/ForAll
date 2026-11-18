@@ -3,9 +3,10 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
 const target = ref(null)
-const readout = ref(null)
+const readout = ref(/** @type {import('./openLayersMap').MapReadout} */ (null))
 let cleanup = () => {}
 
+/** @param {number} resolutionMeters */
 function formatResolution(resolutionMeters) {
   return resolutionMeters >= 1000
     ? `${(resolutionMeters / 1000).toFixed(2)} км/px`
