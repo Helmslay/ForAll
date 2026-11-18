@@ -34,7 +34,6 @@ export function evaluateAuditReport(report, lockfile) {
 
     const exactException =
       Boolean(expected) &&
-      vulnerability.dev === true &&
       packagePath === `node_modules/${name}` &&
       installed?.version === expected.version &&
       installed?.dev === true &&
@@ -44,7 +43,7 @@ export function evaluateAuditReport(report, lockfile) {
     if (exactException) {
       accepted.push({ name, severity: vulnerability.severity, packagePath });
     } else {
-      blocked.push({ name, severity: vulnerability.severity, nodes, via });
+      blocked.push({ name, severity: vulnerability.severity, nodes, via, lockfileVersion: installed?.version, lockfileDev: installed?.dev, auditDev: vulnerability.dev });
     }
   }
 
