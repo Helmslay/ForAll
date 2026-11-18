@@ -176,7 +176,7 @@ def search_provider(provider: Provider, timeout: float = 20.0,
         report["items"] = summaries
         report["search_latency_ms"] = elapsed_total
         report["status"] = "PASS"
-        report["has_more"] = bool(report["has_more"] and pages >= MAX_PAGES)
+        report["has_more"] = bool(next_link and pages >= MAX_PAGES)
     except CheckError as exc:
         report["error_stage"] = exc.stage
         report["error_class"] = exc.error_class
