@@ -37,16 +37,18 @@
 - WEB-01.12: temporary user-approved risk acceptance for GHSA-fc5q-39xc-vjpf implemented in PR #27, merged as `f65060be3a9f862a20e2473cc2e4ea3ed26471aa`; exact-head frontend CI run `44328382848` SUCCESS. Exception is limited to the reviewed dev-only picomatch dependency graph and expires/requires review by 2026-12-02. This is not a vulnerability fix.
 - WEB-02.01: semantic CSS design tokens completed in PR #28, merged as `d7a13244e6d06615995f48561523149bb21f9c79`; exact-head frontend CI run `44329428142` SUCCESS, including npm audit policy tests, lint, format, typecheck, unit tests, production build, backend proxy smoke, Compose config/localhost binding and Compose frontend/API smoke.
 - WEB-02.02: desktop app shell completed in PR #29, merged as `3dc70e8df8e271ec2bacf60b70341a53b01eb9a7`; exact-head frontend CI run `44331108330` SUCCESS, including lint, format, typecheck, unit tests, production build, backend proxy smoke and Compose frontend/API smoke.
+- WEB-02.03: responsive contextual panels completed in PR #30, merged as `39161d5c1cbedea6756e10ed711c139681313c24`; exact-head frontend CI run `44332026191` SUCCESS. Tablet drawer, mobile bottom sheet, explicit touch-sized controls and backdrop dismissal are implemented; physical-device visual review remains outstanding.
 
 ## Current milestone
 G1 — first local frontend/backend development build verified on the user's Windows computer on 2026-11-18. G0 remains open and blocks real provider/raster implementation.
 
 ## Next task
-- WEB-01.09 — Docker Compose dev — DONE (PR #16; CI run `44118409536` SUCCESS; merge commit `3914c94ba3f8e267307b0ad092283bcd8af76dac`).
-- WEB-01.10 — local setup guide and dev-port hardening — DONE (PR #17; exact-head CI run `44126893666` SUCCESS; merge commit `9936f6af3942ff929867478bbeb237b7c5fce29b`; depends on WEB-01.09).
-- WEB-01.11 — frontend dependency audit — DONE (PR #19; exact-head CI run `44132980902` SUCCESS).
-- First local frontend/backend development build on the user's Windows computer: VERIFIED 2026-11-18 (manual smoke test). G1 local-run milestone is complete for the current scaffold.
-- Current implementation task: WEB-02.03 — responsive panels. WEB-02.02 is DONE; desktop shell is merged and CI-verified. WEB-00.03 remains IN_PROGRESS but its Russian-network Search run is intentionally deferred until the user has computer access; do not repeat the already completed base GET checks. PR #24 merged (`2159f17756883c2f51222e89012c5d285081d749`), exact-head GitHub Actions run `44310541026` passed 23 offline tests and py_compile. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. This is separate from WEB-02.02; G0 still blocks real provider/raster/imagery implementation.
+
+- WEB-02.03 — responsive panels: DONE (PR #30; exact-head frontend CI run `44332026191` SUCCESS; merge commit `39161d5c1cbedea6756e10ed711c139681313c24`).
+
+- Next roadmap candidate: WEB-02.04 — OpenLayers lifecycle. It remains PLANNED; before starting, verify its dependencies, task card, Definition of Ready and actual frontend structure. Do not add a base-map provider or imagery at this stage.
+
+- WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
 ## Important blockers
 1. No provider has been approved as primary.
