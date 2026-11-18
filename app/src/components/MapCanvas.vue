@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
-import type { MapReadout } from './openLayersMap'
+
+type MapReadout = {
+  longitude: number
+  latitude: number
+  resolutionMeters: number
+} | null
 
 const target = ref<HTMLDivElement | null>(null)
 const readout = ref<MapReadout>(null)
