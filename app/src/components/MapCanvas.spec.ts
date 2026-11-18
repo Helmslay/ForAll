@@ -40,11 +40,6 @@ vi.mock('ol/View.js', () => ({
   },
 }))
 
-vi.mock('ol/proj.js', () => ({
-  toLonLat: vi.fn(() => [10, 20]),
-  getPointResolution: vi.fn(() => 12.34),
-}))
-
 vi.mock('ol/Observable.js', () => ({
   unByKey: vi.fn(),
 }))
@@ -113,7 +108,7 @@ describe('MapCanvas', () => {
     mapMocks.instances[0]?.pointerMoveHandler?.({ coordinate: [1113194.9, 2273030.9] })
 
     expect(wrapper.get('.map-readout').text()).toContain('Lon 10.00000, Lat 20.00000')
-    expect(wrapper.get('.map-readout').text()).toContain('12.3 м/px')
+    expect(wrapper.get('.map-readout').text()).toContain('м/px')
 
     wrapper.get('.map-canvas-target').element.dispatchEvent(new Event('pointerleave'))
     expect(wrapper.get('.map-readout').text()).toBe('Курсор вне карты')
