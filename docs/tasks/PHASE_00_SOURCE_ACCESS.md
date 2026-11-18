@@ -104,3 +104,14 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - Статус WEB-00.03 остаётся IN_PROGRESS; критерии приёмки по реальным Item и пользовательской сети не закрыты.
 
 - Чтобы офлайн-проверки выполнялись на каждом PR, добавлен GitHub-hosted workflow `.github/workflows/tools-offline-tests.yml` (Ubuntu, Python 3.12, только offline suite и py_compile); Windows workflow также компилирует STAC Search script/tests. Workflow не обращается к провайдерам. Результат CI для текущего PR ожидается отдельно.
+
+
+### PR #24 — hardening и CI (2026-11-18)
+
+- PR: https://github.com/Helmslay/ForAll/pull/24 — merged.
+- Merge commit: `2159f17756883c2f51222e89012c5d285081d749`.
+- Exact PR head: `fbedcb76319d4bc53fe9d61adc3cb629e549af76`.
+- GitHub Actions `Tools offline tests`, run `44310541026` на exact PR head: SUCCESS; полный набор `tools/test_*.py` — 23 tests PASS; `py_compile` для обоих STAC checker/search модулей и тестов — PASS.
+- Изменения: строгая same-host HTTPS redirect policy для STAC Search; validation pagination schema/POST body; enforcement 100 Items per page; четыре регрессионных теста; hosted Ubuntu offline CI; расширена Windows compile-проверка.
+- Подтверждено: offline implementation/tests/compile. Не подтверждено: реальные provider Search results из российской сети без VPN/proxy, Sentinel-2 asset access, raster reads и licensing.
+- WEB-00.03 остаётся IN_PROGRESS до реального пользовательского Search. Следующее действие: выполнить `python tools/search_stac.py --all` на Windows в России при выключенных VPN и proxy и передать JSON-отчёт без редактирования asset href (их скрипт не выводит).
