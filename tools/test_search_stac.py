@@ -160,6 +160,14 @@ class SearchStacTests(unittest.TestCase):
         self.assertEqual(report["error_stage"], "PAGINATION")
         self.assertEqual(report["error_class"], "ExternalOrUnsafeLinkBlocked")
 
+    def test_malformed_port_in_next_link_is_blocked(self):
+        report = search_provider(
+            PROVIDER, now=NOW, json_getter=self.collections,
+            request_json=self.search_fn([], [{"rel": "next", "href": "https://mock.example:bad/path"}]),
+        )
+        self.assertEqual(report["error_stage"], "PAGINATION")
+        self.assertEqual(report["error_class"], "ExternalOrUnsafeLinkBlocked")
+
     def test_nonstandard_port_redirect_is_blocked(self):
         handler = _SearchRedirectHandler("mock.example")
         with self.assertRaises(urllib.error.URLError):
