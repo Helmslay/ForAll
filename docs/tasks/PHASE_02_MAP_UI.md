@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.03 — DONE; WEB-02.04 — IN_REVIEW; WEB-02.05—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.04 — DONE; WEB-02.05—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 **Статус:** DONE (2026-11-18).
@@ -37,14 +37,14 @@
 
 ## WEB-02.04 — OpenLayers lifecycle
 
-**Статус:** IN_REVIEW (2026-11-18); PR #32 открыт.
+**Статус:** DONE (2026-11-18); PR #32 merged.
 **Зависимости:** WEB-02.02 — DONE; WEB-02.03 — DONE.
 **Результат:** закреплён `ol@10.11.0`; npm lockfile сформирован штатным npm. `MapCanvas.vue` + `openLayersMap.ts` создают один экземпляр OpenLayers Map только после mount, с пустым списком слоёв и минимальным View (center [0, 0], zoom 2). `ResizeObserver` вызывает updateSize; cleanup отключает observer, отсоединяет target через setTarget(undefined) и вызывает dispose. Компонент подключён в существующий workspace; responsive shell сохранён.
 **Изменённые файлы:** `app/package.json`, `app/package-lock.json`, `app/src/App.vue`, `app/src/App.spec.ts`, `app/src/components/MapCanvas.vue`, `app/src/components/MapCanvas.spec.ts`, `app/src/components/openLayersMap.ts`.
-**Проверки:** временный isolated bootstrap workflow run `44338609135` — SUCCESS: npm install --save-exact ol@latest, npm ci, npm audit policy tests, audit, ESLint, Prettier, vue-tsc, Vitest и production build. Точный PR head `abb9321b39fdaad8da8341731b6128466ce87e88` ожидает стандартный frontend PR CI.
-**Критерии приёмки:** map target и один экземпляр карты реализованы; resize/updateSize и полный cleanup покрыты lifecycle tests; remount создаёт независимый экземпляр; тест проверяет отсутствие console errors; в production-коде нет tile/base-map URL, imagery, STAC или provider-запросов. Предварительный набор проверок прошёл; финальный exact-head CI ещё не подтверждён.
+**Проверки:** временный isolated bootstrap workflow run `44338609135` — SUCCESS: npm install --save-exact ol@latest, npm ci, npm audit policy tests, audit, ESLint, Prettier, vue-tsc, Vitest и production build. Стандартный Frontend build CI run `44339512145` для точного PR head `eaf40cc86ec1d2d1d78b600690a5a780a9f18c79` — SUCCESS: npm ci, audit policy, audit, ESLint, Prettier, vue-tsc, Vitest, production build, Vite/backend proxy smoke, Compose config, localhost port assertion, Compose start и frontend/API smoke.
+**Критерии приёмки:** map target и один экземпляр карты реализованы; resize/updateSize и полный cleanup покрыты lifecycle tests; remount создаёт независимый экземпляр; тест проверяет отсутствие console errors; в production-коде нет tile/base-map URL, imagery, STAC или provider-запросов. Все критерии приёмки подтверждены кодом, lifecycle tests и exact-head frontend CI.
 **Ограничения:** ручная проверка в реальном браузере и на физических устройствах не выполнялась. Холст пустой: базовая карта, Sentinel imagery, координаты, AOI и сетевые запросы не добавлены. G0 остаётся открытым.
-**PR:** #32 — https://github.com/Helmslay/ForAll/pull/32; head `abb9321b39fdaad8da8341731b6128466ce87e88`.
+**PR:** #32 merged; merge commit `331b06dd9c82fa0a5ee39691a767b71a52da94fe`.
 **Временная автоматизация:** оба bootstrap workflow удалены из рабочей ветки после генерации lockfile и предварительных проверок.
 
 ## WEB-02.05 — base map provider abstraction
