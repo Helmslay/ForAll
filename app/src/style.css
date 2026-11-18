@@ -528,3 +528,217 @@ h1 {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* Desktop GIS workspace shell */
+.app-shell {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  min-height: 60px;
+  height: 60px;
+  padding: 0 var(--space-15);
+}
+
+.app-layout {
+  min-height: 0;
+  height: calc(100vh - 96px);
+  grid-template-columns: 68px minmax(0, 1fr) 280px;
+}
+
+.sidebar {
+  align-items: center;
+  padding: var(--space-13) var(--space-4);
+}
+
+.sidebar-nav,
+.sidebar-nav ul {
+  width: 100%;
+}
+
+.nav-item {
+  justify-content: center;
+  min-height: 46px;
+  padding: 0;
+}
+
+.nav-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.workspace {
+  min-height: 0;
+  padding: var(--space-15);
+  gap: var(--space-9);
+}
+
+.workspace-heading {
+  margin-bottom: 0;
+}
+
+.map-placeholder {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.map-placeholder:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -4px;
+}
+
+.context-panel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: var(--space-15) var(--space-11);
+  border-left: 1px solid rgba(var(--color-border-rgb), 0.12);
+  background: rgba(var(--color-surface-rgb), 0.72);
+}
+
+.panel-heading {
+  padding-bottom: var(--space-13);
+  border-bottom: 1px solid rgba(var(--color-border-rgb), 0.12);
+}
+
+.panel-heading .eyebrow {
+  margin-bottom: var(--space-5);
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.panel-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-15);
+  text-align: center;
+}
+
+.panel-empty-symbol {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  margin-bottom: var(--space-9);
+  border: 1px solid rgba(var(--color-border-rgb), 0.2);
+  border-radius: var(--radius-lg);
+  color: var(--color-info);
+  font-size: var(--font-size-symbol);
+}
+
+.panel-empty h3 {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.panel-empty p {
+  margin: var(--space-7) 0 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-md);
+  line-height: 1.7;
+}
+
+.app-statusbar {
+  display: flex;
+  min-height: 36px;
+  height: 36px;
+  align-items: center;
+  gap: var(--space-17);
+  padding: 0 var(--space-15);
+  border-top: 1px solid rgba(var(--color-border-rgb), 0.12);
+  color: var(--color-subtle);
+  background: var(--color-background-deep);
+  font-size: var(--font-size-xs);
+}
+
+.app-statusbar > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.app-statusbar .status-dot {
+  width: 6px;
+  height: 6px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .context-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .app-layout {
+    height: auto;
+    min-height: calc(100vh - 96px);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(520px, 1fr);
+  }
+
+  .sidebar {
+    padding: var(--space-5) var(--space-9);
+    border-right: 0;
+    border-bottom: 1px solid rgba(var(--color-border-rgb), 0.12);
+  }
+
+  .sidebar-nav ul {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-1);
+  }
+
+  .nav-item {
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .workspace {
+    min-height: 520px;
+    padding: var(--space-13);
+  }
+
+  .workspace-heading {
+    flex-direction: column;
+    gap: var(--space-9);
+  }
+
+  .map-placeholder {
+    min-height: 320px;
+  }
+
+  .app-statusbar {
+    height: auto;
+    min-height: 36px;
+    flex-wrap: wrap;
+    gap: var(--space-5) var(--space-13);
+    padding: var(--space-5) var(--space-13);
+  }
+}
