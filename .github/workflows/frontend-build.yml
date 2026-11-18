@@ -62,6 +62,10 @@ jobs:
         working-directory: app
         run: npm run lint
 
+      - name: Diagnostic Prettier output for CSS
+        working-directory: app
+        run: npx prettier src/style.css
+
       - name: Check formatting
         working-directory: app
         run: npm run format:check
