@@ -43,7 +43,7 @@ WEB-00.01 и WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS (безопасный
 Карточки: tasks/PHASE_00_SOURCE_ACCESS.md
 - WEB-00.01 — каталог сетевых зависимостей — **DONE**.
 - WEB-00.02 — безопасная проверка STAC root/collections — **DONE**.
-- WEB-00.03 — тестовый STAC Search для Березников (радиус 100 км, последние 30 суток UTC, Sentinel-2 L2A; три allowlisted каталога) — **IN_PROGRESS**. Реализовать безопасный поиск и offline tests, затем получить реальный отчёт с Windows-компьютера пользователя в России без VPN/proxy. Карточка: `tasks/PHASE_00_SOURCE_ACCESS.md`.
+- WEB-00.03 — тестовый STAC Search для Березников (радиус 100 км, последние 30 суток UTC, Sentinel-2 L2A; три allowlisted каталога) — **IN_PROGRESS**. PR #24 merged (`2159f17756883c2f51222e89012c5d285081d749`); exact-head CI run `44310541026` SUCCESS, 23 offline tests PASS и py_compile PASS. Остался обязательный реальный Search с Windows-компьютера пользователя в России без VPN/proxy. Карточка: `tasks/PHASE_00_SOURCE_ACCESS.md`.
 - WEB-00.04 — безопасный snapshot test item.
 - WEB-00.05 — проверка четырёх каналов и asset metadata.
 - WEB-00.06 — HTTP Range и COG read.
