@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
 const target = ref(null)
-const readout = ref(/** @type {import('./openLayersMap').MapReadout} */ (null))
+const readout = ref(/** @type {import('./openLayersMap').MapReadout} */ null)
 let cleanup = () => {}
 
 /** @param {number} resolutionMeters */
