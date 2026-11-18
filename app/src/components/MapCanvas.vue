@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
 const target = ref(null)
-const readout = ref(/** @type {import('./openLayersMap').MapReadout} */ null)
+const readout = reactive({ longitude: 0, latitude: 0, resolutionMeters: 0, hasCursor: false })
 let cleanup = () => {}
 
 function formatResolution(resolutionMeters = readout.resolutionMeters) {
