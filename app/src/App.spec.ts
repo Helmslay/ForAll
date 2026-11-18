@@ -20,4 +20,31 @@ describe('App', () => {
     expect(wrapper.get('#map-placeholder-title').text()).toContain('Карта будет подключена')
     expect(wrapper.get('.map-placeholder').attributes('tabindex')).toBe('0')
   })
+
+  it('opens and closes the contextual panel using touch-sized controls', async () => {
+    const wrapper = mount(App)
+    const toggle = wrapper.get('.panel-toggle')
+
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(toggle.attributes('aria-controls')).toBe('context-panel')
+
+    await toggle.trigger('click')
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+    expect(wrapper.get('.context-panel').classes()).toContain('is-open')
+    expect(wrapper.find('.panel-backdrop').exists()).toBe(true)
+
+    await wrapper.get('.panel-close').trigger('click')
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(wrapper.get('.context-panel').classes()).not.toContain('is-open')
+    expect(wrapper.find('.panel-backdrop').exists()).toBe(false)
+  })
+
+  it('closes the contextual panel when its backdrop is activated', async () => {
+    const wrapper = mount(App)
+
+    await wrapper.get('.panel-toggle').trigger('click')
+    await wrapper.get('.panel-backdrop').trigger('click')
+
+    expect(wrapper.get('.panel-toggle').attributes('aria-expanded')).toBe('false')
+  })
 })
