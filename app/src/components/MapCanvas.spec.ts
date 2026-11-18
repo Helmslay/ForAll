@@ -77,10 +77,15 @@ vi.mock('ol/View.js', () => ({
 vi.mock('ol/interaction/Draw.js', () => ({
   createBox: vi.fn(() => 'box-geometry-function'),
   default: class MockDraw {
-    on = vi.fn((_type: string, handler: (event: { feature: { getGeometry: () => { getExtent: () => number[] } | null } }) => void) => {
-      this.drawEndHandler = handler
-      return { target: this }
-    })
+    on = vi.fn(
+      (
+        _type: string,
+        handler: (event: { feature: { getGeometry: () => { getExtent: () => number[] } | null } }) => void,
+      ) => {
+        this.drawEndHandler = handler
+        return { target: this }
+      },
+    )
     drawEndHandler?: (event: {
       feature: {
         getGeometry: () => { getExtent: () => number[] } | null
