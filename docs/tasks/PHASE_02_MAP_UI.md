@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.03 — DONE; WEB-02.04 — READY; WEB-02.05—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.03 — DONE; WEB-02.04 — IN_REVIEW; WEB-02.05—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 **Статус:** DONE (2026-11-18).
@@ -37,26 +37,15 @@
 
 ## WEB-02.04 — OpenLayers lifecycle
 
-**Статус:** READY (2026-11-18).
+**Статус:** IN_REVIEW (2026-11-18); PR #32 открыт.
 **Зависимости:** WEB-02.02 — DONE; WEB-02.03 — DONE.
-**Цель:** заменить карту-заглушку на пустой OpenLayers canvas и обеспечить предсказуемый жизненный цикл экземпляра карты.
-**Scope:**
-- Добавить закреплённую runtime-зависимость `ol` и синхронизировать `app/package-lock.json`.
-- Создать один компонент `app/src/components/MapCanvas.vue`, который владеет одним экземпляром OpenLayers Map.
-- Создавать карту после mount на DOM target; использовать минимальный View без реальных данных.
-- Наблюдать за размером контейнера через `ResizeObserver` и вызывать обновление размера карты при изменении.
-- На unmount отключать ResizeObserver, отсоединять target и освобождать экземпляр карты; все добавленные в рамках компонента OL event keys (если появятся) снимать.
-- Подключить компонент в существующий workspace, сохранив responsive shell и доступное описание состояния.
-**Входные контракты и модули:** отдельного backend/API контракта нет; DOM target — внутренний элемент компонента. Затрагиваются `app/package.json`, `app/package-lock.json`, `app/src/App.vue`, `app/src/style.css`, новый `app/src/components/MapCanvas.vue` и тест компонента.
-**Тесты:** Vitest/jsdom уже настроен. Замокать OpenLayers Map и ResizeObserver; проверить создание ровно одного экземпляра, вызов updateSize при resize, disconnect observer, detach target и dispose при unmount. Проверить отсутствие console errors. Полный frontend CI: audit policy/audit, lint, format, typecheck, unit tests, production build и существующие proxy/Compose smoke checks.
-**Критерии приёмки:**
-1. В workspace смонтирован OpenLayers map target; компонент создаёт ровно один экземпляр карты.
-2. Изменение размера контейнера вызывает updateSize.
-3. После unmount observer отключён, target отсоединён, карта disposed; повторный mount создаёт новый независимый экземпляр.
-4. Тесты lifecycle проходят без console errors; полный frontend CI проходит.
-5. В production-коде нет URL базовой карты, tile layer, imagery, STAC или provider-запросов.
-**Не входит:** выбор/подключение базовой карты, attribution провайдера, Sentinel imagery, координаты/масштаб, AOI interactions, backend/API и сетевые запросы. G0 остаётся открытым.
-**Definition of Ready:** зависимости DONE; target и frontend test environment существуют; затрагиваемые модули и тесты перечислены; acceptance criteria измеримы; задача ограничена одним map component и подключением в shell.
+**Результат:** закреплён `ol@10.11.0`; npm lockfile сформирован штатным npm. `MapCanvas.vue` + `openLayersMap.ts` создают один экземпляр OpenLayers Map только после mount, с пустым списком слоёв и минимальным View (center [0, 0], zoom 2). `ResizeObserver` вызывает updateSize; cleanup отключает observer, отсоединяет target через setTarget(undefined) и вызывает dispose. Компонент подключён в существующий workspace; responsive shell сохранён.
+**Изменённые файлы:** `app/package.json`, `app/package-lock.json`, `app/src/App.vue`, `app/src/App.spec.ts`, `app/src/components/MapCanvas.vue`, `app/src/components/MapCanvas.spec.ts`, `app/src/components/openLayersMap.ts`.
+**Проверки:** временный isolated bootstrap workflow run `44338609135` — SUCCESS: npm install --save-exact ol@latest, npm ci, npm audit policy tests, audit, ESLint, Prettier, vue-tsc, Vitest и production build. Точный PR head `abb9321b39fdaad8da8341731b6128466ce87e88` ожидает стандартный frontend PR CI.
+**Критерии приёмки:** map target и один экземпляр карты реализованы; resize/updateSize и полный cleanup покрыты lifecycle tests; remount создаёт независимый экземпляр; тест проверяет отсутствие console errors; в production-коде нет tile/base-map URL, imagery, STAC или provider-запросов. Предварительный набор проверок прошёл; финальный exact-head CI ещё не подтверждён.
+**Ограничения:** ручная проверка в реальном браузере и на физических устройствах не выполнялась. Холст пустой: базовая карта, Sentinel imagery, координаты, AOI и сетевые запросы не добавлены. G0 остаётся открытым.
+**PR:** #32 — https://github.com/Helmslay/ForAll/pull/32; head `abb9321b39fdaad8da8341731b6128466ce87e88`.
+**Временная автоматизация:** оба bootstrap workflow удалены из рабочей ветки после генерации lockfile и предварительных проверок.
 
 ## WEB-02.05 — base map provider abstraction
 Зависимость: WEB-02.04 и сетевой gate для источника подложки. URL не хардкодить в component; attribution/license; tile error state. Приёмка: provider заменяем и проверен из РФ.

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import MapCanvas from './components/MapCanvas.vue'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
@@ -67,9 +68,7 @@ function closePanel() {
           <div>
             <p class="eyebrow">SENTINEL EXPLORER / GIS</p>
             <h1 id="workspace-title">Рабочая область</h1>
-            <p class="workspace-description">
-              Здесь будет карта для исследования территории и работы со спутниковыми данными.
-            </p>
+            <p class="workspace-description">Подготовлен пустой холст карты; источники данных пока не подключены.</p>
           </div>
           <div class="workspace-actions">
             <button
@@ -85,18 +84,7 @@ function closePanel() {
           </div>
         </div>
 
-        <section class="map-placeholder" aria-labelledby="map-placeholder-title" tabindex="0">
-          <div class="placeholder-grid" aria-hidden="true"></div>
-          <div class="placeholder-content">
-            <span class="placeholder-icon" aria-hidden="true">⌖</span>
-            <h2 id="map-placeholder-title">Карта будет подключена на следующем этапе</h2>
-            <p>
-              Сейчас подготовлена только оболочка приложения. Спутниковые снимки, базовая карта, каталог и геоданные ещё
-              не подключены.
-            </p>
-          </div>
-          <span class="placeholder-caption">РАБОЧИЙ ХОЛСТ · ОЖИДАЕТ ПОДКЛЮЧЕНИЯ КАРТЫ</span>
-        </section>
+        <MapCanvas />
       </main>
 
       <aside id="context-panel" class="context-panel" :class="{ 'is-open': panelOpen }" aria-label="Контекстная панель">
@@ -127,8 +115,8 @@ function closePanel() {
 
     <footer class="app-statusbar" role="status" aria-label="Состояние приложения">
       <span><i class="status-dot" aria-hidden="true"></i> Интерфейс запущен</span>
-      <span>Карта не подключена</span>
-      <span>Координаты и масштаб недоступны</span>
+      <span>Пустой холст OpenLayers</span>
+      <span>Источники данных не подключены</span>
     </footer>
   </div>
 </template>

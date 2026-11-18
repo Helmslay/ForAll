@@ -16,6 +16,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "ol": "10.11.0",
     "vue": "3.5.45"
   },
   "devDependencies": {
