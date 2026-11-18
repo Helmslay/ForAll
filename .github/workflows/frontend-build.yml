@@ -51,9 +51,12 @@ jobs:
         working-directory: app
         run: npm ci
 
+      - name: Test temporary npm audit exception policy
+        run: node --test tools/test_npm_audit_policy.mjs
+
       - name: Audit frontend dependencies
         working-directory: app
-        run: npm audit --audit-level=high
+        run: node ../tools/check_npm_audit.mjs
 
       - name: Lint frontend
         working-directory: app

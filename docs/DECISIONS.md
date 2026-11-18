@@ -56,3 +56,11 @@ Use this log for decisions affecting more than one module. Format: status, conte
 - Проверить HTTP Range/COG, доступность каналов B02/B03/B04/B08, производительность, лицензии и российскую сетевую доступность до выбора production-поставщика.
 - Это архитектурное решение не означает, что потоковый просмотр уже реализован, что любой кандидат поддерживает Range/COG или что доступ без VPN подтверждён.
 - Текущая задача WEB-00.03 не расширяется: испытания raster assets и Range/COG выполняются отдельными последующими задачами фазы 00.
+
+
+## ADR-013 — временное принятие одного риска npm audit для devDependency
+**Status:** Accepted temporarily by explicit user authorization (2026-11-18); implementation pending CI in PR #27.
+**Context:** GitHub-reviewed advisory GHSA-fc5q-39xc-vjpf affects `picomatch@4.0.7`, which is present only in the frontend development toolchain. The advisory did not list a patched release at the time of review; forcing a Vite downgrade or unverified override would create additional compatibility risk.
+**Decision:** Temporarily allow only the exact advisory GHSA-fc5q-39xc-vjpf for the exact package/version `picomatch@4.0.7`, only when npm audit identifies it as a devDependency at `node_modules/picomatch`. Every other high/critical advisory, package, version, dependency scope or path remains a CI failure. Keep the npm audit report visible. This is risk acceptance, not a security fix.
+**Review/expiry:** Recheck upstream advisory/release status within 14 days (by 2026-12-02) and remove the exception as soon as a patched compatible version is available. Revert the exception if the package moves into production dependencies or the dependency path changes.
+**Consequences:** This does not authorize downgrading Vite, force-updating packages, weakening production controls, or claiming the vulnerability is fixed. PR #27 must pass policy unit tests and full frontend CI before activation.
