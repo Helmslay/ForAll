@@ -72,7 +72,7 @@ Gate G1: новый разработчик запускает проект по 
 
 ### Фаза 02 — карта и UI
 Карточки: tasks/PHASE_02_MAP_UI.md
-- WEB-02.01 — CSS tokens.
+- WEB-02.01 — CSS design tokens — **IN_PROGRESS** (semantic palette/spacing/radius/typography tokens; focus and contrast checks in progress).
 - WEB-02.02 — desktop app shell.
 - WEB-02.03 — responsive panels.
 - WEB-02.04 — OpenLayers lifecycle.
