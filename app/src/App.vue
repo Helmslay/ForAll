@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 const projectName = 'Sentinel Explorer'
+const panelOpen = ref(false)
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -8,6 +11,10 @@ const navigationItems = [
   { label: 'Измерения', symbol: '⌁', active: false },
   { label: 'Локальные данные', symbol: '▤', active: false },
 ]
+
+function closePanel() {
+  panelOpen.value = false
+}
 </script>
 
 <template>
@@ -64,7 +71,18 @@ const navigationItems = [
               Здесь будет карта для исследования территории и работы со спутниковыми данными.
             </p>
           </div>
-          <span class="workspace-badge">Предварительная версия</span>
+          <div class="workspace-actions">
+            <button
+              class="panel-toggle"
+              type="button"
+              aria-controls="context-panel"
+              :aria-expanded="panelOpen"
+              @click="panelOpen = !panelOpen"
+            >
+              {{ panelOpen ? 'Скрыть панель' : 'Инструменты' }}
+            </button>
+            <span class="workspace-badge">Предварительная версия</span>
+          </div>
         </div>
 
         <section class="map-placeholder" aria-labelledby="map-placeholder-title" tabindex="0">
@@ -81,10 +99,15 @@ const navigationItems = [
         </section>
       </main>
 
-      <aside class="context-panel" aria-label="Контекстная панель">
+      <aside id="context-panel" class="context-panel" :class="{ 'is-open': panelOpen }" aria-label="Контекстная панель">
         <div class="panel-heading">
-          <span class="eyebrow">РАБОЧАЯ ПАНЕЛЬ</span>
-          <h2>Контекст</h2>
+          <div>
+            <span class="eyebrow">РАБОЧАЯ ПАНЕЛЬ</span>
+            <h2>Контекст</h2>
+          </div>
+          <button class="panel-close" type="button" aria-label="Закрыть панель инструментов" @click="closePanel">
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
         <div class="panel-empty">
           <span class="panel-empty-symbol" aria-hidden="true">⌑</span>
@@ -93,6 +116,14 @@ const navigationItems = [
         </div>
       </aside>
     </div>
+
+    <button
+      v-if="panelOpen"
+      class="panel-backdrop"
+      type="button"
+      aria-label="Закрыть панель инструментов"
+      @click="closePanel"
+    ></button>
 
     <footer class="app-statusbar" role="status" aria-label="Состояние приложения">
       <span><i class="status-dot" aria-hidden="true"></i> Интерфейс запущен</span>
