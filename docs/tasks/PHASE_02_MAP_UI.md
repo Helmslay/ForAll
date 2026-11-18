@@ -65,6 +65,8 @@
 **Дополнительное исправление CI:** `tools/check_npm_audit.mjs` теперь явно использует `--audit-level=high`, что соответствует существующей политике high/critical gate; семь moderate dev-tool findings остаются видимыми в отчёте и не принимаются как новые исключения.
 **Ограничения:** ручная проверка на физических устройствах не выполнялась. Карта остаётся пустой; разрешение рассчитывается в точке курсора для текущего view, не для конкретного спутникового источника. G0 остаётся открытым.
 **Приёмка:** WGS84 lon/lat order, локальное разрешение, empty state вне карты, listener cleanup и полный exact-head CI подтверждены.
+**PR:** #35 merged; merge commit `b3870808b0b6ada015d5f1cc158abedd86c9621c`.
+**Временная автоматизация:** временные audit-diagnostic и Prettier workflows удалены после использования.
 
 ## WEB-02.07 — AOI rectangle draw/clear
 Зависимость: WEB-02.04. Rectangle interaction, geometry and WGS84 bbox, clear, validate non-empty area, remove interaction after mode exits. Приёмка: bbox имеет [west,south,east,north].
