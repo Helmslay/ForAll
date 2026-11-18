@@ -13,7 +13,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from check_stac import PROVIDERS, Provider, CheckError, get_json, USER_AGENT
+from check_stac import PROVIDERS, Provider, CheckError, get_json, USER_AGENT, AllowlistedRedirectHandler
 
 CENTER_LON = 56.8204
 CENTER_LAT = 59.4091
@@ -26,7 +26,7 @@ MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 def make_circle_polygon(lon: float = CENTER_LON, lat: float = CENTER_LAT,
                         radius_km: float = RADIUS_KM, vertices: int = 64) -> dict[str, Any]:
     """Approximate a geodesic circle with a WGS84 polygon."""
-    if not (-180 <= lon <= 180 and -90 <= lat <= 90 and radius_km > 0 or vertices < 8):
+    if not (-180 <= lon <= 180 and -90 <= lat <= 90 and radius_km > 0 and vertices >= 8):
         raise ValueError("Invalid AOI parameters")
     angular = radius_km / 6371.0088
     lat_r = math.radians(lat)
@@ -70,7 +70,7 @@ def _request_json(url: str, hostname: str, timeout: float, method: str,
     request = urllib.request.Request(url, data=data, headers=headers, method=method)
     started = time.monotonic()
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        opener = urllib.request.build_opener(AllowlistedRedirectHandler(hostname))\n        with opener.open(request, timeout=timeout) as response:
             body = response.read(MAX_RESPONSE_BYTES + 1)
             status = response.status
     except urllib.error.HTTPError as exc:
@@ -148,8 +148,9 @@ def search_provider(provider: Provider, timeout: float = 20.0,
         summaries = []
         pages = 0
         elapsed_total = 0.0
+        method = "POST"
         while pages < MAX_PAGES:
-            _, page, elapsed = request_json(search_url, provider.hostname, timeout, "POST", payload)
+            _, page, elapsed = request_json(search_url, provider.hostname, timeout, method, payload)
             elapsed_total += elapsed
             if not isinstance(page, dict) or page.get("type") != "FeatureCollection" or not isinstance(page.get("features"), list):
                 raise CheckError("SEARCH_SCHEMA", "InvalidFeatureCollection")
@@ -170,25 +171,6 @@ def search_provider(provider: Provider, timeout: float = 20.0,
             if method not in {"GET", "POST"}:
                 raise CheckError("PAGINATION", "UnsupportedNextMethod")
             payload = next_link.get("body") if method == "POST" else None
-            # A next link is followed only on the same allowlisted HTTPS hostname.
-            if method == "GET":
-                _, page, elapsed = request_json(search_url, provider.hostname, timeout, "GET", None)
-                elapsed_total += elapsed
-                if not isinstance(page, dict) or page.get("type") != "FeatureCollection" or not isinstance(page.get("features"), list):
-                    raise CheckError("SEARCH_SCHEMA", "InvalidFeatureCollection")
-                pages += 1
-                for feature in page["features"]:
-                    if isinstance(feature, dict):
-                        summaries.append(_item_summary(feature))
-                next_link = next((link for link in page.get("links", [])
-                                  if isinstance(link, dict) and link.get("rel") == "next"), None)
-                if not next_link:
-                    break
-                href = next_link.get("href")
-                if not isinstance(href, str):
-                    raise CheckError("PAGINATION", "InvalidNextLink")
-                search_url = _safe_url(urllib.parse.urljoin(search_url, href), provider.hostname)
-                payload = next_link.get("body") if str(next_link.get("method", "GET")).upper() == "POST" else None
         report["pages_checked"] = pages
         report["item_count"] = len(summaries)
         report["items"] = summaries
