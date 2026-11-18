@@ -1,6 +1,6 @@
 # WEB-08.00 — read-only preflight текущего VPS для изолированного публичного demo
 
-**Статус:** READY  
+**Статус:** IN_REVIEW  
 **Зависимости:** WEB-01.10 — DONE; WEB-01.11 — DONE.  
 **Цель:** определить, подходит ли существующий VPS `195.208.123.209` для отдельного публичного demo текущего frontend/backend scaffold без влияния на Sentinel Explorer Agent.
 
@@ -42,5 +42,14 @@
 - Реализация карты, каталога, Sentinel API или raster viewer.
 - Заявления о доступности Sentinel-2 или работе без VPN.
 
-## Результат
-Ожидает выполнения read-only команд на VPS. До получения отчёта нельзя утверждать, что текущий сервер подходит для публичного demo.
+## Результат (2026-11-18)
+
+- Read-only отчёт получен от пользователя с VPS `195.208.123.209`; дата проверки: 2026-11-18 14:03 MSK.
+- ОС: Ubuntu 26.04 LTS; CPU: 1 vCPU (Intel Xeon Icelake); RAM: 985 MiB total, 794 MiB available; swap отсутствует; root filesystem 9.8 GB, свободно 5.8 GB (38% занято).
+- TCP listeners: SSH на 22 и локальные DNS stub listeners на 127.0.0.53/127.0.0.54; публичных web listeners нет.
+- Активны 21 systemd service; `sentinel-explorer-agent.service` — active/enabled. Его MemoryCurrent около 26 MiB, MemoryMax 128 MiB, CPUQuota 25%.
+- Docker, Docker Compose, Nginx и Caddy не обнаружены. Пакеты/службы не устанавливались, настройки VPS не менялись, агент не останавливался и не перезапускался.
+- Вывод: ресурсов достаточно для ограниченного scaffold demo при статической раздаче frontend (сборка вне VPS) и лёгком FastAPI health/API process; не подходит для raster processing, базы данных, worker или высокой/неограниченной нагрузки. Это оценка по ресурсам, не нагрузочный тест.
+- Для публичного HTTPS потребуется доменное имя с DNS на VPS и проверенный TLS/ACME сценарий. Домен и DNS/TLS ещё не определены; публичный доступ не включён.
+- Acceptance по инвентаризации и ресурсной оценке подтверждены. Полная готовность PR к merge не подтверждена: exact-head frontend CI run 44291002102 завершился failure на `npm audit --audit-level=high` из-за обновившейся базы advisories (13 findings: 6 moderate, 7 high). В логе виден high advisory GHSA-fc5q-39xc-vjpf для `picomatch@4.0.7`; на момент проверки advisory не указывает patched version. CI и merge gate остаются блокером.
+- **Итоговый статус:** IN_REVIEW — preflight выполнен, но PR не может быть объединён до разрешения CI blocker. Это не означает, что demo развернуто или доступно публично.
