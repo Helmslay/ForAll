@@ -80,7 +80,7 @@ export function createOpenLayersMap(
     onAoiChange(null)
   }
 
-  const setAoiDrawing = (enabled: boolean) => {
+  const setAoiDrawing = (enabled = false) => {
     removeDrawInteraction()
 
     if (!enabled) {
