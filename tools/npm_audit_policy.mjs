@@ -1,6 +1,16 @@
 export const TEMPORARY_ALLOWED_ADVISORY = "https://github.com/advisories/GHSA-fc5q-39xc-vjpf";
-export const TEMPORARY_ALLOWED_PACKAGE = "picomatch";
-export const TEMPORARY_ALLOWED_VERSION = "4.0.7";
+
+// Exact dev-only dependency graph observed in the reviewed lockfile and npm audit report.
+// Keep this list narrow; any changed package, version, path or dependency edge fails closed.
+const ALLOWED_HIGH_PATHS = {
+  "picomatch": { version: "4.0.7", via: [TEMPORARY_ALLOWED_ADVISORY] },
+  "@vue/language-core": { version: "3.3.14", via: ["picomatch"] },
+  "fdir": { version: "6.5.0", via: ["picomatch"] },
+  "tinyglobby": { version: "0.2.17", via: ["fdir", "picomatch"] },
+  "vite": { version: "8.3.8", via: ["picomatch", "tinyglobby"] },
+  "vitest": { version: "4.1.11", via: ["@vitest/mocker", "picomatch", "tinyglobby"] },
+  "vue-tsc": { version: "3.3.14", via: ["@vue/language-core"] },
+};
 
 export function evaluateAuditReport(report, lockfile) {
   if (!report || typeof report !== "object" || !report.vulnerabilities) {
@@ -13,23 +23,23 @@ export function evaluateAuditReport(report, lockfile) {
   for (const [name, vulnerability] of Object.entries(report.vulnerabilities)) {
     if (!["high", "critical"].includes(vulnerability.severity)) continue;
 
+    const expected = ALLOWED_HIGH_PATHS[name];
     const nodes = Array.isArray(vulnerability.nodes) ? vulnerability.nodes : [];
     const via = Array.isArray(vulnerability.via) ? vulnerability.via : [];
     const packagePath = nodes.length === 1 ? nodes[0] : null;
     const installed = packagePath ? lockfile?.packages?.[packagePath] : null;
+    const actualVia = via.map((item) =>
+      typeof item === "string" ? item : item?.url ?? null,
+    );
+
     const exactException =
-      name === TEMPORARY_ALLOWED_PACKAGE &&
+      Boolean(expected) &&
       vulnerability.dev === true &&
-      packagePath === "node_modules/picomatch" &&
-      installed?.version === TEMPORARY_ALLOWED_VERSION &&
+      packagePath === `node_modules/${name}` &&
+      installed?.version === expected.version &&
       installed?.dev === true &&
-      via.length > 0 &&
-      via.every(
-        (item) =>
-          item &&
-          typeof item === "object" &&
-          item.url === TEMPORARY_ALLOWED_ADVISORY,
-      );
+      actualVia.length === expected.via.length &&
+      actualVia.every((item, index) => item === expected.via[index]);
 
     if (exactException) {
       accepted.push({ name, severity: vulnerability.severity, packagePath });
