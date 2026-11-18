@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import MapCanvas from './MapCanvas.vue'
 
@@ -64,6 +65,7 @@ afterEach(() => {
   mapMocks.instances.length = 0
   resizeObservers.length = 0
   vi.unstubAllGlobals()
+  vi.clearAllMocks()
   vi.restoreAllMocks()
 })
 
@@ -101,16 +103,18 @@ describe('MapCanvas', () => {
     expect(map?.dispose).toHaveBeenCalledOnce()
   })
 
-  it('shows WGS84 longitude/latitude and local map resolution for the cursor', () => {
+  it('shows WGS84 longitude/latitude and local map resolution for the cursor', async () => {
     vi.stubGlobal('ResizeObserver', MockResizeObserver)
 
     const wrapper = mount(MapCanvas)
     mapMocks.instances[0]?.pointerMoveHandler?.({ coordinate: [1113194.9, 2273030.9] })
+    await nextTick()
 
     expect(wrapper.get('.map-readout').text()).toContain('Lon 10.00000, Lat 20.00000')
     expect(wrapper.get('.map-readout').text()).toContain('м/px')
 
     wrapper.get('.map-canvas-target').element.dispatchEvent(new Event('pointerleave'))
+    await nextTick()
     expect(wrapper.get('.map-readout').text()).toBe('Курсор вне карты')
 
     wrapper.unmount()
