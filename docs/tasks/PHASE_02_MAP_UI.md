@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.04 — DONE; WEB-02.05 — BLOCKED by G0; WEB-02.06 — DONE; WEB-02.07—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.04 — DONE; WEB-02.05 — BLOCKED by G0; WEB-02.06 — DONE; WEB-02.07 — READY; WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 **Статус:** DONE (2026-11-18).
@@ -69,7 +69,15 @@
 **Временная автоматизация:** временные audit-diagnostic и Prettier workflows удалены после использования.
 
 ## WEB-02.07 — AOI rectangle draw/clear
-Зависимость: WEB-02.04. Rectangle interaction, geometry and WGS84 bbox, clear, validate non-empty area, remove interaction after mode exits. Приёмка: bbox имеет [west,south,east,north].
+
+**Статус:** READY (2026-11-18).
+**Зависимости:** WEB-02.04 — DONE; WEB-02.06 — DONE. G0 не требуется: AOI drawing is local and uses the empty canvas.
+**Цель:** пользователь включает режим прямоугольника, рисует одну AOI и получает bbox WGS84.
+**Scope:** явные controls Start/Finish/Clear; OpenLayers `Draw` interaction with rectangle geometry; vector source/layer for one selected AOI; transform extent into WGS84 and return `[west, south, east, north]`; reject zero-area/invalid geometry; remove Draw interaction immediately after draw completes or mode exits; clear stored feature and bbox; cleanup interaction/layer/source on unmount. No persistence or API calls.
+**Тесты:** drawing mode adds one Draw interaction; completing one rectangle emits a correctly ordered WGS84 bbox; drawing interaction is removed after completion; Clear removes geometry and resets bbox; invalid/zero-area geometry is rejected; leaving mode and unmount clean up interactions/listeners.
+**Критерии приёмки:** only one AOI is active; bbox order is exactly `[west, south, east, north]`; all four values are finite and bounds are non-empty; interaction is not left active after completion or mode exit; Clear returns to empty state; full frontend CI passes.
+**Не входит:** AOI persistence, backend/API, STAC search, imagery, provider adapters, multiple AOIs, polygon/freehand drawing, network calls.
+**Readiness:** OpenLayers lifecycle and projection readout are DONE; `ol` is pinned and lockfile exists; OpenLayers Draw/VectorSource/VectorLayer/geometry helpers are part of the installed package; component and Vitest/jsdom test harness exist. The task is independent of G0 and can be implemented on the empty canvas.
 
 ## WEB-02.08 — search form shell
 Зависимости: WEB-02.02, WEB-02.07. Date range/cloud/AOI controls, validation, reset, typed SearchRequest. На этом шаге сетевого вызова нет.
