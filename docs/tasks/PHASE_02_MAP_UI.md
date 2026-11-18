@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. Все задачи PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01 — IN_PROGRESS; WEB-02.02—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 Зависимость: WEB-01.04. Один CSS token file: background/surfaces/text/primary/warning/error/spacing/radius/type. Проверить контраст и prefers-reduced-motion. Приёмка: компоненты используют tokens.
@@ -25,3 +25,13 @@
 
 ## WEB-02.08 — search form shell
 Зависимости: WEB-02.02, WEB-02.07. Date range/cloud/AOI controls, validation, reset, typed SearchRequest. На этом шаге сетевого вызова нет.
+
+
+### WEB-02.01 — progress (2026-11-18)
+
+- Проверены существующие `app/src/style.css` и `docs/UX_UI_GUIDE.md`: палитра уже соответствует ADR-011 и секции 8 UX guide, но значительная часть цветов/типографики/отступов оставалась hardcoded.
+- В `app/src/style.css` введены semantic tokens для фонов, поверхностей, текста, границ, primary/secondary/info/warning/error, RGB alpha channels, spacing, radius и typography.
+- Существующие правила переведены на tokens без изменения согласованных значений палитры; добавлен общий `:focus-visible` для ссылок и интерактивных элементов. `prefers-reduced-motion` сохранён.
+- Контраст токенов на background/surface проверен по WCAG formula: text 14.52/12.73, muted 8.31/7.29, primary 9.58/8.41, info 9.57/8.39, warning 10.26/9.00, error 8.08/7.08; subtle 5.40/4.73 (background/surface соответственно). Все превышают 4.5:1.
+- Полный frontend CI ещё не завершён; задача не DONE до успешных exact-head checks.
+- G0 остаётся открытым; изменения не подключают карту, provider или внешние данные.
