@@ -1,6 +1,6 @@
 # Phase 01 — каркас
 
-WEB-01.01—WEB-01.10 — DONE. WEB-01.10 was merged in PR #17; first local user-side dev-build is still pending. Не добавлять Sentinel business logic на этом этапе.
+WEB-01.01—WEB-01.11 — DONE. First local Windows dev-build manually verified 2026-11-18 (recorded below). Не добавлять Sentinel business logic на этом этапе.
 
 ## WEB-01.01 — структура и ignore rules
 Зависимости: нет. Scope: directories и .gitignore.
@@ -225,3 +225,20 @@ Scope: request ID для каждого запроса; возвращать е�
 - **Acceptance criteria:** audit встроен в CI; high/critical блокируют CI; moderate/low остаются видимыми; все текущие advisory paths классифицированы; несовместимые/force обновления не применялись; точный результат и ограничения задокументированы. Все критерии подтверждены.
 - **Ограничения:** аудит выполнялся на GitHub-hosted runner 2026-11-17 и зависит от актуальной базы npm advisories. Он не является локальным сканированием компьютера пользователя и не подтверждает российскую сетевую доступность.
 - **PR:** https://github.com/Helmslay/ForAll/pull/19 — merged; initial audit CI run `44132980902` SUCCESS; final exact-head CI run `44133991243` SUCCESS; merge commit `61676aced8f5e24e1f63a53e78c6096b0e7a6d21`.
+
+
+## Первый локальный Windows dev-build — проверка пользователя (2026-11-18)
+
+**Результат:** локальный smoke-test frontend/backend пройден; это подтверждение запуска текущего scaffold, а не готовности GIS-функций.
+
+- **Среда:** Windows 10; проект распакован в `ForAll-main`; Node.js 26.13.1 / npm 11.20.0; Python 3.12.8.
+- **Подготовка:** frontend зависимости установлены через `npm.cmd ci`; backend runtime dependencies установлены из `backend/requirements.txt`; Python virtual environment создан в `backend/.venv`.
+- **Сборка:** `npm.cmd run build` завершилась успешно (Vite 8.3.8).
+- **Запуск backend:** `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`; startup completed.
+- **Проверка backend:** `http://127.0.0.1:8000/api/v1/health` вернул `status=ok`, `app_version=0.1.0`.
+- **Запуск frontend:** Vite 8.3.8 доступен на `http://127.0.0.1:5173/`; приложение открылось в Chrome.
+- **Проверка proxy:** `http://127.0.0.1:5173/api/v1/health` вернул `status=ok`, `app_version=0.1.0`.
+- **Браузер:** других ошибок Console не обнаружено; единственное замечание — `/favicon.ico` возвращает 404.
+- **Критерии, подтверждённые ручной проверкой:** локальная установка runtime dependencies; frontend build; запуск frontend/backend; direct backend health; frontend-to-backend Vite proxy; открытие страницы в браузере.
+- **Не подтверждено:** карта, каталог Sentinel-2, raster assets, RGB, скачивание, российская доступность без VPN и доступ к upstream из российского backend.
+- **Изменения приложения:** отсутствуют; выполнена только локальная подготовка среды. Результат зафиксирован в `docs/STATUS.md` и `docs/EXECUTION_PLAN.md`.
