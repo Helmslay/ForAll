@@ -48,7 +48,14 @@ onBeforeUnmount(() => {
 <style scoped>
 .map-canvas-target {
   position: absolute;
+  z-index: 1;
   inset: 0;
+}
+
+.placeholder-grid,
+.placeholder-content,
+.placeholder-caption {
+  pointer-events: none;
 }
 
 .map-readout {
