@@ -15,6 +15,7 @@
   --color-warning: #d8c7a4;
   --color-error: #e0a3a3;
   --color-mask: #000;
+  --color-map-surface: var(--color-map-surface);
   --color-background-rgb: 23, 28, 38;
   --color-surface-rgb: 32, 39, 53;
   --color-surface-raised-rgb: 41, 52, 69;
@@ -61,11 +62,18 @@
   --font-size-base: 12px;
   --font-size-lg: 13px;
   --font-size-xl: 15px;
+  --font-size-icon: 17px;
+  --font-size-icon-large: 19px;
+  --font-size-symbol: 22px;
+  --font-size-placeholder-icon: 29px;
+  --font-size-display: clamp(25px, 3vw, 34px);
+  --font-size-heading: clamp(17px, 2vw, 21px);
   --font-weight-medium: 540;
   --font-weight-semibold: 620;
   --font-weight-bold: 680;
   --font-weight-heavy: 750;
   --font-weight-black: 760;
+  --font-weight-regular: 540;
 
   font-family: var(--font-family-sans);
   color: var(--color-text);
@@ -97,7 +105,8 @@ a {
   text-decoration: none;
 }
 
-a:focus-visible {
+a:focus-visible,
+:where(button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
@@ -139,18 +148,18 @@ a:focus-visible {
   border-radius: var(--radius-lg);
   color: var(--color-primary);
   background: var(--color-surface-raised);
-  font-size: 22px;
+  font-size: var(--font-size-symbol);
 }
 
 .brand-name {
   font-size: var(--font-size-xl);
-  font-weight: 760;
+  font-weight: var(--font-weight-black);
   letter-spacing: -0.045em;
 }
 
 .brand-name span {
   color: var(--color-primary);
-  font-weight: 540;
+  font-weight: var(--font-weight-medium);
 }
 
 .header-context {
@@ -162,12 +171,12 @@ a:focus-visible {
 }
 
 .development-state {
-  padding: 6px 10px;
+  padding: var(--space-3) var(--space-7);
   border: 1px solid rgba(var(--color-primary-rgb), 0.18);
   border-radius: var(--radius-sm);
   color: var(--color-primary);
   background: rgba(var(--color-primary-rgb), 0.06);
-  font-size: 11px;
+  font-size: var(--font-size-md);
 }
 
 .app-layout {
@@ -180,16 +189,16 @@ a:focus-visible {
 .sidebar {
   display: flex;
   flex-direction: column;
-  padding: 24px 14px 18px;
+  padding: var(--space-17) var(--space-11) var(--space-13);
   border-right: 1px solid rgba(var(--color-border-rgb), 0.12);
   background: rgba(var(--color-surface-rgb), 0.94);
 }
 
 .sidebar-heading {
-  margin: 0 10px 14px;
+  margin: 0 var(--space-7) var(--space-11);
   color: var(--color-subtle);
   font-size: var(--font-size-md);
-  font-weight: 750;
+  font-weight: var(--font-weight-heavy);
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -207,7 +216,7 @@ a:focus-visible {
   min-height: 42px;
   align-items: center;
   gap: var(--space-8);
-  padding: 0 11px;
+  padding: 0 var(--space-8);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--color-muted);
@@ -225,7 +234,7 @@ a:focus-visible {
   width: 18px;
   place-items: center;
   color: var(--color-info);
-  font-size: 17px;
+  font-size: var(--font-size-icon);
 }
 
 .nav-item.unavailable {
@@ -246,8 +255,8 @@ a:focus-visible {
 .sidebar-note {
   display: flex;
   gap: var(--space-6);
-  margin: auto 4px 0;
-  padding: 13px 10px 2px;
+  margin: auto var(--space-1) 0;
+  padding: var(--space-10) var(--space-7) 2px;
   border-top: 1px solid rgba(var(--color-border-rgb), 0.1);
 }
 
@@ -272,19 +281,19 @@ a:focus-visible {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  padding: 30px clamp(20px, 3.2vw, 48px) 18px;
+  padding: var(--space-19) clamp(var(--space-15), 3.2vw, var(--space-24)) var(--space-13);
 }
 
 .workspace-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--space-15);
   margin-bottom: 24px;
 }
 
 .eyebrow {
-  margin: 0 0 9px;
+  margin: 0 0 var(--space-6);
   color: var(--color-info);
   font-size: var(--font-size-sm);
   font-weight: 760;
@@ -293,15 +302,15 @@ a:focus-visible {
 
 h1 {
   margin: 0;
-  font-size: clamp(25px, 3vw, 34px);
-  font-weight: 680;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.055em;
   line-height: 1.15;
 }
 
 .workspace-description {
   max-width: 620px;
-  margin: 10px 0 0;
+  margin: var(--space-7) 0 0;
   color: var(--color-muted);
   font-size: var(--font-size-lg);
   line-height: 1.7;
@@ -309,7 +318,7 @@ h1 {
 
 .workspace-badge {
   flex: 0 0 auto;
-  padding: 7px 10px;
+  padding: var(--space-4) var(--space-7);
   border: 1px solid rgba(var(--color-border-rgb), 0.13);
   border-radius: var(--radius-sm);
   color: var(--color-muted);
@@ -342,7 +351,7 @@ h1 {
 .placeholder-content {
   position: relative;
   width: min(100% - 36px, 430px);
-  padding: 35px 20px;
+  padding: var(--space-21) var(--space-15);
   text-align: center;
 }
 
@@ -351,23 +360,23 @@ h1 {
   width: 52px;
   height: 52px;
   place-items: center;
-  margin: 0 auto 19px;
+  margin: 0 auto var(--space-14);
   border: 1px solid rgba(var(--color-primary-rgb), 0.22);
   border-radius: var(--radius-2xl);
   color: var(--color-primary);
   background: rgba(var(--color-primary-rgb), 0.07);
-  font-size: 29px;
+  font-size: var(--font-size-placeholder-icon);
 }
 
 .placeholder-content h2 {
   margin: 0;
-  font-size: clamp(17px, 2vw, 21px);
-  font-weight: 620;
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: -0.035em;
 }
 
 .placeholder-content p {
-  margin: 12px 0 0;
+  margin: var(--space-9) 0 0;
   color: var(--color-muted);
   font-size: var(--font-size-base);
   line-height: 1.8;
@@ -409,7 +418,7 @@ h1 {
 @media (max-width: 760px) {
   .app-header {
     min-height: 62px;
-    padding: 0 18px;
+    padding: 0 var(--space-13);
   }
 
   .app-layout {
@@ -419,7 +428,7 @@ h1 {
 
   .sidebar {
     align-items: center;
-    padding: 18px 7px 12px;
+    padding: var(--space-13) var(--space-4) var(--space-9);
   }
 
   .sidebar-heading,
@@ -439,11 +448,11 @@ h1 {
   }
 
   .nav-symbol {
-    font-size: 19px;
+    font-size: var(--font-size-icon-large);
   }
 
   .workspace {
-    padding: 24px 18px 12px;
+    padding: var(--space-17) var(--space-13) var(--space-9);
   }
 
   .header-context {
@@ -462,7 +471,7 @@ h1 {
   }
 
   .sidebar {
-    padding: 8px 12px;
+    padding: var(--space-5) var(--space-9);
     border-right: 0;
     border-bottom: 1px solid rgba(var(--color-border-rgb), 0.12);
   }
@@ -470,7 +479,7 @@ h1 {
   .sidebar-nav ul {
     display: flex;
     justify-content: space-between;
-    gap: 4px;
+    gap: var(--space-1);
   }
 
   .nav-item {
@@ -480,7 +489,7 @@ h1 {
 
   .workspace {
     min-height: calc(100vh - 126px);
-    padding: 22px 14px 10px;
+    padding: var(--space-16) var(--space-11) var(--space-7);
   }
 
   .workspace-heading {
@@ -498,11 +507,11 @@ h1 {
     flex-direction: column;
     justify-content: center;
     gap: var(--space-2);
-    padding: 9px 0;
+    padding: var(--space-6) 0;
   }
 
   .development-state {
-    padding: 5px 7px;
+    padding: var(--space-2) var(--space-4);
     font-size: var(--font-size-sm);
   }
 }
