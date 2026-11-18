@@ -1,15 +1,9 @@
-<script setup lang="ts">
+<script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
-type MapReadout = {
-  longitude: number
-  latitude: number
-  resolutionMeters: number
-} | null
-
 const target = ref<HTMLDivElement | null>(null)
-const readout = ref<MapReadout>(null)
+const readout = ref(null)
 let cleanup: () => void = () => {}
 
 function formatResolution(resolutionMeters: number): string {
