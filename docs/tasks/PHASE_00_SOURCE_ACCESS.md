@@ -115,3 +115,5 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - Изменения: строгая same-host HTTPS redirect policy для STAC Search; validation pagination schema/POST body; enforcement 100 Items per page; четыре регрессионных теста; hosted Ubuntu offline CI; расширена Windows compile-проверка.
 - Подтверждено: offline implementation/tests/compile. Не подтверждено: реальные provider Search results из российской сети без VPN/proxy, Sentinel-2 asset access, raster reads и licensing.
 - WEB-00.03 остаётся IN_PROGRESS до реального пользовательского Search. Следующее действие: выполнить `python tools/search_stac.py --all` на Windows в России при выключенных VPN и proxy и передать JSON-отчёт без редактирования asset href (их скрипт не выводит).
+
+- Дополнительная проверка после merge: main push workflow `Tools offline tests`, run `44310622444`, SUCCESS; 23 tests и py_compile выполнены на merge commit. `Local Windows tests` run `44310622370` остаётся QUEUED (self-hosted runner); его результат не заявляется как PASS.
