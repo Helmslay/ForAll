@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import App from './App.vue'
 
 describe('App', () => {
-  it('renders the GIS application shell with semantic landmarks', () => {
+  it('renders the desktop GIS shell and its semantic landmarks', () => {
     const wrapper = mount(App)
 
     expect(wrapper.get('header').text()).toContain('Sentinel Explorer')
@@ -15,7 +15,9 @@ describe('App', () => {
     expect(wrapper.text()).toContain('Поиск сцен')
     expect(wrapper.text()).toContain('Слои')
     expect(wrapper.text()).toContain('Измерения')
-    expect(wrapper.get('[role="status"]').text()).toContain('Картографический модуль не подключён')
+    expect(wrapper.get('.context-panel').text()).toContain('Панель инструментов')
+    expect(wrapper.get('[role="status"]').text()).toContain('Карта не подключена')
     expect(wrapper.get('#map-placeholder-title').text()).toContain('Карта будет подключена')
+    expect(wrapper.get('.map-placeholder').attributes('tabindex')).toBe('0')
   })
 })

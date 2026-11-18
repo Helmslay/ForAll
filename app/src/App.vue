@@ -26,27 +26,33 @@ const navigationItems = [
 
     <div class="app-layout">
       <aside class="sidebar" aria-label="Боковая панель приложения">
-        <div class="sidebar-heading">Инструменты</div>
         <nav class="sidebar-nav" aria-label="Основная навигация">
           <ul>
             <li v-for="item in navigationItems" :key="item.label">
-              <a v-if="item.active" class="nav-item active" href="#workspace" aria-current="page">
+              <a
+                v-if="item.active"
+                class="nav-item active"
+                href="#workspace"
+                :aria-label="item.label"
+                aria-current="page"
+                :title="item.label"
+              >
                 <span class="nav-symbol" aria-hidden="true">{{ item.symbol }}</span>
-                <span>{{ item.label }}</span>
+                <span class="nav-label">{{ item.label }}</span>
               </a>
-              <span v-else class="nav-item unavailable" aria-disabled="true">
+              <span
+                v-else
+                class="nav-item unavailable"
+                :aria-label="`${item.label}, будет доступно позже`"
+                aria-disabled="true"
+                :title="`${item.label} — позже`"
+              >
                 <span class="nav-symbol" aria-hidden="true">{{ item.symbol }}</span>
-                <span>{{ item.label }}</span>
-                <span class="nav-soon">Позже</span>
+                <span class="nav-label">{{ item.label }}</span>
               </span>
             </li>
           </ul>
         </nav>
-
-        <div class="sidebar-note">
-          <span class="note-indicator" aria-hidden="true"></span>
-          <p>Инструменты будут подключаться по мере развития проекта.</p>
-        </div>
       </aside>
 
       <main id="workspace" class="workspace" aria-labelledby="workspace-title">
@@ -61,7 +67,7 @@ const navigationItems = [
           <span class="workspace-badge">Предварительная версия</span>
         </div>
 
-        <section class="map-placeholder" aria-labelledby="map-placeholder-title">
+        <section class="map-placeholder" aria-labelledby="map-placeholder-title" tabindex="0">
           <div class="placeholder-grid" aria-hidden="true"></div>
           <div class="placeholder-content">
             <span class="placeholder-icon" aria-hidden="true">⌖</span>
@@ -73,12 +79,25 @@ const navigationItems = [
           </div>
           <span class="placeholder-caption">РАБОЧИЙ ХОЛСТ · ОЖИДАЕТ ПОДКЛЮЧЕНИЯ КАРТЫ</span>
         </section>
-
-        <footer class="workspace-status" role="status">
-          <span><i class="status-dot" aria-hidden="true"></i> Интерфейс запущен</span>
-          <span>Картографический модуль не подключён</span>
-        </footer>
       </main>
+
+      <aside class="context-panel" aria-label="Контекстная панель">
+        <div class="panel-heading">
+          <span class="eyebrow">РАБОЧАЯ ПАНЕЛЬ</span>
+          <h2>Контекст</h2>
+        </div>
+        <div class="panel-empty">
+          <span class="panel-empty-symbol" aria-hidden="true">⌑</span>
+          <h3>Панель инструментов</h3>
+          <p>Здесь будут параметры выбранного инструмента, слоя или спутниковой сцены.</p>
+        </div>
+      </aside>
     </div>
+
+    <footer class="app-statusbar" role="status" aria-label="Состояние приложения">
+      <span><i class="status-dot" aria-hidden="true"></i> Интерфейс запущен</span>
+      <span>Карта не подключена</span>
+      <span>Координаты и масштаб недоступны</span>
+    </footer>
   </div>
 </template>
