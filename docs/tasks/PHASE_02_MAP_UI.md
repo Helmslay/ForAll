@@ -1,6 +1,6 @@
 # Phase 02 — карта и UI
 
-Следовать UX_UI_GUIDE.md. WEB-02.01 — DONE; WEB-02.02 — DONE; WEB-02.03 — READY; WEB-02.04—WEB-02.08 — PLANNED.
+Следовать UX_UI_GUIDE.md. WEB-02.01—WEB-02.03 — DONE; WEB-02.04—WEB-02.08 — PLANNED.
 
 ## WEB-02.01 — CSS design tokens
 **Статус:** DONE (2026-11-18).
@@ -25,7 +25,15 @@
 **Ограничения:** визуальная проверка в реальном браузере не выполнялась; карта, поиск, network status, coordinates и scale остаются не реализованы. Это только оболочка.
 **PR:** #29 merged; merge commit `3dc70e8df8e271ec2bacf60b70341a53b01eb9a7`.
 ## WEB-02.03 — responsive panels
-Зависимость: WEB-02.02. Desktop side panel; tablet drawer; mobile bottom sheet. Никаких hover-only controls. Проверить narrow viewport и touch. Приёмка: основные действия доступны на телефоне.
+
+**Статус:** DONE (2026-11-18).
+**Зависимость:** WEB-02.02 — DONE.
+**Результат:** контекстная панель сохраняется справа на desktop; на ширине до 900 px становится выдвижной правой панелью с затемнением фона; до 520 px превращается в нижний bottom sheet. Добавлены явные кнопки открытия/закрытия, закрытие по backdrop, aria-controls/aria-expanded, доступные имена и touch-action. Кнопки имеют минимальную высоту/ширину 44 px; переходы учитывают prefers-reduced-motion. Hover для открытия панели не требуется.
+**Изменённые файлы:** app/src/App.vue, app/src/style.css, app/src/App.spec.ts.
+**Проверки:** PR #30 exact-head commit 34cb4bb7a623929584bc9daac3695ede4addac9a; Frontend build CI run 44332026191 — SUCCESS. Успешны npm audit policy, audit, ESLint, Prettier, TypeScript, Vitest, production build, Vite/backend proxy smoke, Compose config, localhost port assertion, Compose start и frontend/API smoke.
+**Приёмка:** responsive drawer/bottom sheet и touch-sized controls реализованы; open/close/backdrop взаимодействия покрыты unit tests; полный frontend CI прошёл.
+**Ограничения:** автоматические unit tests не эмулируют реальный viewport/touch browser; ручная визуальная проверка на физических планшете/телефоне не выполнялась. Карта и инструменты пока заглушки.
+**PR:** #30 merged; merge commit 39161d5c1cbedea6756e10ed711c139681313c24.
 
 ## WEB-02.04 — OpenLayers lifecycle
 Зависимость: WEB-02.02. Один map component/composable: create on mount, dispose listeners/map on unmount, resize observer. Тест mount/unmount без console errors и утечек.
