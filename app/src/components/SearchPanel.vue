@@ -2,14 +2,14 @@
 import { computed, ref } from 'vue'
 import { createSearchRequest } from '../types/catalog'
 
-const aoiPropType = /** @type {import('vue').PropType<import('./openLayersMap').AOIBbox>} */ (Array)
-
 const props = defineProps({
   aoi: {
-    type: aoiPropType,
+    type: Array,
     default: null,
   },
 })
+
+const currentAoi = computed(() => /** @type {import('./openLayersMap').AOIBbox} */ (props.aoi ?? null))
 
 const emit = defineEmits(['submit', 'reset'])
 
@@ -57,11 +57,11 @@ const errors = computed(() => {
   }
 
   if (
-    !props.aoi ||
-    props.aoi.length !== 4 ||
-    !props.aoi.every(Number.isFinite) ||
-    props.aoi[2] <= props.aoi[0] ||
-    props.aoi[3] <= props.aoi[1]
+    !currentAoi.value ||
+    currentAoi.value.length !== 4 ||
+    !currentAoi.value.every(Number.isFinite) ||
+    currentAoi.value[2] <= currentAoi.value[0] ||
+    currentAoi.value[3] <= currentAoi.value[1]
   ) {
     result.aoi = 'Нарисуйте прямоугольную область интереса на карте.'
   }
@@ -72,12 +72,12 @@ const errors = computed(() => {
 const canSubmit = computed(() => Object.values(errors.value).every((message) => !message))
 
 function submit() {
-  if (!canSubmit.value || !props.aoi) {
+  if (!canSubmit.value || !currentAoi.value) {
     return
   }
 
   const request = createSearchRequest({
-    bbox: props.aoi,
+    bbox: currentAoi.value,
     dateFrom: dateFrom.value,
     dateTo: dateTo.value,
     cloudCover: Number(cloudCover.value),
@@ -137,11 +137,11 @@ function reset() {
 
     <section class="search-aoi" aria-labelledby="search-aoi-title">
       <h3 id="search-aoi-title">Область интереса</h3>
-      <div v-if="props.aoi" class="aoi-value">
-        <span>W {{ props.aoi[0].toFixed(5) }}</span>
-        <span>S {{ props.aoi[1].toFixed(5) }}</span>
-        <span>E {{ props.aoi[2].toFixed(5) }}</span>
-        <span>N {{ props.aoi[3].toFixed(5) }}</span>
+      <div v-if="currentAoi" class="aoi-value">
+        <span>W {{ currentAoi.value[0].toFixed(5) }}</span>
+        <span>S {{ currentAoi.value[1].toFixed(5) }}</span>
+        <span>E {{ currentAoi.value[2].toFixed(5) }}</span>
+        <span>N {{ currentAoi.value[3].toFixed(5) }}</span>
       </div>
       <p v-else class="aoi-empty">Область не выбрана.</p>
       <p v-if="errors.aoi" class="field-error" role="alert">{{ errors.aoi }}</p>
