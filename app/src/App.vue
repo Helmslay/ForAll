@@ -5,7 +5,8 @@ import SearchPanel from './components/SearchPanel.vue'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
-const aoiBbox = ref(/** @type {import('./components/openLayersMap').AOIBbox} */ (null))
+const initialAoi = /** @type {import('./components/openLayersMap').AOIBbox} */ (null)
+const aoiBbox = ref(initialAoi)
 const searchPrepared = ref(false)
 
 const navigationItems = [
