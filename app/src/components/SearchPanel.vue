@@ -109,9 +109,7 @@ function reset() {
         type="date"
         :aria-invalid="Boolean(errors.dateFrom || errors.dateRange)"
       />
-      <p v-if="errors.dateFrom" class="field-error" role="alert">
-        {{ errors.dateFrom }}
-      </p>
+      <p v-if="errors.dateFrom" class="field-error" role="alert">{{ errors.dateFrom }}</p>
     </div>
 
     <div class="search-field">
@@ -122,12 +120,8 @@ function reset() {
         type="date"
         :aria-invalid="Boolean(errors.dateTo || errors.dateRange)"
       />
-      <p v-if="errors.dateTo" class="field-error" role="alert">
-        {{ errors.dateTo }}
-      </p>
-      <p v-if="errors.dateRange" class="field-error" role="alert">
-        {{ errors.dateRange }}
-      </p>
+      <p v-if="errors.dateTo" class="field-error" role="alert">{{ errors.dateTo }}</p>
+      <p v-if="errors.dateRange" class="field-error" role="alert">{{ errors.dateRange }}</p>
     </div>
 
     <div class="search-field">
@@ -142,9 +136,7 @@ function reset() {
         inputmode="numeric"
         :aria-invalid="Boolean(errors.cloudCover)"
       />
-      <p v-if="errors.cloudCover" class="field-error" role="alert">
-        {{ errors.cloudCover }}
-      </p>
+      <p v-if="errors.cloudCover" class="field-error" role="alert">{{ errors.cloudCover }}</p>
     </div>
 
     <section class="search-aoi" aria-labelledby="search-aoi-title">
@@ -154,9 +146,7 @@ function reset() {
         {{ props.aoi[3].toFixed(5) }}
       </p>
       <p v-else class="aoi-empty">Область не выбрана.</p>
-      <p v-if="errors.aoi" class="field-error" role="alert">
-        {{ errors.aoi }}
-      </p>
+      <p v-if="errors.aoi" class="field-error" role="alert">{{ errors.aoi }}</p>
     </section>
 
     <div class="search-actions">
