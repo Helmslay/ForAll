@@ -79,7 +79,7 @@ Gate G1: новый разработчик запускает проект по 
 - WEB-02.05 — base map provider abstraction — **BLOCKED** (G0/source network and licensing gate remains open).
 - WEB-02.06 — cursor coordinates and map resolution — **DONE** (PR #35 merged; exact-head Frontend build CI run `44358215174` SUCCESS for `3b03c7cbd18a9c5165e2d498c9aca637f28ee900`; tools offline tests run `44357847194` SUCCESS; merge commit `b3870808b0b6ada015d5f1cc158abedd86c9621c`).
 - WEB-02.07 — AOI rectangle draw/clear — **DONE** (PR #36 merged; exact-head Frontend build CI run `44359722241` SUCCESS for `6223561722c18c079037da171da4f945fadc6c44`; merge commit `b485dfb429f50292702410bb43d4283cf9c3a8e9`).
-- WEB-02.08 — search form shell — **IN_REVIEW** (PR #37 открыт; exact-head Frontend CI ожидается; G0 не затронут).
+- WEB-02.08 — search form shell — **DONE** (PR #52 merged; exact-head Frontend build CI run `44552193095` SUCCESS; 17/17 unit tests PASS; merge commit `f6b75e6071b3779f693abdeb1a35c62015ffeea3`; G0 не затронут).
 
 Gate G2: пользователь создаёт AOI и видит bbox.
 
