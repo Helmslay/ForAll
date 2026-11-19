@@ -2,13 +2,11 @@
 import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import SearchPanel from './components/SearchPanel.vue'
-import type { AOIBbox } from './components/openLayersMap'
-import type { SearchRequest } from './types/catalog'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
-const aoiBbox = ref<AOIBbox>(null)
-const preparedSearch = ref<SearchRequest | null>(null)
+const aoiBbox = ref(/** @type {import('./components/openLayersMap').AOIBbox} */ (null))
+const preparedSearch = ref(/** @type {import('./types/catalog').SearchRequest | null} */ (null))
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -22,7 +20,8 @@ function closePanel() {
   panelOpen.value = false
 }
 
-function handleSearch(request: SearchRequest) {
+/** @param {import('./types/catalog').SearchRequest} request */
+function handleSearch(request) {
   preparedSearch.value = request
 }
 
