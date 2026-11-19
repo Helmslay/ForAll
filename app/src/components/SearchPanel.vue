@@ -46,11 +46,7 @@ const errors = computed(() => {
     result.dateTo = 'Проверьте конечную дату.'
   }
 
-  if (
-    !result.dateFrom &&
-    !result.dateTo &&
-    dateFrom.value > dateTo.value
-  ) {
+  if (!result.dateFrom && !result.dateTo && dateFrom.value > dateTo.value) {
     result.dateRange = 'Начальная дата не может быть позже конечной.'
   }
 
@@ -106,19 +102,37 @@ function reset() {
 
 <template>
   <form class="search-form" @submit.prevent="submit">
-    <p class="search-intro">Параметры поиска Sentinel-2 L2A. Отправка запроса пока не подключена.</p>
+    <p class="search-intro">
+      Параметры поиска Sentinel-2 L2A. Отправка запроса пока не подключена.
+    </p>
 
     <div class="search-field">
       <label for="search-date-from">Дата от</label>
-      <input id="search-date-from" v-model="dateFrom" type="date" :aria-invalid="Boolean(errors.dateFrom || errors.dateRange)" />
-      <p v-if="errors.dateFrom" class="field-error" role="alert">{{ errors.dateFrom }}</p>
+      <input
+        id="search-date-from"
+        v-model="dateFrom"
+        type="date"
+        :aria-invalid="Boolean(errors.dateFrom || errors.dateRange)"
+      />
+      <p v-if="errors.dateFrom" class="field-error" role="alert">
+        {{ errors.dateFrom }}
+      </p>
     </div>
 
     <div class="search-field">
       <label for="search-date-to">Дата до</label>
-      <input id="search-date-to" v-model="dateTo" type="date" :aria-invalid="Boolean(errors.dateTo || errors.dateRange)" />
-      <p v-if="errors.dateTo" class="field-error" role="alert">{{ errors.dateTo }}</p>
-      <p v-if="errors.dateRange" class="field-error" role="alert">{{ errors.dateRange }}</p>
+      <input
+        id="search-date-to"
+        v-model="dateTo"
+        type="date"
+        :aria-invalid="Boolean(errors.dateTo || errors.dateRange)"
+      />
+      <p v-if="errors.dateTo" class="field-error" role="alert">
+        {{ errors.dateTo }}
+      </p>
+      <p v-if="errors.dateRange" class="field-error" role="alert">
+        {{ errors.dateRange }}
+      </p>
     </div>
 
     <div class="search-field">
@@ -133,7 +147,9 @@ function reset() {
         inputmode="numeric"
         :aria-invalid="Boolean(errors.cloudCover)"
       />
-      <p v-if="errors.cloudCover" class="field-error" role="alert">{{ errors.cloudCover }}</p>
+      <p v-if="errors.cloudCover" class="field-error" role="alert">
+        {{ errors.cloudCover }}
+      </p>
     </div>
 
     <section class="search-aoi" aria-labelledby="search-aoi-title">
@@ -143,15 +159,21 @@ function reset() {
         {{ aoi[3].toFixed(5) }}
       </p>
       <p v-else class="aoi-empty">Область не выбрана.</p>
-      <p v-if="errors.aoi" class="field-error" role="alert">{{ errors.aoi }}</p>
+      <p v-if="errors.aoi" class="field-error" role="alert">
+        {{ errors.aoi }}
+      </p>
     </section>
 
     <div class="search-actions">
-      <button class="search-submit" type="submit" :disabled="!canSubmit">Подготовить поиск</button>
+      <button class="search-submit" type="submit" :disabled="!canSubmit">
+        Подготовить поиск
+      </button>
       <button class="search-reset" type="button" @click="reset">Сбросить</button>
     </div>
 
-    <p class="search-note" role="status">Здесь формируется SearchRequest. Сетевой поиск не выполняется.</p>
+    <p class="search-note" role="status">
+      Здесь формируется SearchRequest. Сетевой поиск не выполняется.
+    </p>
   </form>
 </template>
 
