@@ -8,7 +8,7 @@
 
 **Изменённые файлы:** `backend/app/schemas/__init__.py`, `backend/app/schemas/catalog.py`, `backend/tests/test_catalog_schemas.py`, `docs/API_CONTRACTS.md`, `docs/tasks/PHASE_03_CATALOG.md`.
 
-**Тесты:** добавлены 12 unit-test функций с параметризацией для валидного/невалидного bbox, дат, облачности, limit, опциональных полей, списка каналов, ProviderStatus и вложенного SearchResponse. Результат CI будет зафиксирован после проверки PR.
+**Тесты:** добавлены 13 unit-test функций с параметризацией для валидного/невалидного bbox, дат, облачности, limit, опциональных полей, списка каналов, ProviderStatus и вложенного SearchResponse. Результат CI будет зафиксирован после проверки PR.
 
 **Критерии приёмки:** DTO соответствуют зафиксированным полям контракта; значения bbox/date/cloud/limit проверяются; максимальный limit равен 100; optional source metadata не подменяется выдуманными значениями.
 
