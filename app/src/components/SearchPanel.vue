@@ -52,7 +52,7 @@ const errors = computed(() => {
   }
 
   const cloudValue = Number(cloudCover.value)
-  if (cloudCover.value.trim() === '' || !Number.isInteger(cloudValue) || cloudValue < 0 || cloudValue > 100) {
+  if (String(cloudCover.value).trim() === '' || !Number.isInteger(cloudValue) || cloudValue < 0 || cloudValue > 100) {
     result.cloudCover = 'Облачность должна быть целым числом от 0 до 100%.'
   }
 
