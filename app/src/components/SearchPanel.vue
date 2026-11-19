@@ -141,10 +141,12 @@ function reset() {
 
     <section class="search-aoi" aria-labelledby="search-aoi-title">
       <h3 id="search-aoi-title">Область интереса</h3>
-      <p v-if="props.aoi" class="aoi-value">
-        W {{ props.aoi[0].toFixed(5) }} · S {{ props.aoi[1].toFixed(5) }} · E {{ props.aoi[2].toFixed(5) }} · N
-        {{ props.aoi[3].toFixed(5) }}
-      </p>
+      <div v-if="props.aoi" class="aoi-value">
+        <span>W {{ props.aoi[0].toFixed(5) }}</span>
+        <span>S {{ props.aoi[1].toFixed(5) }}</span>
+        <span>E {{ props.aoi[2].toFixed(5) }}</span>
+        <span>N {{ props.aoi[3].toFixed(5) }}</span>
+      </div>
       <p v-else class="aoi-empty">Область не выбрана.</p>
       <p v-if="errors.aoi" class="field-error" role="alert">{{ errors.aoi }}</p>
     </section>
@@ -224,6 +226,8 @@ function reset() {
 }
 
 .aoi-value {
+  display: grid;
+  gap: var(--space-3);
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
 }
