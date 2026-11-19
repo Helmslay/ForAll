@@ -2,11 +2,11 @@
 import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import SearchPanel from './components/SearchPanel.vue'
+import { normalizeAoiBbox } from './types/catalog'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
-const initialAoi = /** @type {import('./components/openLayersMap').AOIBbox} */ (null)
-const aoiBbox = ref(initialAoi)
+const aoiBbox = ref(normalizeAoiBbox(null))
 const searchPrepared = ref(false)
 
 const navigationItems = [
