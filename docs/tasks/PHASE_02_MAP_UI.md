@@ -87,7 +87,7 @@
 
 ## WEB-02.08 — search form shell
 
-**Статус:** IN_REVIEW (2026-11-19; PR #41).  
+**Статус:** IN_REVIEW (2026-11-19; PR #42).  
 **Зависимости:** WEB-02.02 — DONE; WEB-02.07 — DONE.  
 **Goal:** подготовить пользовательские параметры Sentinel-2 L2A поиска и типизированный SearchRequest без сетевого вызова.
 
@@ -129,7 +129,7 @@
 - Сетевые вызовы и изменения backend не добавлялись.
 - **Изменённые файлы:** `app/src/types/catalog.ts`, `app/src/components/SearchPanel.vue`, `app/src/components/SearchPanel.spec.ts`, `app/src/components/MapCanvas.vue`, `app/src/components/MapCanvas.spec.ts`, `app/src/App.vue`, `app/src/App.spec.ts`, `app/src/style.css`, эта карточка и `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
 - **Проверки:** unit tests добавлены; локальное выполнение в этой среде недоступно. Exact-head Frontend build CI ожидается; критерии DONE пока не подтверждены.
-- **PR:** #37 — https://github.com/Helmslay/ForAll/pull/41.
+- **PR:** #37 — https://github.com/Helmslay/ForAll/pull/42.
 - **Ограничения:** G0 остаётся открытым; каталог, provider, assets и no-VPN доступ не проверялись.
 
 **Приёмка:** код и тесты добавлены; ожидается exact-head CI для подтверждения всех критериев.
