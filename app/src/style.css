@@ -868,3 +868,17 @@ h1 {
     transition-duration: 0.01ms;
   }
 }
+
+/* Search form workspace */
+.context-panel {
+  overflow-y: auto;
+}
+
+.search-prepared {
+  margin: var(--space-9) 0 0;
+  padding: var(--space-7);
+  border-left: 2px solid var(--color-primary);
+  color: var(--color-muted);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}

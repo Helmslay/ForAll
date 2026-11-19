@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
+import SearchPanel from './components/SearchPanel.vue'
+import { normalizeAoiBbox } from './types/catalog'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
+const aoiBbox = ref(normalizeAoiBbox(null))
+const searchPrepared = ref(false)
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -15,6 +19,14 @@ const navigationItems = [
 
 function closePanel() {
   panelOpen.value = false
+}
+
+function handleSearch() {
+  searchPrepared.value = true
+}
+
+function resetSearch() {
+  searchPrepared.value = false
 }
 </script>
 
@@ -84,24 +96,23 @@ function closePanel() {
           </div>
         </div>
 
-        <MapCanvas />
+        <MapCanvas @aoi-change="aoiBbox = $event" />
       </main>
 
       <aside id="context-panel" class="context-panel" :class="{ 'is-open': panelOpen }" aria-label="Контекстная панель">
         <div class="panel-heading">
           <div>
-            <span class="eyebrow">РАБОЧАЯ ПАНЕЛЬ</span>
-            <h2>Контекст</h2>
+            <span class="eyebrow">КАТАЛОГ SENTINEL-2</span>
+            <h2>Поиск сцен</h2>
           </div>
           <button class="panel-close" type="button" aria-label="Закрыть панель инструментов" @click="closePanel">
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <div class="panel-empty">
-          <span class="panel-empty-symbol" aria-hidden="true">⌑</span>
-          <h3>Панель инструментов</h3>
-          <p>Здесь будут параметры выбранного инструмента, слоя или спутниковой сцены.</p>
-        </div>
+        <SearchPanel :aoi="aoiBbox || undefined" @submit="handleSearch" @reset="resetSearch" />
+        <p v-if="searchPrepared" class="search-prepared" role="status">
+          Параметры подготовлены. Сетевой поиск пока не подключён.
+        </p>
       </aside>
     </div>
 

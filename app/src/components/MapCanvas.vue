@@ -2,6 +2,8 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { createOpenLayersMap } from './openLayersMap'
 
+const emit = defineEmits(['aoi-change'])
+
 const target = ref(null)
 const readout = reactive({ longitude: 0, latitude: 0, resolutionMeters: 0, hasCursor: false })
 const aoi = reactive({ west: 0, south: 0, east: 0, north: 0, hasAoi: false, drawing: false })
@@ -43,6 +45,7 @@ onMounted(() => {
         readout.hasCursor = nextReadout !== null
       },
       (bbox) => {
+        emit('aoi-change', bbox)
         aoi.hasAoi = bbox !== null
         aoi.drawing = false
 

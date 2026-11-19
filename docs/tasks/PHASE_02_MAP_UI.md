@@ -86,4 +86,50 @@
 **Временная автоматизация:** временный formatter workflow удалён после форматирования тестов.
 
 ## WEB-02.08 — search form shell
-Зависимости: WEB-02.02, WEB-02.07. Date range/cloud/AOI controls, validation, reset, typed SearchRequest. На этом шаге сетевого вызова нет.
+
+**Статус:** IN_REVIEW (2026-11-19; PR #52).  
+**Зависимости:** WEB-02.02 — DONE; WEB-02.07 — DONE.  
+**Goal:** подготовить пользовательские параметры Sentinel-2 L2A поиска и типизированный SearchRequest без сетевого вызова.
+
+### Scope
+- Добавить frontend SearchRequest type, точно соответствующий разделу 4 `docs/API_CONTRACTS.md`: bbox WGS84 [west, south, east, north], datetime.from/to UTC, cloud_cover_lte, collections, limit и cursor.
+- Добавить панель поиска с датой начала/окончания, максимальной облачностью 0–100 и состоянием текущего AOI.
+- Передавать AOI прямоугольника из OpenLayers MapCanvas в SearchPanel.
+- Проверять обязательные даты, корректность календарных дат, порядок from <= to, целочисленную облачность 0–100 и наличие непустого AOI.
+- По submit выдавать типизированный SearchRequest с коллекцией sentinel-2-l2a, лимитом 20 и cursor=null.
+- Сброс очищает даты и возвращает cloud cover к 100%; AOI очищается отдельным действием карты.
+- Ясно показывать, что параметры подготовлены, но реальный сетевой поиск пока не подключён.
+
+### Не входит
+- HTTP/API запросы, provider adapters, pagination, результаты и карточки сцен.
+- Автоматический поиск при перемещении карты.
+- Изменения backend или API-контракта.
+- Base map, raster assets, RGB и обход G0.
+
+### Тесты
+- Валидный ввод создаёт точный SearchRequest с UTC границами суток и текущим bbox.
+- Неполные/некорректные даты, обратный диапазон, cloud cover вне 0–100 и отсутствие AOI блокируют submit.
+- Reset очищает фильтры, не подменяя AOI.
+- MapCanvas передаёт bbox и null при очистке.
+- Существующие frontend tests и полный Frontend build CI проходят.
+
+### Критерии приёмки
+- [ ] DTO соответствует API_CONTRACTS.md без изменения backend API.
+- [ ] AOI отображается в порядке W/S/E/N и используется в запросе.
+- [ ] Даты валидны, from не позже to; UTC start/end сформированы детерминированно.
+- [ ] Cloud cover ограничен целыми значениями 0–100.
+- [ ] Reset восстанавливает пустые даты и cloud cover 100%.
+- [ ] Submit выдаёт typed SearchRequest; ни одного сетевого вызова нет.
+- [ ] Unit tests, lint, format, typecheck и production build проходят.
+
+### Фактический результат
+- Добавлены `SearchRequest` и `SearchPanel.vue` по существующему API/UX контракту.
+- MapCanvas передаёт WGS84 AOI bbox в App и панель поиска.
+- Реализованы date range, cloud cover 0–100, AOI validation, reset и локальная подготовка typed request.
+- Сетевые вызовы и изменения backend не добавлялись.
+- **Изменённые файлы:** `app/src/types/catalog.ts`, `app/src/components/SearchPanel.vue`, `app/src/components/SearchPanel.spec.ts`, `app/src/components/MapCanvas.vue`, `app/src/components/MapCanvas.spec.ts`, `app/src/App.vue`, `app/src/App.spec.ts`, `app/src/style.css`, эта карточка и `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
+- **Проверки:** unit tests добавлены; локальное выполнение в этой среде недоступно. Exact-head Frontend build CI ожидается; критерии DONE пока не подтверждены.
+- **PR:** #37 — https://github.com/Helmslay/ForAll/pull/52.
+- **Ограничения:** G0 остаётся открытым; каталог, provider, assets и no-VPN доступ не проверялись.
+
+**Приёмка:** код и тесты добавлены; ожидается exact-head CI для подтверждения всех критериев.
