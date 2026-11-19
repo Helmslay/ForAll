@@ -81,6 +81,11 @@ class Scene(DTOModel):
     geometry: dict[str, Any] | None = None
     available_bands: list[BandName]
     preview_available: bool
+    resolution: float | None = Field(default=None, allow_inf_nan=False)
+    crs: str | None = None
+    nodata: float | None = Field(default=None, allow_inf_nan=False)
+    scale: float | None = Field(default=None, allow_inf_nan=False)
+    offset: float | None = Field(default=None, allow_inf_nan=False)
 
     @field_validator("acquired_at")
     @classmethod
