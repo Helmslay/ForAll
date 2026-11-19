@@ -85,7 +85,7 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 
 ### Фаза 03 — каталог и поиск
 Карточки: tasks/PHASE_03_CATALOG.md
-- WEB-03.01 — Scene/Search DTO.
+- WEB-03.01 — Scene/Search DTO — **IN_REVIEW** (PR #53; backend CI ожидает запуска на актуальном HEAD).
 - WEB-03.02 — CatalogProvider Protocol.
 - WEB-03.03 — STAC fixtures.
 - WEB-03.04 — STAC HTTP client.
