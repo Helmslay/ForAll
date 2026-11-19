@@ -228,6 +228,7 @@ describe('MapCanvas', () => {
     expect(wrapper.get('.aoi-bbox').text()).toContain('N 21.00000')
     expect(map?.removeInteraction).toHaveBeenCalledWith(draw)
     expect(wrapper.get('.aoi-draw-button').attributes('aria-pressed')).toBe('false')
+    expect(wrapper.emitted('aoi-change')?.[0]?.[0]).toEqual([10, 20, 11, 21])
 
     wrapper.unmount()
   })
