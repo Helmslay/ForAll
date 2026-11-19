@@ -17,7 +17,7 @@ const cloudCover = ref('100')
 
 /** @param {string} value */
 function isCalendarDate(value) {
-  if (!/^\d{4}-\\d{2}-\\d{2}$/.test(value)) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return false
   }
 
@@ -62,6 +62,7 @@ const errors = computed(() => {
 
   if (
     !props.aoi ||
+    props.aoi.length !== 4 ||
     !props.aoi.every(Number.isFinite) ||
     props.aoi[2] <= props.aoi[0] ||
     props.aoi[3] <= props.aoi[1]
