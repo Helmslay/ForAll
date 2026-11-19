@@ -85,8 +85,8 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 
 ### Фаза 03 — каталог и поиск
 Карточки: tasks/PHASE_03_CATALOG.md
-- WEB-03.01 — Scene/Search DTO — **IN_REVIEW** (PR #53; backend CI ожидает запуска на актуальном HEAD).
-- WEB-03.02 — CatalogProvider Protocol.
+- WEB-03.01 — Scene/Search DTO — **DONE** (PR #53 merged; exact-head Backend tests run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; Frontend build run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`).
+- WEB-03.02 — CatalogProvider Protocol — **IN_PROGRESS**.
 - WEB-03.03 — STAC fixtures.
 - WEB-03.04 — STAC HTTP client.
 - WEB-03.05 — primary provider adapter.

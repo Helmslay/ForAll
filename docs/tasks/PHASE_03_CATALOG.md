@@ -2,20 +2,27 @@
 
 До реального adapter пройти WEB-00.10. Контракты в API_CONTRACTS.md. Статусы ведутся по каждой задаче.
 
-## WEB-03.01 — Pydantic DTO — IN_REVIEW
+## WEB-03.01 — Pydantic DTO — DONE
 
 **Результат:** добавлены `Scene`, `SearchRequest`, `SearchResponse`, `ProviderStatus` и вложенная `DateTimeRange`. Максимальный `SearchRequest.limit` зафиксирован как 100 сцен (диапазон 1–100 включительно). Bbox проверяется по EPSG:4326 и порядку west/south/east/north; даты должны быть timezone-aware UTC и упорядочены; облачность ограничена 0–100. Каналы ограничены B02/B03/B04/B08. Неизвестные поля отклоняются (`extra=forbid`), signed URL не входит в DTO. Необязательные `platform`, `cloud_cover`, `bbox`, `geometry`, `resolution`, `crs`, `nodata`, `scale`, `offset` остаются `None`, если источник их не предоставил.
 
 **Изменённые файлы:** `backend/app/schemas/__init__.py`, `backend/app/schemas/catalog.py`, `backend/tests/test_catalog_schemas.py`, `docs/API_CONTRACTS.md`, `docs/tasks/PHASE_03_CATALOG.md`.
 
-**Тесты:** добавлены 13 unit-test функций с параметризацией для валидного/невалидного bbox, дат, облачности, limit, опциональных полей, списка каналов, ProviderStatus и вложенного SearchResponse. Результат CI будет зафиксирован после проверки PR.
+**Тесты:** 13 unit-test функций с параметризацией; backend CI run `44576619525` — SUCCESS (30 tests passed, Uvicorn smoke-check passed); frontend build CI run `44576619705` — SUCCESS (audit, lint, format, typecheck, unit tests, production build, proxy smoke и Compose smoke).
 
 **Критерии приёмки:** DTO соответствуют зафиксированным полям контракта; значения bbox/date/cloud/limit проверяются; максимальный limit равен 100; optional source metadata не подменяется выдуманными значениями.
 
-**Ограничения:** provider, STAC HTTP client, normalizer и search endpoint не реализуются в этой задаче. Значения необязательных raster metadata не вычисляются и не подменяются: DTO принимает их только из фактических данных источника.
+**Ограничения:** provider, STAC HTTP client, normalizer и search endpoint не реализуются в этой задаче. Значения необязательных raster metadata не вычисляются и не подменяются: DTO принимает их только из фактических данных источника. Реальный STAC Search и доступность без VPN не проверялись.
 
-## WEB-03.02 — CatalogProvider Protocol
-Interface search/get_item/capabilities и общие domain errors. Не включать HTTP library-specific детали. Приёмка: provider можно заменить.
+## WEB-03.02 — CatalogProvider Protocol — IN_PROGRESS
+
+**Цель:** определить transport-independent интерфейс `capabilities`, `search`, `get_item` и общие доменные ошибки. Использовать существующие `SearchRequest`, `SearchResponse` и `Scene`; не включать HTTP library-specific детали.
+
+**Планируемые файлы:** `backend/app/catalog_provider.py`, `backend/tests/test_catalog_provider.py` и эта карточка/индексные документы.
+
+**Критерии приёмки:** тестовая реализация без сетевого клиента структурно соответствует Protocol; методы используют общие DTO; capability metadata неизменяемы и описывают только явно объявленные возможности; ошибки имеют стабильные безопасные коды/сообщения и не зависят от HTTP framework; тесты проходят.
+
+**Не входит:** STAC HTTP client, provider adapter, реальные capability values, search endpoint, orchestration и pagination.
 
 ## WEB-03.03 — STAC fixtures
 Valid item, missing cloud cover, missing required band, malformed geometry, provider error. Fixtures sanitized; offline-only tests.
