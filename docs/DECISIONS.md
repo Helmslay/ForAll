@@ -64,3 +64,9 @@ Use this log for decisions affecting more than one module. Format: status, conte
 **Decision:** Temporarily allow only the exact high-severity dependency graph propagated from advisory GHSA-fc5q-39xc-vjpf on `picomatch@4.0.7`: `picomatch`, `@vue/language-core`, `fdir`, `tinyglobby`, `vite`, `vitest`, and `vue-tsc`, each at its reviewed exact lockfile version and exact `npm audit` dependency edges. Every other high/critical advisory, package, version, dependency scope or path remains a CI failure. Dependency scope is verified from `package-lock.json`; the npm audit severity report remains visible. This is risk acceptance, not a security fix.
 **Review/expiry:** Recheck upstream advisory/release status within 14 days (by 2026-12-02) and remove the exception as soon as a patched compatible version is available. Revert the exception if the package moves into production dependencies or the dependency path changes.
 **Consequences:** This does not authorize downgrading Vite, force-updating packages, weakening production controls, or claiming the vulnerability is fixed. The exception is tested by five Node policy tests and full frontend CI. Review/remove by 2026-12-02, or earlier as soon as an upstream patched release is available.
+
+## ADR-014 — maximum catalog search page size
+**Status:** Accepted by explicit user direction (2026-11-19).
+**Context:** `API_CONTRACTS.md` required a server-bounded catalog search limit but did not specify its maximum.
+**Decision:** `SearchRequest.limit` is a required integer in the inclusive range 1–100. A single catalog search response may contain at most 100 scenes. The value 100 is the hard maximum, not an implicit default; pagination uses the opaque cursor defined by the API contract.
+**Consequences:** The backend DTO rejects limits below 1, above 100 and non-integer values. Any future change to this maximum requires an explicit contract and decision-log update.
