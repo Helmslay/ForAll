@@ -87,7 +87,7 @@
 
 ## WEB-02.08 — search form shell
 
-**Статус:** IN_REVIEW (2026-11-19; PR #52).  
+**Статус:** DONE (2026-11-19; PR #52 merged; merge commit `f6b75e6071b3779f693abdeb1a35c62015ffeea3`).  
 **Зависимости:** WEB-02.02 — DONE; WEB-02.07 — DONE.  
 **Goal:** подготовить пользовательские параметры Sentinel-2 L2A поиска и типизированный SearchRequest без сетевого вызова.
 
@@ -114,13 +114,13 @@
 - Существующие frontend tests и полный Frontend build CI проходят.
 
 ### Критерии приёмки
-- [ ] DTO соответствует API_CONTRACTS.md без изменения backend API.
-- [ ] AOI отображается в порядке W/S/E/N и используется в запросе.
-- [ ] Даты валидны, from не позже to; UTC start/end сформированы детерминированно.
-- [ ] Cloud cover ограничен целыми значениями 0–100.
-- [ ] Reset восстанавливает пустые даты и cloud cover 100%.
-- [ ] Submit выдаёт typed SearchRequest; ни одного сетевого вызова нет.
-- [ ] Unit tests, lint, format, typecheck и production build проходят.
+- [x] DTO соответствует API_CONTRACTS.md без изменения backend API.
+- [x] AOI отображается в порядке W/S/E/N и используется в запросе.
+- [x] Даты валидны, from не позже to; UTC start/end сформированы детерминированно.
+- [x] Cloud cover ограничен целыми значениями 0–100.
+- [x] Reset восстанавливает пустые даты и cloud cover 100%.
+- [x] Submit выдаёт typed SearchRequest; ни одного сетевого вызова нет.
+- [x] Unit tests, lint, format, typecheck и production build проходят.
 
 ### Фактический результат
 - Добавлены `SearchRequest` и `SearchPanel.vue` по существующему API/UX контракту.
@@ -128,8 +128,9 @@
 - Реализованы date range, cloud cover 0–100, AOI validation, reset и локальная подготовка typed request.
 - Сетевые вызовы и изменения backend не добавлялись.
 - **Изменённые файлы:** `app/src/types/catalog.ts`, `app/src/components/SearchPanel.vue`, `app/src/components/SearchPanel.spec.ts`, `app/src/components/MapCanvas.vue`, `app/src/components/MapCanvas.spec.ts`, `app/src/App.vue`, `app/src/App.spec.ts`, `app/src/style.css`, эта карточка и `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
-- **Проверки:** unit tests добавлены; локальное выполнение в этой среде недоступно. Exact-head Frontend build CI ожидается; критерии DONE пока не подтверждены.
-- **PR:** #37 — https://github.com/Helmslay/ForAll/pull/52.
+- **Проверки:** exact-head Frontend build CI run `44552193095` — SUCCESS; 17/17 unit tests PASS; ESLint, Prettier, TypeScript, production build, Vite proxy/backend health smoke, Docker Compose config и Compose frontend/API smoke — PASS.
+- **PR:** #52 — https://github.com/Helmslay/ForAll/pull/52 (merged).  
+- **Merge commit:** `f6b75e6071b3779f693abdeb1a35c62015ffeea3`.
 - **Ограничения:** G0 остаётся открытым; каталог, provider, assets и no-VPN доступ не проверялись.
 
-**Приёмка:** код и тесты добавлены; ожидается exact-head CI для подтверждения всех критериев.
+**Приёмка:** все критерии подтверждены exact-head CI run `44552193095`; задача закрыта после merge.
