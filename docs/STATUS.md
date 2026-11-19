@@ -54,7 +54,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 - WEB-02.07 — AOI rectangle draw/clear — DONE (PR #36 merged as `b485dfb429f50292702410bb43d4283cf9c3a8e9`; exact-head Frontend build CI run `44359722241` SUCCESS for `6223561722c18c079037da171da4f945fadc6c44`). Local Draw interaction, single AOI feature, WGS84 bbox `[west,south,east,north]`, cancel/clear and zero-area validation are implemented.
 - WEB-02.08 — search form shell — DONE (PR #52 merged; merge commit `f6b75e6071b3779f693abdeb1a35c62015ffeea3`; exact-head Frontend CI run `44552193095` SUCCESS; 17/17 unit tests PASS; lint/format/typecheck/build and Compose smoke PASS). Search parameters are prepared locally; network search is intentionally not connected.
 
-- Next planned implementation task: WEB-03.01 — Scene/Search DTO. Read its task card and verify dependencies/READY status before starting. WEB-03.05 remains dependent on WEB-00.10.
+- WEB-03.01 — Scene/Search DTO — IN_REVIEW (PR #53). Реализация и unit tests находятся в PR; статус DONE не выставляется до успешных проверок и review. Следующая задача после завершения: WEB-03.02 — CatalogProvider Protocol. WEB-03.05 остаётся зависимой от WEB-00.10.
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
 ## Important blockers
