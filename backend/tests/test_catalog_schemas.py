@@ -38,7 +38,7 @@ def test_search_request_accepts_contract_payload_and_limit_100() -> None:
     assert request.limit == 100
     assert request.datetime.start.isoformat() == "2025-06-01T00:00:00+00:00"
     serialized = request.model_dump(mode="json", by_alias=True)
-    assert serialized["datetime"]["from"].endswith("+00:00")
+    assert serialized["datetime"]["from"] == "2025-06-01T00:00:00Z"
 
 
 @pytest.mark.parametrize(
