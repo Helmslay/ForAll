@@ -5,8 +5,8 @@ import SearchPanel from './components/SearchPanel.vue'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
-const aoiBbox = ref(/** @type {import('./components/openLayersMap').AOIBbox} */ (null))
-const preparedSearch = ref(/** @type {import('./types/catalog').SearchRequest | null} */ (null))
+const aoiBbox = ref(null)
+const searchPrepared = ref(false)
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -22,11 +22,11 @@ function closePanel() {
 
 /** @param {import('./types/catalog').SearchRequest} request */
 function handleSearch(request) {
-  preparedSearch.value = request
+  searchPrepared.value = Boolean(request)
 }
 
 function resetSearch() {
-  preparedSearch.value = null
+  searchPrepared.value = false
 }
 </script>
 
@@ -110,7 +110,7 @@ function resetSearch() {
           </button>
         </div>
         <SearchPanel :aoi="aoiBbox" @submit="handleSearch" @reset="resetSearch" />
-        <p v-if="preparedSearch" class="search-prepared" role="status">
+        <p v-if="searchPrepared" class="search-prepared" role="status">
           Параметры подготовлены. Сетевой поиск пока не подключён.
         </p>
       </aside>
