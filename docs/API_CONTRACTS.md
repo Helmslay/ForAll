@@ -74,7 +74,7 @@ This is an illustrative DTO, not a real scene response.
 ## 5. Scene
 GET /api/v1/catalog/scenes/{scene_key}
 
-Return the normalized Scene and band availability. `platform`, `cloud_cover`, `bbox` and `geometry` may be absent when the source does not provide them; do not synthesize values. The only band identifiers exposed by this DTO are B02, B03, B04 and B08. Per-asset resolution/CRS/nodata/scale/offset shapes are not yet defined by this DTO contract and must not be guessed. Never return signed URLs or local paths. Unknown scene key → 404. Provider temporarily unavailable with no cached metadata → 503.
+Return the normalized Scene, band availability and optional `resolution`, `crs`, `nodata`, `scale` and `offset` metadata when the source provides them. `platform`, `cloud_cover`, `bbox` and `geometry` may be absent when the source does not provide them; do not synthesize values. The only band identifiers exposed by this DTO are B02, B03, B04 and B08. Never return signed URLs or local paths. Unknown scene key → 404. Provider temporarily unavailable with no cached metadata → 503.
 
 ## 6. RGB tiles
 GET /api/v1/imagery/{scene_key}/tiles/{z}/{x}/{y}.png
