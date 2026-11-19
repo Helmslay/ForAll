@@ -4,7 +4,7 @@ import { createSearchRequest } from '../types/catalog'
 
 const props = defineProps({
   aoi: {
-    type: Array,
+    type: /** @type {import('vue').PropType<import('./openLayersMap').AOIBbox>} */ (Array),
     default: null,
   },
 })
@@ -15,8 +15,7 @@ const dateFrom = ref('')
 const dateTo = ref('')
 const cloudCover = ref('100')
 
-/** @param {string} value */
-function isCalendarDate(value) {
+function isCalendarDate(value = '') {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return false
   }
