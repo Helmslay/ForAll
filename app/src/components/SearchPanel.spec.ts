@@ -4,13 +4,13 @@ import SearchPanel from './SearchPanel.vue'
 
 const aoi: [number, number, number, number] = [56.1, 58.9, 57.2, 59.8]
 
-function mountPanel(props: { aoi: typeof aoi | null } = { aoi }) {
+function mountPanel(props: { aoi?: typeof aoi } = { aoi }) {
   return mount(SearchPanel, { props })
 }
 
 describe('SearchPanel', () => {
   it('requires an AOI and valid date range before enabling submit', () => {
-    const wrapper = mountPanel({ aoi: null })
+    const wrapper = mountPanel({ aoi: undefined })
 
     expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
     expect(wrapper.text()).toContain('Нарисуйте прямоугольную область интереса на карте.')
