@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { createOpenLayersMap, type AOIBbox } from './openLayersMap'
+import { createOpenLayersMap } from './openLayersMap'
 
-const emit = defineEmits<{
-  'aoi-change': [bbox: AOIBbox]
-}>()
+const emit = defineEmits(['aoi-change'])
 
 const target = ref(null)
 const readout = reactive({ longitude: 0, latitude: 0, resolutionMeters: 0, hasCursor: false })
