@@ -37,7 +37,8 @@ def test_search_request_accepts_contract_payload_and_limit_100() -> None:
     assert request.bbox == (56.0, 57.0, 58.0, 59.0)
     assert request.limit == 100
     assert request.datetime.start.isoformat() == "2025-06-01T00:00:00+00:00"
-    assert request.model_dump(by_alias=True)["datetime"]["from"].endswith("+00:00")
+    serialized = request.model_dump(mode="json", by_alias=True)
+    assert serialized["datetime"]["from"].endswith("+00:00")
 
 
 @pytest.mark.parametrize(
@@ -131,7 +132,9 @@ def test_scene_rejects_unsupported_or_duplicate_bands() -> None:
 
 def test_scene_rejects_signed_url_and_non_utc_acquisition_time() -> None:
     with pytest.raises(ValidationError):
-        Scene.model_validate({**VALID_SCENE, "signed_url": "https://example.invalid/x"})
+        Scene.model_validate(
+            {**VALID_SCENE, "signed_url": "https://example.invalid/x"}
+        )
 
     with pytest.raises(ValidationError):
         Scene.model_validate(
@@ -156,7 +159,9 @@ def test_provider_status_accepts_known_states_and_utc_timestamp() -> None:
 
 def test_provider_status_rejects_unknown_state_and_extra_fields() -> None:
     with pytest.raises(ValidationError):
-        ProviderStatus.model_validate({"id": "earth-search", "status": "healthy"})
+        ProviderStatus.model_validate(
+            {"id": "earth-search", "status": "healthy"}
+        )
 
     with pytest.raises(ValidationError):
         ProviderStatus.model_validate(
