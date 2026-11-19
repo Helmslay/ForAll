@@ -26,11 +26,7 @@ export function createSearchRequest(input: {
     throw new Error('Invalid AOI bbox')
   }
 
-  if (
-    !Number.isInteger(input.cloudCover) ||
-    input.cloudCover < 0 ||
-    input.cloudCover > 100
-  ) {
+  if (!Number.isInteger(input.cloudCover) || input.cloudCover < 0 || input.cloudCover > 100) {
     throw new Error('Invalid cloud cover')
   }
 
