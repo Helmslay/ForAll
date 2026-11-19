@@ -150,9 +150,9 @@ function reset() {
 
     <section class="search-aoi" aria-labelledby="search-aoi-title">
       <h3 id="search-aoi-title">Область интереса</h3>
-      <p v-if="aoi" class="aoi-value">
-        W {{ aoi[0].toFixed(5) }} · S {{ aoi[1].toFixed(5) }} · E {{ aoi[2].toFixed(5) }} · N
-        {{ aoi[3].toFixed(5) }}
+      <p v-if="props.aoi" class="aoi-value">
+        W {{ props.aoi[0].toFixed(5) }} · S {{ props.aoi[1].toFixed(5) }} · E {{ props.aoi[2].toFixed(5) }} · N
+        {{ props.aoi[3].toFixed(5) }}
       </p>
       <p v-else class="aoi-empty">Область не выбрана.</p>
       <p v-if="errors.aoi" class="field-error" role="alert">
