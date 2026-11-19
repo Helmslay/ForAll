@@ -109,7 +109,7 @@ function resetSearch() {
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <SearchPanel :aoi="aoiBbox" @submit="handleSearch" @reset="resetSearch" />
+        <SearchPanel :aoi="aoiBbox || undefined" @submit="handleSearch" @reset="resetSearch" />
         <p v-if="searchPrepared" class="search-prepared" role="status">
           Параметры подготовлены. Сетевой поиск пока не подключён.
         </p>
