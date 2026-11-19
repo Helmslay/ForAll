@@ -22,7 +22,7 @@ describe('App', () => {
     expect(wrapper.get('.panel-heading h2').text()).toBe('Поиск сцен')
     expect(wrapper.find('.search-form').exists()).toBe(true)
     expect(wrapper.get('.context-panel').text()).toContain('Нарисуйте прямоугольную область интереса на карте.')
-    expect(wrapper.get('[role="status"]').text()).toContain('Пустой холст OpenLayers')
+    expect(wrapper.get('.app-statusbar').text()).toContain('Пустой холст OpenLayers')
     expect(wrapper.find('map-canvas-stub').exists()).toBe(true)
   })
 
