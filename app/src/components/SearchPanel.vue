@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { createSearchRequest } from '../types/catalog'
+import { createSearchRequest, normalizeAoiBbox } from '../types/catalog'
 
 const props = defineProps({
   aoi: {
@@ -9,7 +9,7 @@ const props = defineProps({
   },
 })
 
-const currentAoi = computed(() => /** @type {import('./openLayersMap').AOIBbox} */ (props.aoi ?? null))
+const currentAoi = computed(() => normalizeAoiBbox(props.aoi))
 
 const emit = defineEmits(['submit', 'reset'])
 
@@ -56,13 +56,7 @@ const errors = computed(() => {
     result.cloudCover = 'Облачность должна быть целым числом от 0 до 100%.'
   }
 
-  if (
-    !currentAoi.value ||
-    currentAoi.value.length !== 4 ||
-    !currentAoi.value.every(Number.isFinite) ||
-    currentAoi.value[2] <= currentAoi.value[0] ||
-    currentAoi.value[3] <= currentAoi.value[1]
-  ) {
+  if (!currentAoi.value) {
     result.aoi = 'Нарисуйте прямоугольную область интереса на карте.'
   }
 
