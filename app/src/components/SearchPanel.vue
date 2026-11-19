@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { SearchRequest } from '../types/catalog'
-import type { AOIBbox } from './openLayersMap'
+import { createSearchRequest } from '../types/catalog'
 
-const props = defineProps<{
-  aoi: AOIBbox
-}>()
+const props = defineProps({
+  aoi: {
+    type: Array,
+    default: null,
+  },
+})
 
-const emit = defineEmits<{
-  submit: [request: SearchRequest]
-  reset: []
-}>()
+const emit = defineEmits(['submit', 'reset'])
 
 const dateFrom = ref('')
 const dateTo = ref('')
@@ -79,17 +78,13 @@ function submit() {
     return
   }
 
-  emit('submit', {
-    bbox: [props.aoi[0], props.aoi[1], props.aoi[2], props.aoi[3]],
-    datetime: {
-      from: `${dateFrom.value}T00:00:00Z`,
-      to: `${dateTo.value}T23:59:59Z`,
-    },
-    cloud_cover_lte: Number(cloudCover.value),
-    collections: ['sentinel-2-l2a'],
-    limit: 20,
-    cursor: null,
+  const request = createSearchRequest({
+    bbox: props.aoi,
+    dateFrom: dateFrom.value,
+    dateTo: dateTo.value,
+    cloudCover: Number(cloudCover.value),
   })
+  emit('submit', request)
 }
 
 function reset() {
