@@ -1,3 +1,5 @@
+import type { AOIBbox } from '../components/openLayersMap'
+
 export type SearchRequest = {
   bbox: [west: number, south: number, east: number, north: number]
   datetime: {
@@ -41,4 +43,25 @@ export function createSearchRequest(input: {
     limit: 20,
     cursor: null,
   }
+}
+
+export function normalizeAoiBbox(value: unknown): AOIBbox {
+  if (!Array.isArray(value) || value.length !== 4) {
+    return null
+  }
+
+  const [west, south, east, north] = value
+  if (
+    typeof west !== 'number' ||
+    typeof south !== 'number' ||
+    typeof east !== 'number' ||
+    typeof north !== 'number' ||
+    ![west, south, east, north].every(Number.isFinite) ||
+    east <= west ||
+    north <= south
+  ) {
+    return null
+  }
+
+  return [west, south, east, north]
 }
