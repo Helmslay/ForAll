@@ -60,8 +60,8 @@ const errors = computed(() => {
     !currentAoi.value ||
     currentAoi.value.length !== 4 ||
     !currentAoi.value.every(Number.isFinite) ||
-    currentAoi.value[2] <= currentAoi.value[0] ||
-    currentAoi.value[3] <= currentAoi.value[1]
+    currentAoi[2] <= currentAoi[0] ||
+    currentAoi[3] <= currentAoi[1]
   ) {
     result.aoi = 'Нарисуйте прямоугольную область интереса на карте.'
   }
