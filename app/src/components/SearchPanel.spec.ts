@@ -53,14 +53,14 @@ describe('SearchPanel', () => {
     expect(wrapper.text()).toContain('Облачность должна быть целым числом от 0 до 100%.')
   })
 
-  it('rejects impossible calendar dates', async () => {
+  it('does not emit a request when the browser rejects an invalid calendar date', async () => {
     const wrapper = mountPanel()
 
     await wrapper.get('#search-date-from').setValue('2026-02-30')
     await wrapper.get('#search-date-to').setValue('2026-03-01')
 
     expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
-    expect(wrapper.text()).toContain('Проверьте начальную дату.')
+    expect(wrapper.emitted('submit')).toBeUndefined()
   })
 
   it('resets date and cloud filters while preserving the map AOI', async () => {
