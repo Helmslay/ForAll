@@ -14,18 +14,29 @@
 
 **Ограничения:** provider, STAC HTTP client, normalizer и search endpoint не реализуются в этой задаче. Значения необязательных raster metadata не вычисляются и не подменяются: DTO принимает их только из фактических данных источника. Реальный STAC Search и доступность без VPN не проверялись.
 
-## WEB-03.02 — CatalogProvider Protocol — IN_PROGRESS
+## WEB-03.02 — CatalogProvider Protocol — DONE
 
 **Цель:** определить transport-independent интерфейс `capabilities`, `search`, `get_item` и общие доменные ошибки. Использовать существующие `SearchRequest`, `SearchResponse` и `Scene`; не включать HTTP library-specific детали.
 
-**Планируемые файлы:** `backend/app/catalog_provider.py`, `backend/tests/test_catalog_provider.py` и эта карточка/индексные документы.
+**Результат:** добавлен async `CatalogProvider` Protocol с методами `capabilities`, `search(SearchRequest)`, `get_item(scene_key)`; типы возвращаемых значений используют существующие DTO `CatalogCapabilities`, `SearchResponse` и `Scene`. `CatalogCapabilities` — неизменяемая структура с provider ID, явно заявленными коллекциями и поддерживаемыми каналами. Добавлены общие доменные ошибки `CatalogProviderError`, `CatalogUnavailableError`, `CatalogItemNotFoundError`, `CatalogQueryNotSupportedError`, `CatalogRateLimitedError`, `CatalogConfigurationError` со стабильными безопасными кодами/сообщениями. В модуле нет зависимости от HTTP-клиента или FastAPI.
 
-**Критерии приёмки:** тестовая реализация без сетевого клиента структурно соответствует Protocol; методы используют общие DTO; capability metadata неизменяемы и описывают только явно объявленные возможности; ошибки имеют стабильные безопасные коды/сообщения и не зависят от HTTP framework; тесты проходят.
+**Изменённые файлы:** `backend/app/catalog_provider.py`, `backend/tests/test_catalog_provider.py`, `docs/tasks/PHASE_03_CATALOG.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
 
-**Не входит:** STAC HTTP client, provider adapter, реальные capability values, search endpoint, orchestration и pagination.
+**Тесты:** 5 тестовых функций, включая параметризованную проверку шести доменных ошибок; backend CI run `44589067499` — SUCCESS (40 passed, Uvicorn smoke-check passed); frontend build CI run `44589067504` — SUCCESS (audit, lint, format, typecheck, frontend tests, production build, proxy и Compose smoke).
 
-## WEB-03.03 — STAC fixtures
-Valid item, missing cloud cover, missing required band, malformed geometry, provider error. Fixtures sanitized; offline-only tests.
+**Критерии приёмки:** fake provider без сетевого клиента соответствует Protocol; методы используют общие DTO; capability metadata неизменяема; ошибки имеют безопасные коды/сообщения и не содержат HTTP-specific полей. Все проверки прошли.
+
+**PR:** #54 merged; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`.
+
+**Ограничения:** реальные provider capabilities не объявлялись и не проверялись; STAC HTTP client, provider adapter, search endpoint, orchestration и pagination не реализованы. G0 остаётся открытым.
+
+## WEB-03.03 — STAC fixtures — READY
+
+**Зависимости:** WEB-03.01 DONE, WEB-03.02 DONE. Все fixtures должны быть синтетическими или очищенными от URL/credentials и проверяться offline.
+
+**Scope:** valid STAC Item; missing cloud cover; missing required MVP band; malformed geometry; provider error. Не добавлять сетевые запросы и не утверждать, что fixtures являются реальными данными провайдера.
+
+**Критерии приёмки:** fixtures покрывают все перечисленные варианты; тесты подтверждают безопасную обработку каждого случая; в фикстурах нет signed URLs, токенов и секретов.
 
 ## WEB-03.04 — STAC HTTP client
 Timeouts, finite retries for transient failures, JSON validation, safe logs, endpoint allowlist/config. Mock tests for 200/500/timeout/invalid JSON. No infinite retry.
