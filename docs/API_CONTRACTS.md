@@ -44,7 +44,7 @@ Request:
       "cursor": null
     }
 
-Rules: bbox valid; from <= to; cloud_cover 0..100; limit server-bounded; providers optional; cursor opaque and bound to query signature. Never accept arbitrary catalog URL.
+Rules: bbox contains four finite coordinates in [west, south, east, north] order; longitude is within -180..180, latitude within -90..90, west < east and south < north. `datetime.from` and `datetime.to` must be timezone-aware UTC values, with from <= to. `cloud_cover_lte` is optional and, when present, is 0..100. `limit` is an integer from 1 to 100 inclusive (server-enforced maximum: 100). `providers` is optional; `cursor` is opaque and bound to the query signature. Never accept an arbitrary catalog URL.
 
 Response:
 
@@ -74,7 +74,7 @@ This is an illustrative DTO, not a real scene response.
 ## 5. Scene
 GET /api/v1/catalog/scenes/{scene_key}
 
-Return normalized Scene, band availability and metadata for resolution/CRS/nodata/scale/offset if present. Never return signed URLs. Unknown scene key → 404. Provider temporarily unavailable with no cached metadata → 503.
+Return the normalized Scene, band availability and optional `resolution`, `crs`, `nodata`, `scale` and `offset` metadata when the source provides them. `platform`, `cloud_cover`, `bbox` and `geometry` may be absent when the source does not provide them; do not synthesize values. The only band identifiers exposed by this DTO are B02, B03, B04 and B08. Never return signed URLs or local paths. Unknown scene key → 404. Provider temporarily unavailable with no cached metadata → 503.
 
 ## 6. RGB tiles
 GET /api/v1/imagery/{scene_key}/tiles/{z}/{x}/{y}.png
