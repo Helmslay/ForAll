@@ -2,9 +2,11 @@
 import { computed, ref } from 'vue'
 import { createSearchRequest } from '../types/catalog'
 
+const aoiPropType = /** @type {import('vue').PropType<import('./openLayersMap').AOIBbox>} */ (Array)
+
 const props = defineProps({
   aoi: {
-    type: /** @type {import('vue').PropType<import('./openLayersMap').AOIBbox>} */ (Array),
+    type: aoiPropType,
     default: null,
   },
 })
