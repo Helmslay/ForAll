@@ -120,6 +120,30 @@ def test_scene_accepts_missing_optional_metadata() -> None:
     assert scene.cloud_cover is None
     assert scene.bbox is None
     assert scene.geometry is None
+    assert scene.resolution is None
+    assert scene.crs is None
+    assert scene.nodata is None
+    assert scene.scale is None
+    assert scene.offset is None
+
+
+def test_scene_accepts_source_raster_metadata_when_present() -> None:
+    scene = Scene.model_validate(
+        {
+            **VALID_SCENE,
+            "resolution": 10,
+            "crs": "EPSG:32640",
+            "nodata": 0,
+            "scale": 0.0001,
+            "offset": -0.1,
+        }
+    )
+
+    assert scene.resolution == 10
+    assert scene.crs == "EPSG:32640"
+    assert scene.nodata == 0
+    assert scene.scale == 0.0001
+    assert scene.offset == -0.1
 
 
 def test_scene_rejects_unsupported_or_duplicate_bands() -> None:
