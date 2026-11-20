@@ -41,7 +41,7 @@
 - WEB-02.04: DONE; PR #32 merged as `331b06dd9c82fa0a5ee39691a767b71a52da94fe`. OpenLayers `10.11.0`, empty map canvas, ResizeObserver cleanup and lifecycle tests are implemented. Exact-head Frontend build CI run `44339512145` SUCCESS, including npm audit policy/audit, lint, format, typecheck, unit tests, production build, backend proxy smoke, Compose config/localhost binding, Compose startup and frontend/API smoke. Temporary bootstrap workflows were removed before PR creation.
 
 ## Current milestone
-G1 — first local frontend/backend development build verified on the user's Windows computer on 2026-11-18. G0 remains open and blocks real provider/raster implementation.
+G1 — first local frontend/backend development build verified on the user's Windows computer on 2026-11-18. По прямому решению пользователя G0 отложен до проверки доступности через готовое приложение; он остаётся OPEN и не блокирует разработку каталога/API. Доступность без VPN не подтверждена.
 
 ## Next task
 
@@ -54,14 +54,14 @@ G1 — first local frontend/backend development build verified on the user's Win
 - WEB-02.07 — AOI rectangle draw/clear — DONE (PR #36 merged as `b485dfb429f50292702410bb43d4283cf9c3a8e9`; exact-head Frontend build CI run `44359722241` SUCCESS for `6223561722c18c079037da171da4f945fadc6c44`). Local Draw interaction, single AOI feature, WGS84 bbox `[west,south,east,north]`, cancel/clear and zero-area validation are implemented.
 - WEB-02.08 — search form shell — DONE (PR #52 merged; merge commit `f6b75e6071b3779f693abdeb1a35c62015ffeea3`; exact-head Frontend CI run `44552193095` SUCCESS; 17/17 unit tests PASS; lint/format/typecheck/build and Compose smoke PASS). Search parameters are prepared locally; network search is intentionally not connected.
 
-- WEB-03.01 — Scene/Search DTO — DONE (PR #53 merged; exact-head backend CI run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; exact-head frontend CI run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`). WEB-03.02 — CatalogProvider Protocol — DONE (PR #54 merged; exact-head backend CI run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; exact-head frontend CI run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`). WEB-03.03 — STAC fixtures — IN_REVIEW (PR #56; exact-head CI SUCCESS). WEB-03.05 остаётся зависимой от WEB-00.10.
-- WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
+- WEB-03.01 — Scene/Search DTO — DONE (PR #53 merged; exact-head backend CI run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; exact-head frontend CI run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`). WEB-03.02 — CatalogProvider Protocol — DONE (PR #54 merged; exact-head backend CI run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; exact-head frontend CI run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`). WEB-03.03 — STAC fixtures — DONE (PR #56 merged; merge commit `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror SUCCESS). Следующая задача: WEB-03.04 — STAC HTTP client (READY). WEB-00.10/provider selection is deferred; do not claim a primary source or no-VPN availability.
+- WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is deferred until the user tests through the usable application. Do not repeat diagnostic-agent work or already completed base GET checks. G0 is OPEN but deferred from the current development critical path by explicit user decision.
 
 ## Important blockers
-1. No provider has been approved as primary.
+1. No provider has been approved as primary; provider selection is deferred until application-level testing.
 2. Real Sentinel-2 asset access from a Russian backend has not been proven.
 3. Permission to cache and redistribute each candidate source's data must be reviewed.
-4. The user-facing path from Russian home/mobile networks without VPN has not been tested.
+4. The user-facing path from Russian home/mobile networks without VPN has not been tested. Do not claim no-VPN availability.
 5. One high-severity advisory GHSA-fc5q-39xc-vjpf remains present in the frontend development toolchain (`picomatch@4.0.7` and exact transitive paths). It is temporarily accepted under ADR-013; npm audit continues to block all other high/critical findings. Review/remove the exception by 2026-12-02 or earlier when an upstream fix is available. No production dependency is affected; no forced upgrade or audit suppression was used.
 
 ## Status policy
@@ -74,4 +74,4 @@ Update this file when a milestone or material project decision changes. Do not m
 
 
 ## Current task
-WEB-03.03 — STAC fixtures — IN_REVIEW. Five synthetic offline-only fixtures and tests are submitted in PR #56. Exact PR head `cf948e476d368f4cc37ecc6b916068e520a5d5c4` passed backend tests, frontend build and mirror checks (run IDs `44717413409`, `44717413260`, `44717395847`). No provider/network integration was added; G0 remains open.
+WEB-03.04 — STAC HTTP client — READY. WEB-03.03 is DONE: PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror checks passed (run IDs `44719855813`, `44719855787`, `44719846069`). G0 remains OPEN but deferred from the development critical path by explicit user decision.
