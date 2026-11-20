@@ -18,8 +18,6 @@ from app.catalog_provider import (
 
 logger = logging.getLogger(__name__)
 
-_RETRYABLE_STATUSES = frozenset({429, 500, 502, 503, 504})
-
 
 class StacHttpClient:
     """HTTP JSON client restricted to explicitly allowlisted HTTPS hosts."""
@@ -111,15 +109,16 @@ class StacHttpClient:
                     json=json_body,
                     headers={"Accept": "application/json, application/geo+json"},
                 ) as response:
-                    if response.status_code in _RETRYABLE_STATUSES:
+                    status = response.status_code
+                    if status == 429 or 500 <= status < 600:
                         if attempt < self.max_retries:
                             await asyncio.sleep(self._retry_delay(response, attempt))
                             continue
-                        if response.status_code == 429:
+                        if status == 429:
                             raise CatalogRateLimitedError(self.provider_id)
                         raise CatalogUnavailableError(self.provider_id)
 
-                    if not 200 <= response.status_code < 300:
+                    if not 200 <= status < 300:
                         raise CatalogProviderError(self.provider_id)
 
                     content_type = response.headers.get("content-type", "").lower()
