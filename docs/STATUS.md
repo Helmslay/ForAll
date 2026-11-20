@@ -1,6 +1,6 @@
 # Project status
 
-**Last updated:** 2026-11-19
+**Last updated:** 2026-11-20
 
 ## Repository state
 - Presentation landing page: present at `/index.html`; GIS-first redesign LP-01 is complete in PR #9. The concept map is explicitly illustrative; browser GIS functionality is not claimed as implemented.
@@ -11,7 +11,7 @@
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
 - A standalone allowlisted STAC connectivity checker and offline mock tests are present under /tools; this is a diagnostic utility, not the application or a provider adapter.
 - Database and storage: not provisioned.
-- Russian upstream access: not verified.
+- Russian VPS → STAC catalog: partially verified on 2026-11-20. Earth Search and CDSE root/collections passed; Planetary Computer root passed but collections exceeded the diagnostic response-size limit. VPS egress country/ASN reported RU/AS44112 by two services. Real STAC Search, raster assets, COG reads and storage remain unverified (Issues #58 and #60; details in `docs/DATA_SOURCE_TEST_MATRIX.md`).
 - User-side access from Russian networks without VPN: not verified.
 - First user-side local Windows dev-build verified on 2026-11-18: frontend production build succeeded; FastAPI started on `127.0.0.1:8000`; direct `/api/v1/health` and proxied `http://127.0.0.1:5173/api/v1/health` both returned `status=ok`, version `0.1.0`; app opened in Chrome; no other Console errors were reported besides missing `/favicon.ico` (404). This verifies the local scaffold only, not GIS features or Russian network access.
 
