@@ -117,3 +117,15 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - WEB-00.03 остаётся IN_PROGRESS до реального пользовательского Search. Следующее действие: выполнить `python tools/search_stac.py --all` на Windows в России при выключенных VPN и proxy и передать JSON-отчёт без редактирования asset href (их скрипт не выводит).
 
 - Дополнительная проверка после merge: main push workflow `Tools offline tests`, run `44310622444`, SUCCESS; 23 tests и py_compile выполнены на merge commit. `Local Windows tests` run `44310622370` остаётся QUEUED (self-hosted runner); его результат не заявляется как PASS.
+
+
+### Дополнительный VPS baseline — 2026-11-20
+
+- Через установленный диагностический агент выполнено задание `stac_connectivity`, Issue #58: [G0 VPS STAC connectivity check](https://github.com/Helmslay/sentinel-explorer-agent/issues/58).
+- Отдельное задание `egress_identity`, Issue #60: [VPS egress identity](https://github.com/Helmslay/sentinel-explorer-agent/issues/60). IPinfo и ipwho.is независимо вернули country `RU` и ASN `AS44112` (assessment `AGREE`); raw IP и координаты в отчёт не включались.
+- Sentinel VPS → Earth Search: DNS/TCP/TLS/root/collections PASS; root HTTP 200, collections HTTP 200, 9 collections.
+- Sentinel VPS → CDSE: DNS/TCP/TLS/root/collections PASS; root HTTP 200, collections HTTP 200, 10 collections.
+- Sentinel VPS → Planetary Computer: DNS/TCP/TLS/root PASS; collections не подтверждён из-за `ResponseTooLarge` в лимите действующего diagnostic agent. Это не доказывает недоступность каталога.
+- Это только дополнительная проверка root/collections через сетевой выход российского VPS. Она **не является STAC Search**, не подтверждает реальные Sentinel-2 Items, assets, B02/B03/B04/B08, Range/COG, raster read, лицензию или пользовательский доступ из домашних/мобильных сетей.
+- Установленный диагностический агент пока не имеет job type `stac_search`; его фиксированный allowlist поддерживает `stac_connectivity` и другие заранее заданные проверки. Произвольная shell-команда не разрешена. Следующий серверный шаг — отдельное тестируемое расширение с фиксированным безопасным STAC Search handler либо запуск существующего `tools/search_stac.py --all` на Windows в России без VPN/proxy.
+- Статус WEB-00.03 остаётся IN_PROGRESS; критерий реального Search и остальные G0 gates не закрыты.
