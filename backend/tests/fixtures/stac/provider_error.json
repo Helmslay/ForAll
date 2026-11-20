@@ -1,0 +1,7 @@
+{
+  "fixture_type": "provider_error",
+  "sentinel_explorer_fixture": true,
+  "provider_id": "synthetic-provider",
+  "code": "PROVIDER_UNAVAILABLE",
+  "message": "Каталог временно недоступен"
+}
