@@ -33,14 +33,19 @@ class StacHttpClient:
         max_retries: int = 2,
         max_response_bytes: int = 2_000_000,
         retry_backoff_seconds: float = 0.25,
-        client: httpx.AsyncClient | None = None,
+        transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         if not provider_id.strip():
             raise ValueError("provider_id must not be empty")
         hosts = frozenset(host.strip().lower() for host in allowed_hosts if host.strip())
         if not hosts:
             raise CatalogConfigurationError(provider_id)
-        if timeout_seconds <= 0 or max_retries < 0 or max_response_bytes <= 0:
+        if (
+            timeout_seconds <= 0
+            or max_retries < 0
+            or max_retries > 5
+            or max_response_bytes <= 0
+        ):
             raise ValueError("invalid STAC HTTP client limits")
         if retry_backoff_seconds < 0:
             raise ValueError("retry_backoff_seconds must not be negative")
@@ -50,10 +55,10 @@ class StacHttpClient:
         self.max_retries = max_retries
         self.max_response_bytes = max_response_bytes
         self.retry_backoff_seconds = retry_backoff_seconds
-        self._owns_client = client is None
-        self._client = client or httpx.AsyncClient(
+        self._client = httpx.AsyncClient(
             timeout=httpx.Timeout(timeout_seconds),
             follow_redirects=False,
+            transport=transport,
         )
 
     async def __aenter__(self) -> "StacHttpClient":
@@ -63,8 +68,7 @@ class StacHttpClient:
         await self.aclose()
 
     async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        await self._client.aclose()
 
     def _validate_url(self, url: str) -> None:
         try:
