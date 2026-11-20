@@ -87,9 +87,9 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 Карточки: tasks/PHASE_03_CATALOG.md
 - WEB-03.01 — Scene/Search DTO — **DONE** (PR #53 merged; exact-head Backend tests run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; Frontend build run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`).
 - WEB-03.02 — CatalogProvider Protocol — **DONE** (PR #54 merged; exact-head Backend tests run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; Frontend build run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`).
-- WEB-03.03 — STAC fixtures — **IN_REVIEW** (PR #56; exact-head backend tests and build checks passed; final mergeability recheck pending).
-- WEB-03.04 — STAC HTTP client — **IN_REVIEW** (async HTTPX transport, HTTPS host allowlist, bounded retries, response size/JSON validation; exact-head CI pending).
-- WEB-03.05 — configurable STAC adapter; provider endpoint must be explicitly configured/allowlisted. Primary-source approval and live availability remain deferred; use mocked integration tests until user-side testing.
+- WEB-03.03 — STAC fixtures — **DONE** (PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror SUCCESS).
+- WEB-03.04 — STAC HTTP client — **DONE** (PR #58 merged as `ad0b06b0c7b01f06796cda9e3df62061c622217f`; exact-head backend tests run `44724633948`, frontend build run `44724633952`, mirror run `44724626930` — all SUCCESS; retries cover all HTTP 5xx).
+- WEB-03.05 — configurable STAC adapter — **READY** (dependencies WEB-03.01–03.04 DONE; configured HTTPS endpoint + exact host allowlist; mocked integration tests only; no provider approval/live availability claim).
 - WEB-03.06 — STAC Item normalizer.
 - WEB-03.07 — search API endpoint.
 - WEB-03.08 — catalog orchestrator.
@@ -188,7 +188,7 @@ Gate G7: offline tested without network; analytic outputs checked against fixtur
 Gate G8: release checklist and data-access report are complete.
 
 ## 6. Зависимости, которые нельзя обходить
-- Выбор primary provider (WEB-00.10) отложен до пользовательской проверки; WEB-03.04 HTTP client and generic STAC integration can be developed with strict endpoint allowlisting and mocked tests. Do not represent any provider as approved/available.
+- Выбор primary provider (WEB-00.10) и G0 отложены до пользовательской проверки готового приложения. Это не блокирует generic STAC adapter: endpoint задаётся явно, hostname проходит allowlist, интеграция проверяется mock-тестами. Не представлять провайдера как одобренного/доступного.
 - Внешний raster reader зависит от WEB-00.06.
 - Tile endpoint зависит от asset model, safe resolver и RGB tests.
 - Export зависит от storage/job contracts.
