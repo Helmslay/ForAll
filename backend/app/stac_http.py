@@ -143,9 +143,12 @@ class StacHttpClient:
                         chunks.append(chunk)
 
                     try:
-                        return json.loads(b"".join(chunks))
+                        payload = json.loads(b"".join(chunks))
                     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
                         raise CatalogProviderError(self.provider_id) from exc
+                    if not isinstance(payload, dict):
+                        raise CatalogProviderError(self.provider_id)
+                    return payload
 
             except (httpx.TimeoutException, httpx.TransportError) as exc:
                 logger.warning(
