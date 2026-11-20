@@ -60,8 +60,23 @@
 
 **Ограничения:** реальный provider endpoint и доступность без VPN не проверялись; HTTP client сам по себе не выбирает и не одобряет поставщика.
 
-## WEB-03.05 — configurable STAC adapter
-Provider endpoint must be explicitly configured and allowlisted. Primary-source approval and live availability remain deferred; use mocked integration tests until user-side testing. Implement STAC search/item requests, collections, pagination links and provider errors. Never persist or log temporary signed hrefs.
+## WEB-03.05 — configurable STAC adapter — DONE
+
+**Зависимости:** WEB-03.01–03.04 DONE.
+
+**Результат:** добавлены `StacAdapterConfig` и `StacCatalogAdapter`. Endpoint задаётся явно; конфигурация принимает только HTTPS endpoint на hostname из точного allowlist, стандартный порт 443, без userinfo/query/fragment. Конфигурация явно объявляет коллекции и доступные каналы. Реализованы STAC `GET /collections`, `POST /search`, получение Item по collection/item ID и переход по provider `rel=next` ссылке. Все запросы идут через `StacHttpClient`; redirect и выход на hostname вне allowlist блокируются. Cloud-cover filter отправляется только при явном включении Query Extension; неподдерживаемый фильтр/collection/cursor отклоняется доменной ошибкой. Ответы проверяются на базовую STAC-структуру. Временные next href используются только внутри backend вызова и не записываются в логи/хранилище.
+
+**Изменённые файлы:** `backend/app/stac_adapter.py`, `backend/tests/test_stac_adapter.py`.
+
+**Тесты:** offline HTTPX MockTransport tests: explicit HTTPS/allowlist validation, collections, STAC Search payload, pagination next link, rejection of off-host next link, escaped Item path, configured/unsupported query extension, unsupported collection/cursor and safe provider failure/invalid payload. Exact PR head `30604a43ac2d1f0b2acb30939a840b146dc99fe1`: Backend tests run `44725439719` SUCCESS (including Uvicorn smoke-check); mirror run `44725430664` SUCCESS.
+
+**Критерии приёмки:** explicit configured endpoint and exact-host allowlist; collection/search/item requests; backend-only next-link traversal; safe error handling; mocked tests without real provider traffic. Все критерии этой задачи проверены CI.
+
+**PR:** #59 merged; merge commit `87a97534c4a3ce8b8fdecb76052e6f7210ca59a2`.
+
+**Ограничения:** adapter возвращает raw STAC Items; mapping в Scene DTO выполняется в WEB-03.06. Opaque cursor/signature/expiry остаются в WEB-03.09. Provider approval, live availability, asset access, licensing and no-VPN access не проверялись. Не реализована автоматическая обработка provider-specific POST pagination links; next link fetch сейчас выполняется GET.
+
+
 
 ## WEB-03.06 — STAC normalizer
 Pure map id/collection/datetime/platform/geometry/bbox/cloud/assets; stable provider:collection:item key. Tests optional/invalid fields. No invented metadata.
