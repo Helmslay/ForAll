@@ -18,14 +18,13 @@ URL = "https://catalog.example/stac"
 
 def make_client(handler, **kwargs):
     transport = httpx.MockTransport(handler)
-    http_client = httpx.AsyncClient(transport=transport)
     return StacHttpClient(
         provider_id="test-catalog",
         allowed_hosts=HOSTS,
-        client=http_client,
+        transport=transport,
         retry_backoff_seconds=0,
         **kwargs,
-    ), http_client
+    ), transport
 
 
 @pytest.mark.asyncio
@@ -45,7 +44,7 @@ async def test_returns_json_for_successful_stac_response():
             "id": "scene-1",
         }
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
