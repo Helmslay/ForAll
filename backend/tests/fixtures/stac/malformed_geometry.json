@@ -1,0 +1,68 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "synthetic-sentinel-2-bad-geometry-001",
+  "collection": "sentinel-2-l2a",
+  "sentinel_explorer_fixture": true,
+  "bbox": [
+    59.3,
+    56.7,
+    59.5,
+    56.9
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          59.3,
+          56.7
+        ],
+        [
+          59.5,
+          56.7
+        ],
+        [
+          59.5,
+          56.9
+        ],
+        [
+          59.3,
+          56.9
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": "2025-06-15T07:20:00Z",
+    "platform": "sentinel-2b",
+    "eo:cloud_cover": 4
+  },
+  "assets": {
+    "B02": {
+      "href": "urn:sentinel-explorer:fixture:asset:B02",
+      "roles": [
+        "data"
+      ]
+    },
+    "B03": {
+      "href": "urn:sentinel-explorer:fixture:asset:B03",
+      "roles": [
+        "data"
+      ]
+    },
+    "B04": {
+      "href": "urn:sentinel-explorer:fixture:asset:B04",
+      "roles": [
+        "data"
+      ]
+    },
+    "B08": {
+      "href": "urn:sentinel-explorer:fixture:asset:B08",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "links": []
+}
