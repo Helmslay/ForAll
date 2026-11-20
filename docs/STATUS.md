@@ -54,7 +54,7 @@ G1 — first local frontend/backend development build verified on the user's Win
 - WEB-02.07 — AOI rectangle draw/clear — DONE (PR #36 merged as `b485dfb429f50292702410bb43d4283cf9c3a8e9`; exact-head Frontend build CI run `44359722241` SUCCESS for `6223561722c18c079037da171da4f945fadc6c44`). Local Draw interaction, single AOI feature, WGS84 bbox `[west,south,east,north]`, cancel/clear and zero-area validation are implemented.
 - WEB-02.08 — search form shell — DONE (PR #52 merged; merge commit `f6b75e6071b3779f693abdeb1a35c62015ffeea3`; exact-head Frontend CI run `44552193095` SUCCESS; 17/17 unit tests PASS; lint/format/typecheck/build and Compose smoke PASS). Search parameters are prepared locally; network search is intentionally not connected.
 
-- WEB-03.01 — Scene/Search DTO — DONE (PR #53 merged; exact-head backend CI run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; exact-head frontend CI run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`). WEB-03.02 — CatalogProvider Protocol — DONE (PR #54 merged; exact-head backend CI run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; exact-head frontend CI run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`). Следующая задача: WEB-03.03 — STAC fixtures (READY). WEB-03.05 остаётся зависимой от WEB-00.10.
+- WEB-03.01 — Scene/Search DTO — DONE (PR #53 merged; exact-head backend CI run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; exact-head frontend CI run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`). WEB-03.02 — CatalogProvider Protocol — DONE (PR #54 merged; exact-head backend CI run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; exact-head frontend CI run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`). WEB-03.03 — STAC fixtures — IN_REVIEW (PR #56; exact-head CI SUCCESS). WEB-03.05 остаётся зависимой от WEB-00.10.
 - WEB-00.03 remains IN_PROGRESS; Russian-network STAC Search is intentionally deferred until the user has computer access. Do not repeat the already completed base GET checks. The next user-side STAC action remains `python tools/search_stac.py --all` from a Windows computer in Russia with VPN/proxy disabled. G0 still blocks real provider/raster/imagery implementation.
 
 ## Important blockers
@@ -71,3 +71,7 @@ Update this file when a milestone or material project decision changes. Do not m
 ## User decisions recorded — 2026-11-20
 - VPS diagnostics must use the already deployed `sentinel-explorer-agent`; do not ask the user to update/reinstall/redeploy it merely to run tests. See ADR-015 and `AGENTS.md`.
 - Microsoft Planetary Computer remains in the G0 shortlist. The user confirms Russian-network access; the VPS collections response-size cap is an inconclusive diagnostic limitation, not evidence of provider unavailability. Search/assets/COG and legal checks remain open (ADR-016).
+
+
+## Current task
+WEB-03.03 — STAC fixtures — IN_REVIEW. Five synthetic offline-only fixtures and tests are submitted in PR #56. Exact PR head `cf948e476d368f4cc37ecc6b916068e520a5d5c4` passed backend tests, frontend build and mirror checks (run IDs `44717413409`, `44717413260`, `44717395847`). No provider/network integration was added; G0 remains open.
