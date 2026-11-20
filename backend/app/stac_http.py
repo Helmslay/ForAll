@@ -115,7 +115,7 @@ class StacHttpClient:
                             raise CatalogRateLimitedError(self.provider_id)
                         raise CatalogUnavailableError(self.provider_id)
 
-                    if response.is_redirect or response.status_code >= 400:
+                    if not 200 <= response.status_code < 300:
                         raise CatalogProviderError(self.provider_id)
 
                     content_type = response.headers.get("content-type", "").lower()
