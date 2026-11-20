@@ -88,7 +88,7 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 - WEB-03.01 — Scene/Search DTO — **DONE** (PR #53 merged; exact-head Backend tests run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; Frontend build run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`).
 - WEB-03.02 — CatalogProvider Protocol — **DONE** (PR #54 merged; exact-head Backend tests run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; Frontend build run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`).
 - WEB-03.03 — STAC fixtures — **IN_REVIEW** (PR #56; exact-head backend tests and build checks passed; final mergeability recheck pending).
-- WEB-03.04 — STAC HTTP client — **READY**.
+- WEB-03.04 — STAC HTTP client — **IN_REVIEW** (async HTTPX transport, HTTPS host allowlist, bounded retries, response size/JSON validation; exact-head CI pending).
 - WEB-03.05 — configurable STAC adapter; provider endpoint must be explicitly configured/allowlisted. Primary-source approval and live availability remain deferred; use mocked integration tests until user-side testing.
 - WEB-03.06 — STAC Item normalizer.
 - WEB-03.07 — search API endpoint.

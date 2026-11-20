@@ -74,4 +74,4 @@ Update this file when a milestone or material project decision changes. Do not m
 
 
 ## Current task
-WEB-03.04 — STAC HTTP client — READY. WEB-03.03 is DONE: PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror checks passed (run IDs `44719855813`, `44719855787`, `44719846069`). G0 remains OPEN but deferred from the development critical path by explicit user decision.
+WEB-03.04 — STAC HTTP client — IN_REVIEW. WEB-03.03 is DONE: PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror checks passed (run IDs `44719855813`, `44719855787`, `44719846069`). G0 remains OPEN but deferred from the development critical path by explicit user decision.
