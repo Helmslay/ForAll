@@ -44,17 +44,21 @@
 
 **Ограничения:** fixtures синтетические и не являются ответами реального поставщика. Нет STAC HTTP client или provider adapter. G0 остаётся OPEN и отложен до пользовательской проверки через приложение.
 
-## WEB-03.04 — STAC HTTP client — IN_REVIEW
+## WEB-03.04 — STAC HTTP client — DONE
 
 **Зависимости:** WEB-03.01, WEB-03.02 и WEB-03.03 DONE. `httpx==0.28.1` добавлен в runtime `requirements.txt`; `pytest-asyncio==0.25.3` добавлен в dev requirements.
 
-**Результат:** добавлен `StacHttpClient`: async GET/POST JSON transport; exact-host HTTPS allowlist (только стандартный порт 443, без userinfo/fragments); redirects отключены; ограничение размера ответа; JSON/content-type/object validation; finite retries для transport timeout/errors и HTTP 429/500/502/503/504; Retry-After ограничен одной секундой; безопасные доменные ошибки и логи без URL/query/body. `httpx` перенесён в runtime dependencies.
+**Результат:** добавлен `StacHttpClient`: async GET/POST JSON transport; exact-host HTTPS allowlist (только стандартный порт 443, без userinfo/fragments); redirects отключены; ограничение размера ответа; JSON/content-type/object validation; конечные retry для transport timeout/errors и HTTP 429/всех 5xx; Retry-After ограничен одной секундой; безопасные доменные ошибки и логи без URL/query/body. HTTP 5xx распознаются диапазоном 500–599, а не фиксированным списком кодов.
 
-**Изменённые файлы:** `backend/app/stac_http.py`, `backend/requirements.txt`, `backend/requirements-dev.txt`, `backend/tests/test_stac_http.py`, эта карточка, `docs/STATUS.md`, `docs/EXECUTION_PLAN.md`.
+**Изменённые файлы:** `backend/app/stac_http.py`, `backend/requirements.txt`, `backend/requirements-dev.txt`, `backend/tests/test_stac_http.py`.
 
-**Тесты:** добавлены offline mock tests для success, host/scheme/port/userinfo allowlist, redirect, retry 5xx, non-retryable 4xx, exhausted 5xx/429, timeout, invalid content-type/JSON, oversized body, sanitized logs and unsupported method. Локальный запуск не выполнялся; exact-head GitHub Actions CI pending.
+**Тесты:** offline mock tests покрывают success, host/scheme/port/userinfo allowlist, redirect, retry 5xx, non-retryable 4xx, exhausted 5xx/429, timeout, invalid content-type/JSON, oversized body, sanitized logs and unsupported method. На exact PR head `1adbe0721a9da8f3c2aa935f9a00790eaa34d741`: Backend tests run `44724633948` SUCCESS; Frontend build run `44724633952` SUCCESS; mirror run `44724626930` SUCCESS.
 
-**Критерии приёмки:** код реализует HTTPS host allowlist, bounded retries, response-size cap, JSON validation, redirect denial and sanitized transport errors. Окончательный DONE — только после успешного exact-head CI.
+**Критерии приёмки:** HTTPS host allowlist, bounded retries, response-size cap, JSON validation, redirect denial and sanitized transport errors реализованы; все exact-head CI checks прошли.
+
+**PR:** #58 merged; merge commit `ad0b06b0c7b01f06796cda9e3df62061c622217f`.
+
+**Ограничения:** реальный provider endpoint и доступность без VPN не проверялись; HTTP client сам по себе не выбирает и не одобряет поставщика.
 
 ## WEB-03.05 — configurable STAC adapter
 Provider endpoint must be explicitly configured and allowlisted. Primary-source approval and live availability remain deferred; use mocked integration tests until user-side testing. Implement STAC search/item requests, collections, pagination links and provider errors. Never persist or log temporary signed hrefs.
