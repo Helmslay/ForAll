@@ -7,13 +7,13 @@
 
 ## 2. Dependency chain
 
-    G0 Источники и доступность в России
-      ↓
     G1 Каркас frontend/backend
       ↓
     G2 Карта и интерфейс
       ↓
     G3 Каталог и поиск
+      ↓
+    G0 пользовательская проверка источников (отложена; не DONE)
       ↓
     G4 Растры, каналы, RGB
       ↓
@@ -26,7 +26,7 @@
     G8 Production release
 
 ## 3. Текущий статус
-WEB-00.01 и WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS (безопасный STAC Search для тестового AOI Березников); G0 остаётся открытым. Первый локальный Windows dev-build пользователя успешно проверен 2026-11-18 и зафиксирован в `docs/STATUS.md`. По явному разрешению пользователя (ADR-010) разрешено продолжить G1 до первого локального dev-build, не дожидаясь российских сетевых проверок. Это исключение не снимает G0 gate: реальные provider adapters, STAC search, raster/imagery, downloads и no-VPN claims остаются заблокированы до соответствующих доказательств. STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
+WEB-00.01 и WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS. Первый локальный Windows dev-build проверен 2026-11-18. По прямому решению пользователя G0 отложен до проверки источников через готовое приложение и НЕ считается DONE. G0 не блокирует разработку каталога/API: реализуем STAC-клиент и интеграцию без заявления о доступности конкретного источника или работы без VPN. Реальные provider errors/status должны отображаться честно. STAC checker остаётся диагностической утилитой, а не приложением или provider adapter.
 
 ## 4. Сквозные UX-задачи
 Карточка: tasks/UX_01_SOFT_NEUTRAL_PALETTE.md.
@@ -88,8 +88,8 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 - WEB-03.01 — Scene/Search DTO — **DONE** (PR #53 merged; exact-head Backend tests run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; Frontend build run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`).
 - WEB-03.02 — CatalogProvider Protocol — **DONE** (PR #54 merged; exact-head Backend tests run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; Frontend build run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`).
 - WEB-03.03 — STAC fixtures — **IN_REVIEW** (PR #56; exact-head backend tests and build checks passed; final mergeability recheck pending).
-- WEB-03.04 — STAC HTTP client.
-- WEB-03.05 — primary provider adapter.
+- WEB-03.04 — STAC HTTP client — **READY**.
+- WEB-03.05 — configurable STAC adapter; provider endpoint must be explicitly configured/allowlisted. Primary-source approval and live availability remain deferred; use mocked integration tests until user-side testing.
 - WEB-03.06 — STAC Item normalizer.
 - WEB-03.07 — search API endpoint.
 - WEB-03.08 — catalog orchestrator.
@@ -188,7 +188,7 @@ Gate G7: offline tested without network; analytic outputs checked against fixtur
 Gate G8: release checklist and data-access report are complete.
 
 ## 6. Зависимости, которые нельзя обходить
-- WEB-03.05 зависит от WEB-00.10.
+- Выбор primary provider (WEB-00.10) отложен до пользовательской проверки; WEB-03.04 HTTP client and generic STAC integration can be developed with strict endpoint allowlisting and mocked tests. Do not represent any provider as approved/available.
 - Внешний raster reader зависит от WEB-00.06.
 - Tile endpoint зависит от asset model, safe resolver и RGB tests.
 - Export зависит от storage/job contracts.
