@@ -78,8 +78,21 @@
 
 
 
-## WEB-03.06 — STAC normalizer
-Pure map id/collection/datetime/platform/geometry/bbox/cloud/assets; stable provider:collection:item key. Tests optional/invalid fields. No invented metadata.
+## WEB-03.06 — STAC Item normalizer — DONE
+
+**Зависимости:** WEB-03.01–03.05 DONE.
+
+**Результат:** добавлена функция `normalize_stac_item`, преобразующая STAC Feature Item в существующий `Scene` DTO без изменения API-контракта. Ключ сцены стабилен и формируется как `provider:collection:item` с URL-encoding компонентов. Collection берётся из Item; если поле отсутствует, разрешён только переданный вызывающей стороной доверенный collection context. Конфликт коллекции отклоняется. Дата `properties.datetime` обязательна, должна быть timezone-aware и приводится к UTC. Platform, cloud cover, bbox и geometry остаются необязательными; некорректные optional values опускаются, а не подменяются. Геометрия проходит структурную проверку GeoJSON типов и координат, включая замкнутость Polygon rings. Доступные каналы извлекаются только из явно названных B02/B03/B04/B08 asset key или `eo:bands[].name`, при наличии непустого href. `preview_available` определяется по assets с ролями `thumbnail` или `overview`. Asset href и исходный assets объект не входят в Scene DTO.
+
+**Изменённые файлы:** `backend/app/stac_normalizer.py`, `backend/tests/test_stac_normalizer.py`.
+
+**Тесты:** новые unit tests покрывают корректный Item и стабильный key, missing cloud cover/B08, malformed geometry, invalid optional fields, timezone conversion, invalid required fields, collection fallback/mismatch, preview role и отсутствие href в сериализованном DTO. Exact PR head `16787f5452f88943b595a26e6de25ff9b58556d8`: Backend tests run `44726072118` SUCCESS — **91 passed**, Uvicorn smoke-check SUCCESS; mirror run `44726047813` SUCCESS.
+
+**Критерии приёмки:** STAC identity/date/platform/geometry/bbox/cloud/assets mapped to existing Scene; stable provider:collection:item key; optional/invalid metadata not invented; only four MVP bands exposed; asset hrefs not exposed; offline tests pass.
+
+**PR:** #60 merged; merge commit `29fd0c5e757b6d69b9214d4086f1c7d496ba88df`.
+
+**Ограничения:** отсутствующие/невалидные обязательные identity, collection или datetime приводят к безопасному `CatalogProviderError`; optional invalid geometry/bbox/cloud/platform are omitted. Geometry check is structural and does not replace a full topology/CRS validator. Raster resolution/CRS/nodata/scale/offset are not inferred from assets. Band detection deliberately requires explicit B02/B03/B04/B08 naming; ambiguous common_name aliases such as `nir` are not guessed. Real provider data and no-VPN access were not tested.
 
 ## WEB-03.07 — search endpoint
 POST /catalog/search, validation and standard errors. Tests invalid bbox/date/cloud/limit and valid input. No arbitrary URL.
