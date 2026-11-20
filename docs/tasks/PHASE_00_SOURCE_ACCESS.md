@@ -117,3 +117,13 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - WEB-00.03 остаётся IN_PROGRESS до реального пользовательского Search. Следующее действие: выполнить `python tools/search_stac.py --all` на Windows в России при выключенных VPN и proxy и передать JSON-отчёт без редактирования asset href (их скрипт не выводит).
 
 - Дополнительная проверка после merge: main push workflow `Tools offline tests`, run `44310622444`, SUCCESS; 23 tests и py_compile выполнены на merge commit. `Local Windows tests` run `44310622370` остаётся QUEUED (self-hosted runner); его результат не заявляется как PASS.
+
+
+### Российский VPS: catalog connectivity baseline — 2026-11-20
+
+- VPS egress identity was checked through two independent metadata services: both reported country `RU` and ASN `AS44112`; country and ASN agreement PASS. The report does not independently establish the physical city or test end-user networks. Evidence: [sentinel-explorer-agent Issue #60](https://github.com/Helmslay/sentinel-explorer-agent/issues/60).
+- Earth Search: DNS, TCP, TLS, STAC root and collections PASS; root/collections HTTP 200; 9 collections.
+- CDSE: DNS, TCP, TLS, STAC root and collections PASS; root/collections HTTP 200; 10 collections.
+- Planetary Computer: DNS, TCP, TLS and root PASS (HTTP 200); collections response exceeded the diagnostic response-size limit (`ResponseTooLarge`), so collections remain UNKNOWN and the provider check is FAIL.
+- Evidence for provider checks: [sentinel-explorer-agent Issue #58](https://github.com/Helmslay/sentinel-explorer-agent/issues/58), run 2026-11-20 04:25 UTC.
+- **Interpretation:** this establishes only partial catalog transport/reachability from the Russian VPS. No STAC Search, real Item, asset metadata, B02/B03/B04/B08 bytes, HTTP Range, COG read, preview or storage operation was performed. It does not establish access from Russian home/mobile networks without VPN. WEB-00.03 remains IN_PROGRESS.
