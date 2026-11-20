@@ -74,4 +74,4 @@ Update this file when a milestone or material project decision changes. Do not m
 
 
 ## Current task
-WEB-03.03 — STAC fixtures — IN_REVIEW. Five synthetic offline-only fixtures and tests are submitted in PR #56. Exact PR head `cf948e476d368f4cc37ecc6b916068e520a5d5c4` passed backend tests, frontend build and mirror checks (run IDs `44717413409`, `44717413260`, `44717395847`). No provider/network integration was added; G0 remains open.
+WEB-03.04 — STAC HTTP client — READY. WEB-03.03 is DONE: PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror checks passed (run IDs `44719855813`, `44719855787`, `44719846069`). G0 remains OPEN but deferred from the development critical path by explicit user decision.
