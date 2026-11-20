@@ -46,7 +46,7 @@ def _valid_geometry(geometry: Any) -> bool:
     if not isinstance(geometry, Mapping):
         return False
     geometry_type = geometry.get("type")
-    if geometry_type not in _GEOMETRY_TYPES:
+    if not isinstance(geometry_type, str) or geometry_type not in _GEOMETRY_TYPES:
         return False
     if geometry_type == "GeometryCollection":
         geometries = geometry.get("geometries")
@@ -216,7 +216,7 @@ def _has_preview(assets: Any) -> bool:
             isinstance(href, str)
             and href.strip()
             and isinstance(roles, list)
-            and any(role in {"thumbnail", "overview"} for role in roles)
+            and any(isinstance(role, str) and role in {"thumbnail", "overview"} for role in roles)
         ):
             return True
     return False
