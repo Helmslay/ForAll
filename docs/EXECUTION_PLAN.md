@@ -87,7 +87,7 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 Карточки: tasks/PHASE_03_CATALOG.md
 - WEB-03.01 — Scene/Search DTO — **DONE** (PR #53 merged; exact-head Backend tests run `44576619525` SUCCESS, 30 tests + Uvicorn smoke; Frontend build run `44576619705` SUCCESS; merge commit `8ca882cc7cde1769d0293f92a5d9f39f3b86b79e`).
 - WEB-03.02 — CatalogProvider Protocol — **DONE** (PR #54 merged; exact-head Backend tests run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; Frontend build run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`).
-- WEB-03.03 — STAC fixtures — **READY** (WEB-03.01 and WEB-03.02 DONE; sanitized offline-only fixtures).
+- WEB-03.03 — STAC fixtures — **IN_REVIEW** (PR #56; exact-head backend tests and build checks passed; final mergeability recheck pending).
 - WEB-03.04 — STAC HTTP client.
 - WEB-03.05 — primary provider adapter.
 - WEB-03.06 — STAC Item normalizer.

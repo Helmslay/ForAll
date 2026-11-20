@@ -30,13 +30,19 @@
 
 **Ограничения:** реальные provider capabilities не объявлялись и не проверялись; STAC HTTP client, provider adapter, search endpoint, orchestration и pagination не реализованы. G0 остаётся открытым.
 
-## WEB-03.03 — STAC fixtures — READY
+## WEB-03.03 — STAC fixtures — IN_REVIEW
 
-**Зависимости:** WEB-03.01 DONE, WEB-03.02 DONE. Все fixtures должны быть синтетическими или очищенными от URL/credentials и проверяться offline.
+**Зависимости:** WEB-03.01 DONE, WEB-03.02 DONE.
 
-**Scope:** valid STAC Item; missing cloud cover; missing required MVP band; malformed geometry; provider error. Не добавлять сетевые запросы и не утверждать, что fixtures являются реальными данными провайдера.
+**Результат:** добавлены пять синтетических JSON fixtures: корректный STAC Item с B02/B03/B04/B08; Item без `eo:cloud_cover`; Item без B08; Polygon с незамкнутым кольцом; безопасная ошибка provider. Asset href используют локальные fixture URN `urn:sentinel-explorer:fixture:*`; сетевые URL, signed URLs, токены и секреты отсутствуют. Добавлены offline-тесты для структуры Item, отсутствующего cloud cover, отсутствующего B08, некорректного кольца, безопасной provider error и отсутствия сетевых URL/секретов.
 
-**Критерии приёмки:** fixtures покрывают все перечисленные варианты; тесты подтверждают безопасную обработку каждого случая; в фикстурах нет signed URLs, токенов и секретов.
+**Изменённые файлы:** пять JSON fixtures в `backend/tests/fixtures/stac/`, `backend/tests/test_stac_fixtures.py`, эта карточка, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
+
+**Проверки:** exact PR head `cf948e476d368f4cc37ecc6b916068e520a5d5c4`: backend tests run `44717413409` SUCCESS; frontend build run `44717413260` SUCCESS; mirror run `44717395847` SUCCESS. Backend workflow включает pytest и Uvicorn health smoke-check. Локальный запуск в рабочей сессии не выполнялся.
+
+**Критерии приёмки:** пять сценариев представлены; проверки offline-only; network URLs/credentials отсутствуют; cloud cover и B08 не подменяются выдуманными значениями. Exact-head CI passed. Геометрическая проверка ограничена замыканием Polygon ring; production geometry validator не реализуется.
+
+**Ограничения:** fixtures синтетические и не являются ответами реального поставщика. Нет STAC HTTP client или provider adapter. G0 остаётся открытым.
 
 ## WEB-03.04 — STAC HTTP client
 Timeouts, finite retries for transient failures, JSON validation, safe logs, endpoint allowlist/config. Mock tests for 200/500/timeout/invalid JSON. No infinite retry.
