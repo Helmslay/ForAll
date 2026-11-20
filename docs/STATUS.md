@@ -5,7 +5,7 @@
 ## Repository state
 - Presentation landing page: present at `/index.html`; GIS-first redesign LP-01 is complete in PR #9. The concept map is explicitly illustrative; browser GIS functionality is not claimed as implemented.
 - Landing page README: updated with documentation links.
-- Browser application source: Vue 3/Vite/TypeScript shell is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. OpenLayers empty map canvas/lifecycle (WEB-02.04), WGS84 cursor readout/local resolution (WEB-02.06) and local rectangle AOI draw/clear (WEB-02.07) are implemented. Base map, catalog and imagery are not implemented. WEB-01.08 connects the frontend development server to the backend health endpoint through a proxy.
+- Browser application source: Vue 3/Vite/TypeScript shell is present under `app/`; hosted production build and Vite dev-server HTTP smoke-check passed. OpenLayers empty map canvas/lifecycle (WEB-02.04), WGS84 cursor readout/local resolution (WEB-02.06) and local rectangle AOI draw/clear (WEB-02.07) are implemented. Base map, catalog API orchestration/UI and imagery are not implemented; generic STAC HTTP client and configurable adapter exist, but no provider endpoint is enabled or approved. WEB-01.08 connects the frontend development server to the backend health endpoint through a proxy.
 - Frontend quality tooling: ESLint, Prettier, vue-tsc and Vitest are configured; hosted CI checks pass. One render test covers the scaffold. npm audit retains a fail-closed high/critical gate with one temporary, exact dev-tool advisory exception (ADR-013).
 - Backend source: FastAPI scaffold, request ID middleware, normalized error responses and `GET /api/v1/health` are implemented under `backend/`; WEB-01.08 added the Vite development proxy and typed health client (PR #15 merged; CI run `44115192957` SUCCESS). WEB-01.09 added a two-service Docker Compose development stack (PR #16 merged; CI run `44118409536` SUCCESS), including healthy dependencies and a successful frontend-to-API proxy smoke-check. WEB-01.10 (PR #17 merged; frontend CI run `44126893666` SUCCESS) hardens host port publication to localhost only and adds a CI assertion; the local development guide is available in `docs/LOCAL_DEVELOPMENT.md`. No database or raster dependencies are included yet.
 - Root structure placeholders `scripts/` and `deployment/`, `.gitignore`, and a secret-free `.env.example` were added by WEB-01.01.
@@ -69,8 +69,8 @@ Update this file when a milestone or material project decision changes. Do not m
 
 
 ## User decisions recorded — 2026-11-20
-- VPS diagnostics must use the already deployed `sentinel-explorer-agent`; do not ask the user to update/reinstall/redeploy it merely to run tests. See ADR-015 and `AGENTS.md`.
-- Microsoft Planetary Computer remains in the G0 shortlist. The user confirms Russian-network access; the VPS collections response-size cap is an inconclusive diagnostic limitation, not evidence of provider unavailability. Search/assets/COG and legal checks remain open (ADR-016).
+- G0/provider selection is deferred until the user tests the completed application. Do not spend development sessions on VPS or diagnostic-agent maintenance; continue application development with explicit allowlisted endpoints and mocked tests.
+- No primary provider is approved. Provider availability, real asset access, licensing and no-VPN user access remain unverified.
 
 
 ## Current task
