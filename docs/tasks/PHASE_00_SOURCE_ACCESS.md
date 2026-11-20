@@ -127,3 +127,10 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - Planetary Computer: DNS, TCP, TLS and root PASS (HTTP 200); collections response exceeded the diagnostic response-size limit (`ResponseTooLarge`), so collections remain UNKNOWN and the provider check is FAIL.
 - Evidence for provider checks: [sentinel-explorer-agent Issue #58](https://github.com/Helmslay/sentinel-explorer-agent/issues/58), run 2026-11-20 04:25 UTC.
 - **Interpretation:** this establishes only partial catalog transport/reachability from the Russian VPS. No STAC Search, real Item, asset metadata, B02/B03/B04/B08 bytes, HTTP Range, COG read, preview or storage operation was performed. It does not establish access from Russian home/mobile networks without VPN. WEB-00.03 remains IN_PROGRESS.
+
+
+### Уточнения по G0 от пользователя — 2026-11-20
+
+- **VPS-агент:** для тестов использовать уже установленный `sentinel-explorer-agent`. Не просить пользователя обновлять, переустанавливать, развёртывать или чинить агент ради тестирования. Если нужного обработчика нет, использовать другой уже доступный способ либо зафиксировать точное ограничение и продолжать работу. Обслуживание агента — отдельная задача только по прямому запросу пользователя (ADR-015).
+- **Microsoft Planetary Computer:** по прямому решению пользователя источник обязательно остаётся в подборке G0; пользователь подтверждает доступность из России. Результат VPS `ResponseTooLarge` для `/collections` означает ограничение диагностического ответа, а не недоступность провайдера. Не исключать источник; продолжать Search и последующие asset/raster проверки (ADR-016).
+- **Текущие ограничения доказательств:** VPS root/collections для Earth Search и CDSE подтверждены; у Planetary Computer root подтверждён, collections на этом запуске inconclusive из-за лимита. STAC Search, реальные Items, B02/B03/B04/B08, Range/COG, preview, storage и лицензии ещё требуют отдельных проверок.
