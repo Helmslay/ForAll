@@ -1,6 +1,6 @@
 # Phase 03 — STAC и поиск
 
-До реального adapter пройти WEB-00.10. Контракты в API_CONTRACTS.md. Статусы ведутся по каждой задаче.
+Контракты в API_CONTRACTS.md. G0/provider decision отложены по прямому решению пользователя до проверки через готовое приложение; это не разрешает обходить allowlist, лицензии или заявлять доступность источника. Статусы ведутся по каждой задаче.
 
 ## WEB-03.01 — Pydantic DTO — DONE
 
@@ -30,7 +30,7 @@
 
 **Ограничения:** реальные provider capabilities не объявлялись и не проверялись; STAC HTTP client, provider adapter, search endpoint, orchestration и pagination не реализованы. G0 остаётся открытым.
 
-## WEB-03.03 — STAC fixtures — IN_REVIEW
+## WEB-03.03 — STAC fixtures — DONE
 
 **Зависимости:** WEB-03.01 DONE, WEB-03.02 DONE.
 
@@ -38,17 +38,24 @@
 
 **Изменённые файлы:** пять JSON fixtures в `backend/tests/fixtures/stac/`, `backend/tests/test_stac_fixtures.py`, эта карточка, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
 
-**Проверки:** exact PR head `cf948e476d368f4cc37ecc6b916068e520a5d5c4`: backend tests run `44717413409` SUCCESS; frontend build run `44717413260` SUCCESS; mirror run `44717395847` SUCCESS. Backend workflow включает pytest и Uvicorn health smoke-check. Локальный запуск в рабочей сессии не выполнялся.
+**Проверки:** exact PR head `882af6eea218bf601ce4bbce3048c0c7ccc6529c`: backend tests run `44719855813` SUCCESS; frontend build run `44719855787` SUCCESS; mirror run `44719846069` SUCCESS. PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`. Backend workflow включает pytest и Uvicorn health smoke-check. Локальный запуск в рабочей сессии не выполнялся.
 
 **Критерии приёмки:** пять сценариев представлены; проверки offline-only; network URLs/credentials отсутствуют; cloud cover и B08 не подменяются выдуманными значениями. Exact-head CI passed. Геометрическая проверка ограничена замыканием Polygon ring; production geometry validator не реализуется.
 
-**Ограничения:** fixtures синтетические и не являются ответами реального поставщика. Нет STAC HTTP client или provider adapter. G0 остаётся открытым.
+**Ограничения:** fixtures синтетические и не являются ответами реального поставщика. Нет STAC HTTP client или provider adapter. G0 остаётся OPEN и отложен до пользовательской проверки через приложение.
 
-## WEB-03.04 — STAC HTTP client
-Timeouts, finite retries for transient failures, JSON validation, safe logs, endpoint allowlist/config. Mock tests for 200/500/timeout/invalid JSON. No infinite retry.
+## WEB-03.04 — STAC HTTP client — READY
 
-## WEB-03.05 — primary adapter
-Зависит от WEB-00.10. Implement one tested provider adapter; request, collection, pagination links, provider errors. Не хранить временный href в коде. Integration tests. Приёмка: real sanitized item normalizes.
+**Зависимости:** WEB-03.01, WEB-03.02 и WEB-03.03 DONE. `httpx` уже присутствует в `requirements-dev.txt`; проверить production dependency declaration before implementation.
+
+**Scope:** reusable async HTTP transport for STAC JSON requests; explicit HTTPS endpoint allowlist/config; connect/read/overall timeouts; bounded retries only for transient network errors and 429/5xx; response-size bound; JSON/content-type validation; sanitized logs/errors. No credentials or signed href logging.
+
+**Tests:** mocked 200, non-retryable 4xx, retryable 5xx/429, timeout, invalid JSON/content type, oversized response, disallowed host/scheme and redirect policy. No live provider dependency.
+
+**Acceptance:** all requests constrained to configured allowlisted HTTPS origins; retries finite; errors map to safe domain errors; tests prove secrets and full URLs/query strings are not logged.
+
+## WEB-03.05 — configurable STAC adapter
+Provider endpoint must be explicitly configured and allowlisted. Primary-source approval and live availability remain deferred; use mocked integration tests until user-side testing. Implement STAC search/item requests, collections, pagination links and provider errors. Never persist or log temporary signed hrefs.
 
 ## WEB-03.06 — STAC normalizer
 Pure map id/collection/datetime/platform/geometry/bbox/cloud/assets; stable provider:collection:item key. Tests optional/invalid fields. No invented metadata.
