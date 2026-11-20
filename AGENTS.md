@@ -37,3 +37,8 @@ Before merging, use the current PR head SHA as an expected-head guard. Use the r
 
 Never merge while CI is pending, has not started, is missing, or has failed. Do not treat an empty workflow-run list or a pending status with zero completed checks as success. Diagnose the missing checks or report the blocker and wait; do not bypass required checks. If any safety condition is uncertain, do not merge and report why.
 
+
+## VPS diagnostic agent — do not request updates for tests
+- For routine diagnostics, use the already deployed `sentinel-explorer-agent` and its currently supported job types. **Never ask the project owner to update, reinstall, redeploy or repair the agent merely to run a test.** Do not turn a test request into an agent-maintenance task.
+- First use the existing agent job protocol for supported checks. If a required check is not supported by the deployed agent, use another already available execution path or report the exact limitation and continue with other useful work. An agent code/deployment change is a separate engineering task and must not be requested as a prerequisite unless the owner explicitly asks for that change.
+- A diagnostic failure or response-size cap is not proof that a provider is unavailable; distinguish transport reachability, checker limitations and actual provider responses.
