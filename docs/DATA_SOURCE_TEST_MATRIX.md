@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|---|
 | Earth Search / Element 84 | STAC catalog and search | `earth-search.aws.element84.com` | `https://earth-search.aws.element84.com/v1/` | Anonymous | PARTIAL PASS (RU VPS: root + collections) | VPS diagnostic 2026-11-20 04:25 UTC: DNS/TCP/TLS/root/collections PASS; HTTP 200 for root and collections; 9 collections. Issue [#58](https://github.com/Helmslay/sentinel-explorer-agent/issues/58). STAC Search and user-side access remain unverified. [Official API documentation](https://earth-search.aws.element84.com/v1/api.html); [Element 84 endpoint reference](https://element84.com/earth-search/examples/) |
 | Copernicus Data Space Ecosystem (CDSE) | STAC catalog and search | `stac.dataspace.copernicus.eu` | `https://stac.dataspace.copernicus.eu/v1/` | Anonymous root/collections test | PARTIAL PASS (RU VPS: root + collections) | VPS diagnostic 2026-11-20 04:25 UTC: DNS/TCP/TLS/root/collections PASS; HTTP 200 for root and collections; 10 collections. Issue [#58](https://github.com/Helmslay/sentinel-explorer-agent/issues/58). Search/assets and user-side access remain unverified. [Official STAC documentation](https://documentation.dataspace.copernicus.eu/APIs/STAC.html). The legacy `catalogue.dataspace.copernicus.eu/stac` endpoint is deprecated. |
-| Microsoft Planetary Computer | STAC catalog and search | `planetarycomputer.microsoft.com` | `https://planetarycomputer.microsoft.com/api/stac/v1` | Anonymous test | PARTIAL / FAIL (RU VPS) | VPS diagnostic 2026-11-20 04:25 UTC: DNS/TCP/TLS/root PASS (root HTTP 200); collections response exceeded checker size limit (`ResponseTooLarge`), so collections are UNKNOWN and provider check is FAIL. Issue [#58](https://github.com/Helmslay/sentinel-explorer-agent/issues/58). Do not infer Search or asset access. [Official documentation](https://planetarycomputer.microsoft.com/docs/). Asset access may have separate signing/throttling requirements. |
+| Microsoft Planetary Computer | STAC catalog and search | `planetarycomputer.microsoft.com` | `https://planetarycomputer.microsoft.com/api/stac/v1` | Anonymous test | PARTIAL PASS / INCONCLUSIVE (RU VPS) | User confirms prior Russian-network root/collections test PASS without VPN. VPS diagnostic 2026-11-20 04:25 UTC: DNS/TCP/TLS/root PASS (root HTTP 200); collections response exceeded the diagnostic size cap (`ResponseTooLarge`). This is a checker limitation; collections on this VPS run are UNKNOWN, not a provider outage. Issue [#58](https://github.com/Helmslay/sentinel-explorer-agent/issues/58). Keep in shortlist and continue STAC Search/assets tests. [Official documentation](https://planetarycomputer.microsoft.com/docs/). Asset access may have separate signing/throttling requirements. |
 
 ## Raster asset endpoints — deliberately separate from catalogs
 
@@ -24,7 +24,7 @@
 
 | Dependency | Purpose | Hostname / endpoint | Status | Evidence required |
 |---|---|---|---|---|
-| Russian backend → provider catalog | DNS, TCP, TLS, STAC root/collections/search | Per catalog row above | PARTIAL | VPS egress independently reported as RU / AS44112 by two metadata services at 2026-11-20 04:26 UTC (Issue [#60](https://github.com/Helmslay/sentinel-explorer-agent/issues/60)); root/collections outcomes are recorded per provider above. STAC Search is not yet tested from VPS. |
+| Russian backend → provider catalog | DNS, TCP, TLS, STAC root/collections/search | Per catalog row above | PARTIAL | VPS egress independently reported as RU / AS44112 by two metadata services at 2026-11-20 04:26 UTC (Issue [#60](https://github.com/Helmslay/sentinel-explorer-agent/issues/60)); root/collections outcomes are recorded per provider above. STAC Search is not yet tested from VPS. Microsoft Planetary Computer remains in the shortlist; its VPS collections check was inconclusive due to the diagnostic response-size cap, not a confirmed provider failure. |
 | Russian backend → provider assets | HEAD and GET Range; read real raster window | Per actual Item asset href | UNKNOWN | HTTP status, Content-Range, bytes, GDAL/Rasterio read and timing |
 | Backend → Russian object/file storage | Store permitted test output and serve it back | Not selected / not provisioned | UNKNOWN | Write, read, checksum, Range and delete test |
 | User in Russia → application | Website, API, preview and download | Not deployed | UNKNOWN | Tests from independent Russian home and mobile networks without VPN |
@@ -35,7 +35,7 @@
 |---|---|---|---|---|---|---|
 | Earth Search / Element 84 | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Candidate only |
 | Copernicus Data Space | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Candidate only |
-| Microsoft Planetary Computer | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Candidate only |
+| Microsoft Planetary Computer | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Retain in G0 shortlist (ADR-016); primary-provider decision pending |
 | Other reviewed source | UNKNOWN | PENDING | PENDING | PENDING | PENDING | Not selected |
 
 ## Required test report fields
@@ -43,3 +43,8 @@
 Provider ID; endpoint category (`catalog` / `asset` / `storage` / `user-app`); hostname without token or signed query; RU server region or RU ISP/region; test timestamp UTC; DNS; TCP; TLS; HTTP status; latency; bytes requested/received; Range status and Content-Range; STAC collection/item if safe; band key and media type; raster read result; checksum; auth and signed-URL expiry behavior; caching/legal status; PASS/FAIL/UNKNOWN; error class; script version; report path.
 
 Never store credentials, access tokens or signed asset query strings in this matrix or reports. Do not infer asset hostnames from catalog hostnames. Never mark a source PASS based only on HTTP 200 from a STAC root or successful search. A band is confirmed only after asset metadata is inspected; a raster read is confirmed only after real bytes are read and the raster is opened.
+
+
+## Provider shortlist decision (2026-11-20)
+
+Microsoft Planetary Computer is explicitly retained as a G0 candidate by user decision (ADR-016). The user reports successful access from a Russian network without VPN. The current VPS check confirms STAC root reachability (HTTP 200), while its collections request exceeded the checker's response-size cap; this must be recorded as inconclusive rather than provider unavailability. Continue Search, Item, asset and raster tests. This does not pre-approve licensing or designate a primary provider.
