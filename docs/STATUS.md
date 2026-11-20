@@ -66,3 +66,8 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 ## Status policy
 Update this file when a milestone or material project decision changes. Do not mark a task DONE based only on generated code; follow the acceptance criteria in the task card.
+
+
+## User decisions recorded — 2026-11-20
+- VPS diagnostics must use the already deployed `sentinel-explorer-agent`; do not ask the user to update/reinstall/redeploy it merely to run tests. See ADR-015 and `AGENTS.md`.
+- Microsoft Planetary Computer remains in the G0 shortlist. The user confirms Russian-network access; the VPS collections response-size cap is an inconclusive diagnostic limitation, not evidence of provider unavailability. Search/assets/COG and legal checks remain open (ADR-016).
