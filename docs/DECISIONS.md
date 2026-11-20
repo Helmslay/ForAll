@@ -70,3 +70,16 @@ Use this log for decisions affecting more than one module. Format: status, conte
 **Context:** `API_CONTRACTS.md` required a server-bounded catalog search limit but did not specify its maximum.
 **Decision:** `SearchRequest.limit` is a required integer in the inclusive range 1–100. A single catalog search response may contain at most 100 scenes. The value 100 is the hard maximum, not an implicit default; pagination uses the opaque cursor defined by the API contract.
 **Consequences:** The backend DTO rejects limits below 1, above 100 and non-integer values. Any future change to this maximum requires an explicit contract and decision-log update.
+
+
+## ADR-015 — тесты VPS без обновления диагностического агента
+**Status:** Accepted by explicit user direction (2026-11-20).
+**Context:** Routine G0 tests were repeatedly blocked or delayed by unnecessary requests to update/redeploy the VPS diagnostic agent, although the existing deployed agent can already run supported one-shot diagnostics.
+**Decision:** For testing, always use the currently deployed `sentinel-explorer-agent` and its existing supported job types without asking the user to update, reinstall, redeploy or repair it. If a desired diagnostic is unsupported, use another available execution path or document the precise limitation and continue useful work. Agent maintenance is a separate task and may be raised only when the user explicitly requests it. A diagnostic response cap or handler limitation must not be reported as proof that an upstream provider is unavailable.
+**Consequences:** G0 test execution must not be made conditional on agent updates. Preserve clear distinctions between transport reachability, catalog Search, asset access and raster reads.
+
+## ADR-016 — Microsoft Planetary Computer remains a G0 candidate
+**Status:** Accepted by explicit user direction (2026-11-20).
+**Context:** The user confirms Microsoft Planetary Computer is accessible from Russia and requires it to remain in the provider shortlist. The 2026-11-20 VPS checker reached its STAC root (HTTP 200), but its collections response exceeded the diagnostic size cap; this is an inconclusive checker result, not proof of provider unavailability. Earlier user-side testing was recorded as Planetary Computer PASS for root/collections.
+**Decision:** Keep Microsoft Planetary Computer in the G0 provider shortlist and continue testing it alongside Earth Search and CDSE. Do not remove or reject it because of `ResponseTooLarge`; improve or bypass the diagnostic limitation when needed. Continue to track Search, real Items, asset URLs, B02/B03/B04/B08 reads, Range/COG and legal terms as separate unverified criteria until independently evidenced.
+**Consequences:** Provider candidacy is retained. This decision does not by itself mark every G0 test or legal criterion as passed, nor select Planetary Computer as the primary provider.
