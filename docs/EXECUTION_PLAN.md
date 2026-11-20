@@ -89,8 +89,8 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 - WEB-03.02 — CatalogProvider Protocol — **DONE** (PR #54 merged; exact-head Backend tests run `44589067499` SUCCESS, 40 passed + Uvicorn smoke; Frontend build run `44589067504` SUCCESS; merge commit `ccd9f52d449b5322fadc8ff4b582d076ce01cbe5`).
 - WEB-03.03 — STAC fixtures — **DONE** (PR #56 merged as `4738710c6baf5fdfb7ce530d5b6fceac35ef0fb6`; exact-head backend tests, frontend build and mirror SUCCESS).
 - WEB-03.04 — STAC HTTP client — **DONE** (PR #58 merged as `ad0b06b0c7b01f06796cda9e3df62061c622217f`; exact-head backend tests run `44724633948`, frontend build run `44724633952`, mirror run `44724626930` — all SUCCESS; retries cover all HTTP 5xx).
-- WEB-03.05 — configurable STAC adapter — **READY** (dependencies WEB-03.01–03.04 DONE; configured HTTPS endpoint + exact host allowlist; mocked integration tests only; no provider approval/live availability claim).
-- WEB-03.06 — STAC Item normalizer.
+- WEB-03.05 — configurable STAC adapter — **DONE** (PR #59 merged as `87a97534c4a3ce8b8fdecb76052e6f7210ca59a2`; exact-head backend tests run `44725439719` and mirror run `44725430664` SUCCESS).
+- WEB-03.06 — STAC Item normalizer — **READY** (WEB-03.01 DTO, WEB-03.02 Protocol, WEB-03.03 fixtures and WEB-03.05 adapter DONE; pure STAC Item → Scene mapping, no invented metadata).
 - WEB-03.07 — search API endpoint.
 - WEB-03.08 — catalog orchestrator.
 - WEB-03.09 — cursor pagination.
