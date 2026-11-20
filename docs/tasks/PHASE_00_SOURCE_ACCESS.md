@@ -129,3 +129,12 @@ WEB-00.01 — DONE; WEB-00.02 — DONE; WEB-00.03 — IN_PROGRESS; WEB-00.04—W
 - Это только дополнительная проверка root/collections через сетевой выход российского VPS. Она **не является STAC Search**, не подтверждает реальные Sentinel-2 Items, assets, B02/B03/B04/B08, Range/COG, raster read, лицензию или пользовательский доступ из домашних/мобильных сетей.
 - Установленный диагностический агент пока не имеет job type `stac_search`; его фиксированный allowlist поддерживает `stac_connectivity` и другие заранее заданные проверки. Произвольная shell-команда не разрешена. Следующий серверный шаг — отдельное тестируемое расширение с фиксированным безопасным STAC Search handler либо запуск существующего `tools/search_stac.py --all` на Windows в России без VPN/proxy.
 - Статус WEB-00.03 остаётся IN_PROGRESS; критерий реального Search и остальные G0 gates не закрыты.
+
+
+### Follow-up after VPS baseline — 2026-11-20
+
+- Private VPS agent PR #61 added the fixed metadata-only `stac_search` job and was merged: https://github.com/Helmslay/sentinel-explorer-agent/pull/61.
+- Merge commit: `92463d6619997d6a7ebadcbc35180c13976f9aa3`; exact-head CI run `44675189980` passed on Python 3.11 and 3.14 (compile, unit tests, shell syntax, guarded-update safety/staging tests and CLI help).
+- The new handler is in the agent repository's main branch, but has **not yet been deployed** to the existing VPS service.
+- Next operational action: operator executes the agent repository's guarded updater from a clean checkout of current main, verifies that `sentinel-explorer-agent.service` is active, then a unique `stac_search` job is submitted and its actual report is reviewed.
+- Until that run succeeds, WEB-00.03 remains IN_PROGRESS; no real Search result or provider catalog PASS is recorded.
