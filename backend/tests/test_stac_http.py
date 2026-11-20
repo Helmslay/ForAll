@@ -77,7 +77,7 @@ async def test_rejects_redirects_without_following_them():
         with pytest.raises(CatalogProviderError):
             await client.request_json("GET", URL)
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -96,7 +96,27 @@ async def test_retries_transient_server_error_then_returns_json():
         assert await client.request_json("POST", URL, json_body={"query": {}}) == {"ok": True}
         assert calls == 2
     finally:
-        await transport.aclose()
+        await client.aclose()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [500, 501, 599])
+async def test_retries_any_server_error_status(status):
+    calls = 0
+
+    async def handler(request):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return httpx.Response(status)
+        return httpx.Response(200, headers={"content-type": "application/json"}, json={"ok": True})
+
+    client, transport = make_client(handler, max_retries=1)
+    try:
+        assert await client.request_json("GET", URL) == {"ok": True}
+        assert calls == 2
+    finally:
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -114,7 +134,7 @@ async def test_does_not_retry_non_transient_client_error():
             await client.request_json("GET", URL)
         assert calls == 1
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -132,7 +152,7 @@ async def test_exhausted_server_errors_become_safe_unavailable_error():
             await client.request_json("GET", URL)
         assert calls == 3
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -145,7 +165,7 @@ async def test_exhausted_rate_limit_becomes_rate_limited_error():
         with pytest.raises(CatalogRateLimitedError):
             await client.request_json("GET", URL)
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -163,7 +183,7 @@ async def test_timeout_is_retried_only_a_finite_number_of_times():
             await client.request_json("GET", URL)
         assert calls == 2
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -188,7 +208,7 @@ async def test_rejects_invalid_content_type_json_and_declared_oversize(response)
         with pytest.raises(CatalogProviderError):
             await client.request_json("GET", URL)
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -205,7 +225,7 @@ async def test_rejects_streamed_response_that_exceeds_size_limit():
         with pytest.raises(CatalogProviderError):
             await client.request_json("GET", URL)
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -224,7 +244,7 @@ async def test_logs_do_not_include_signed_url_query_or_exception_text(caplog):
         assert "catalog.example/stac" not in caplog.text
         assert "failed https" not in caplog.text
     finally:
-        await transport.aclose()
+        await client.aclose()
 
 
 @pytest.mark.asyncio
@@ -234,7 +254,7 @@ async def test_rejects_unsupported_method_and_empty_allowlist():
         with pytest.raises(CatalogConfigurationError):
             await client.request_json("DELETE", URL)
     finally:
-        await transport.aclose()
+        await client.aclose()
 
     with pytest.raises(CatalogConfigurationError):
         StacHttpClient(provider_id="test-catalog", allowed_hosts=set())
