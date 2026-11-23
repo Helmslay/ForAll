@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 import App from './App.vue'
-import { searchCatalog } from './api/catalog'
+import { CatalogApiError, searchCatalog } from './api/catalog'
 import type { SearchResponse } from './types/catalog'
 
 vi.mock('./api/catalog', () => ({
@@ -99,7 +99,11 @@ describe('App', () => {
 
   it('shows loading state and disables the search submit button', async () => {
     let resolveSearch!: (value: SearchResponse) => void
-    searchMock.mockReturnValueOnce(new Promise((resolve) => { resolveSearch = resolve }))
+    searchMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveSearch = resolve
+      }),
+    )
     const wrapper = mountApp()
     await submitSearch(wrapper)
 
@@ -137,7 +141,7 @@ describe('App', () => {
   })
 
   it('shows an error and retries', async () => {
-    searchMock.mockRejectedValueOnce(new Error('Каталог временно недоступен')).mockResolvedValueOnce(response)
+    searchMock.mockRejectedValueOnce(new CatalogApiError('Каталог временно недоступен')).mockResolvedValueOnce(response)
     const wrapper = mountApp()
     await submitSearch(wrapper)
     await vi.waitFor(() => expect(wrapper.text()).toContain('Каталог временно недоступен'))
