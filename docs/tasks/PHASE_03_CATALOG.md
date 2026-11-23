@@ -135,8 +135,28 @@
 
 **Ограничения:** production configuration still enables no provider by default. Real provider traffic, credentials, licensing, Russian-network access and no-VPN availability were not tested. Cursor signing and fetching subsequent STAC pages remain WEB-03.09; until then a next link is represented only as a partial provider status.
 
-## WEB-03.09 — cursor pagination
-Opaque cursor bound to query/provider signature, expiry and tamper protection. Tests duplicate page and mismatched query. Never expose signed next links.
+## WEB-03.09 — encrypted aggregate cursor pagination — READY
+
+**Зависимости:** WEB-03.01–03.08 DONE. Existing `SearchRequest.cursor`, `SearchResponse.next_cursor`, STAC `next_href` and orchestrator provider fan-out are available. Existing HTTPS host allowlist remains mandatory for every continuation fetch.
+
+**Цель:** реализовать безопасную pagination поверх всех выбранных STAC adapters, сохраняя текущий API DTO и не раскрывая upstream continuation state.
+
+**Контракт и ограничения:**
+- Cursor — opaque AES-256-GCM ciphertext, nonce + authenticated ciphertext, URL-safe base64. Canonical query hash binds bbox, datetime, cloud filter, collections, providers and limit; cursor itself is excluded.
+- Server key: `SENTINEL_CURSOR_ENCRYPTION_KEY`, base64 encoding of exactly 32 random bytes. No default, generated-at-startup or frontend key. Missing/invalid key: no cursor issuance; continuation request fails closed. Key rotation invalidates outstanding cursors.
+- TTL 15 minutes; expiry checked on every continuation. Payload versioned. Authentication, decoding, schema and query-binding failures map to `INVALID_CATALOG_CURSOR` (HTTP 422) without exposing reason details.
+- Encrypted state contains each selected provider's internal next href, normalized scene buffer not yet emitted, and stable scene keys already emitted. No raw href/token in API response or logs. Every href is revalidated by the adapter HTTP allowlist on fetch.
+- Preserve provider order, partial failures and global `limit`; never silently drop overflow scenes when merging provider pages. Deduplicate by `Scene.key` across page boundaries.
+- Maximum encoded cursor size 64 KiB. If state exceeds cap, do not truncate state or issue a cursor; return safe partial provider status `pagination_state_limit`.
+- Cursor is replayable until expiry (stateless token); no one-time-use guarantee.
+
+**Изменяемые модули (ожидаемо):** `backend/app/catalog_cursor.py`, `backend/app/catalog_orchestrator.py`, `backend/app/stac_adapter.py`, `backend/app/config.py`, schemas/error mapping, tests, `backend/requirements.txt`, `docs/API_CONTRACTS.md`.
+
+**Тесты:** codec round-trip; tampered ciphertext; wrong key/rotation; expiry; malformed/oversized token; mismatched query/provider/limit; multiple providers advancing independently; buffered overflow across pages; cross-page duplicate; one provider failure while another continues; off-host next href rejected; no href/key in response/logs; missing key fails closed.
+
+**Acceptance:** all above offline tests pass; exact-head backend CI and mirror succeed; no live provider or Russian availability claim. G0 remains deferred.
+
+**Не входит:** provider selection, live source validation, one-time cursor replay prevention, frontend pagination UI, raster access.
 
 ## WEB-03.10 — provider status DTO
 Success/partial/unavailable, safe reason and last checked. Hide secrets and raw trace.
