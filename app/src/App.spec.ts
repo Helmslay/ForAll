@@ -141,9 +141,7 @@ describe('App', () => {
 
   it('shows an error and retries', async () => {
     searchMock
-      .mockRejectedValueOnce(
-        new CatalogApiError('Каталог временно недоступен', 503, 'PROVIDER_UNAVAILABLE'),
-      )
+      .mockRejectedValueOnce(new CatalogApiError('Каталог временно недоступен', 503, 'PROVIDER_UNAVAILABLE'))
       .mockResolvedValueOnce(response)
     const wrapper = mountApp()
     await submitSearch(wrapper)
