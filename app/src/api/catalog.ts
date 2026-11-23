@@ -48,9 +48,7 @@ function isScene(value: unknown): value is Scene {
     (value.platform === null || typeof value.platform === 'string') &&
     (value.cloud_cover === null || typeof value.cloud_cover === 'number') &&
     (value.bbox === null ||
-      (Array.isArray(value.bbox) &&
-        value.bbox.length === 4 &&
-        value.bbox.every(Number.isFinite))) &&
+      (Array.isArray(value.bbox) && value.bbox.length === 4 && value.bbox.every(Number.isFinite))) &&
     (value.geometry === null || isRecord(value.geometry)) &&
     Array.isArray(bands) &&
     bands.every((band) => band === 'B02' || band === 'B03' || band === 'B04' || band === 'B08') &&
