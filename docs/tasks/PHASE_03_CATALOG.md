@@ -217,7 +217,7 @@
 - `docs/tasks/PHASE_03_CATALOG.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
 
 **Проверки:**
-- Exact PR head `d4e57a2ae420bdf0aaad21086642590f762ef881`: Frontend build workflow run `45134386481` — SUCCESS. Audit policy, npm audit policy, ESLint, Prettier, vue-tsc, Vitest (**23 passed**), Vite production build, Vite proxy health smoke, Docker Compose config/localhost port checks, Compose startup and frontend/API smoke all passed.
+- Exact application-code commit `d4e57a2ae420bdf0aaad21086642590f762ef881` (before final documentation-only commits): Frontend build workflow run `45134386481` — SUCCESS. Audit policy, npm audit policy, ESLint, Prettier, vue-tsc, Vitest (**23 passed**), Vite production build, Vite proxy health smoke, Docker Compose config/localhost port checks, Compose startup and frontend/API smoke all passed.
 - GitLab mirror run `45134377834` — SUCCESS for the same SHA. No GitLab pipeline was started.
 - PR #65 is open; no unresolved review threads or requested changes. Merge is intentionally held until Buildkite CI is confirmed.
 
