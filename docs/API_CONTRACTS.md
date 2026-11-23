@@ -76,6 +76,11 @@ Search endpoint behavior:
 - Provider domain errors use the standard error envelope: `PROVIDER_UNAVAILABLE` and `PROVIDER_CONFIGURATION_ERROR` → 503; `PROVIDER_RATE_LIMITED` → 429; `CATALOG_QUERY_NOT_SUPPORTED` → 422; other catalog provider errors → 502.
 - Request validation errors return HTTP 422 with `VALIDATION_ERROR`.
 - The endpoint accepts no provider endpoint URL. Provider wiring is server-side only.
+- The server-side catalog orchestrator fans out to explicitly configured adapters; no provider is selected by default. `providers`, when supplied, filters the configured adapters.
+- Each adapter receives only the requested collections it declares as supported. The merged item list is deduplicated by normalized `Scene.key` and capped at the request `limit`.
+- A failed adapter does not discard another adapter's successful items. The response sets `partial=true` and includes a safe per-provider status/reason. Raw upstream exception text and next-link URLs are never returned.
+- If an upstream STAC page advertises another page before cursor support is implemented, that provider is marked `partial` with reason `more_results_available`; `next_cursor` remains null until WEB-03.09.
+- If all selected adapters fail, the endpoint returns a safe domain error rather than a fabricated empty success. An empty or unmatched adapter selection returns `PROVIDER_UNAVAILABLE`.
 
 ## 5. Scene
 GET /api/v1/catalog/scenes/{scene_key}

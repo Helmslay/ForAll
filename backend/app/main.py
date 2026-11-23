@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -16,20 +17,26 @@ from app.catalog_provider import (
     CatalogUnavailableError,
 )
 from app.catalog_routes import router as catalog_router
+from app.catalog_orchestrator import CatalogOrchestrator
+from app.stac_adapter import StacCatalogAdapter
 
 from app.config import Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    catalog_adapters: Sequence[StacCatalogAdapter] = (),
+) -> FastAPI:
     """Build the API application without connecting to external services."""
     app_settings = settings or get_settings()
     app = FastAPI(
         title=app_settings.app_name,
         version=app_settings.app_version,
     )
-    app.state.catalog_provider = None
+    app.state.catalog_provider = CatalogOrchestrator(catalog_adapters)
     app.include_router(catalog_router)
 
     @app.middleware("http")
