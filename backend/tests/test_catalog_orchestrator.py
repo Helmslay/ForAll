@@ -8,6 +8,7 @@ from typing import Any, Callable
 import pytest
 from fastapi.testclient import TestClient
 
+from app.catalog_cursor import CatalogCursorCodec, InvalidCatalogCursor
 from app.catalog_provider import (
     CatalogCapabilities,
     CatalogProvider,
@@ -51,6 +52,7 @@ class FakeAdapter:
         features: list[dict[str, Any]] | None = None,
         error: Exception | None = None,
         next_href: str | None = None,
+        next_pages: list[StacSearchPage] | None = None,
         on_search: Callable[[SearchRequest], Any] | None = None,
     ) -> None:
         self._capabilities = CatalogCapabilities(
@@ -61,6 +63,8 @@ class FakeAdapter:
         self.features = features if features is not None else [FIXTURE]
         self.error = error
         self.next_href = next_href
+        self.next_pages = list(next_pages or [])
+        self.next_page_requests: list[str] = []
         self.on_search = on_search
         self.requests: list[SearchRequest] = []
         self.item_requests: list[tuple[str, str]] = []
@@ -75,6 +79,12 @@ class FakeAdapter:
         if self.error is not None:
             raise self.error
         return StacSearchPage(tuple(self.features), self.next_href)
+
+    async def get_next_page(self, next_href: str) -> StacSearchPage:
+        self.next_page_requests.append(next_href)
+        if not self.next_pages:
+            raise AssertionError("unexpected next-page request")
+        return self.next_pages.pop(0)
 
     async def get_item(self, collection_id: str, item_id: str) -> dict[str, Any]:
         self.item_requests.append((collection_id, item_id))
@@ -324,3 +334,75 @@ def test_orchestrator_exposes_aggregate_catalog_capabilities() -> None:
 def test_duplicate_provider_ids_are_rejected() -> None:
     with pytest.raises(ValueError, match="provider IDs must be unique"):
         CatalogOrchestrator([FakeAdapter("same"), FakeAdapter("same")])
+
+
+def make_feature(item_id: str) -> dict[str, Any]:
+    feature = json.loads(json.dumps(FIXTURE))
+    feature["id"] = item_id
+    return feature
+
+
+def make_cursor_codec() -> CatalogCursorCodec:
+    return CatalogCursorCodec(b"c" * 32)
+
+
+@pytest.mark.asyncio
+async def test_cursor_paginates_buffered_aggregate_results() -> None:
+    adapter = FakeAdapter("provider", features=[make_feature("item-1"), make_feature("item-2")])
+    orchestrator = CatalogOrchestrator([adapter], cursor_codec=make_cursor_codec())
+    first = await orchestrator.search(make_request(limit=1))
+    assert [scene.item_id for scene in first.items] == ["item-1"]
+    assert first.next_cursor is not None
+    second = await orchestrator.search(make_request(limit=1, cursor=first.next_cursor))
+    assert [scene.item_id for scene in second.items] == ["item-2"]
+    assert second.next_cursor is None
+
+
+@pytest.mark.asyncio
+async def test_multiple_providers_advance_independently_and_preserve_buffers() -> None:
+    first = FakeAdapter("first", features=[make_feature("first-1")], next_href="https://first.example/search?page=2", next_pages=[StacSearchPage((make_feature("first-2"),), None)])
+    second = FakeAdapter("second", features=[make_feature("second-1")])
+    orchestrator = CatalogOrchestrator([first, second], cursor_codec=make_cursor_codec())
+    page1 = await orchestrator.search(make_request(limit=1))
+    assert page1.items[0].key == "first:sentinel-2-l2a:first-1"
+    page2 = await orchestrator.search(make_request(limit=1, cursor=page1.next_cursor))
+    assert page2.items[0].key == "first:sentinel-2-l2a:first-2"
+    assert first.next_page_requests == ["https://first.example/search?page=2"]
+    page3 = await orchestrator.search(make_request(limit=1, cursor=page2.next_cursor))
+    assert page3.items[0].key == "second:sentinel-2-l2a:second-1"
+    assert page3.next_cursor is None
+
+
+@pytest.mark.asyncio
+async def test_cursor_deduplicates_scene_keys_across_provider_pages() -> None:
+    adapter = FakeAdapter("provider", features=[make_feature("duplicate")], next_href="https://catalog.example/search?page=2", next_pages=[StacSearchPage((make_feature("duplicate"), make_feature("new-item")), None)])
+    orchestrator = CatalogOrchestrator([adapter], cursor_codec=make_cursor_codec())
+    first = await orchestrator.search(make_request(limit=1))
+    second = await orchestrator.search(make_request(limit=1, cursor=first.next_cursor))
+    assert [scene.item_id for scene in first.items] == ["duplicate"]
+    assert [scene.item_id for scene in second.items] == ["new-item"]
+
+
+@pytest.mark.asyncio
+async def test_cursor_rejects_query_and_provider_changes() -> None:
+    adapter = FakeAdapter("provider", features=[make_feature("item-1"), make_feature("item-2")])
+    orchestrator = CatalogOrchestrator([adapter], cursor_codec=make_cursor_codec())
+    first = await orchestrator.search(make_request(limit=1))
+    with pytest.raises(InvalidCatalogCursor):
+        await orchestrator.search(make_request(limit=1, cursor=first.next_cursor, bbox=[59.2, 56.7, 59.5, 56.9]))
+    other = CatalogOrchestrator([FakeAdapter("different")], cursor_codec=make_cursor_codec())
+    with pytest.raises(InvalidCatalogCursor):
+        await other.search(make_request(limit=1, cursor=first.next_cursor))
+
+
+@pytest.mark.asyncio
+async def test_missing_cursor_key_fails_closed_without_exposing_upstream_href() -> None:
+    adapter = FakeAdapter("provider", next_href="https://catalog.example/search?page=2&token=secret")
+    result = await CatalogOrchestrator([adapter]).search(make_request(limit=1))
+    assert result.next_cursor is None
+    assert result.partial is True
+    assert result.providers[0].reason == "cursor_encryption_unavailable"
+    assert "catalog.example" not in result.model_dump_json()
+    assert "secret" not in result.model_dump_json()
+    with pytest.raises(InvalidCatalogCursor):
+        await CatalogOrchestrator([adapter]).search(make_request(limit=1, cursor="opaque"))
