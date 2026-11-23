@@ -1,14 +1,14 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import App from './App.vue'
+import SearchPanel from './components/SearchPanel.vue'
 import { searchCatalog } from './api/catalog'
 import type { SearchResponse } from './types/catalog'
-import SearchPanel from './components/SearchPanel.vue'
 
 vi.mock('./api/catalog', () => ({
   CatalogApiError: class CatalogApiError extends Error {},
   searchCatalog: vi.fn(),
 }))
-import App from './App.vue'
 
 function mountApp() {
   return mount(App, { global: { stubs: { MapCanvas: true } } })
@@ -90,6 +90,14 @@ describe('App', () => {
 
     expect(wrapper.get('.panel-toggle').attributes('aria-expanded')).toBe('false')
   })
+  it('shows loading state and disables the search submit button', async () => {
+    searchMock.mockReturnValueOnce(new Promise(() => {}))
+    const wrapper = mountApp()
+    await submitSearch(wrapper)
+    expect(wrapper.text()).toContain('Выполняется поиск сцен')
+    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
+  })
+
   it('renders API scenes and provider status', async () => {
     searchMock.mockResolvedValue(response)
     const wrapper = mountApp()
