@@ -7,6 +7,16 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.catalog_provider import (
+    CatalogConfigurationError,
+    CatalogItemNotFoundError,
+    CatalogProviderError,
+    CatalogQueryNotSupportedError,
+    CatalogRateLimitedError,
+    CatalogUnavailableError,
+)
+from app.catalog_routes import router as catalog_router
+
 from app.config import Settings, get_settings
 
 logger = logging.getLogger(__name__)
@@ -19,6 +29,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title=app_settings.app_name,
         version=app_settings.app_version,
     )
+    app.state.catalog_provider = None
+    app.include_router(catalog_router)
 
     @app.middleware("http")
     async def add_request_id(request: Request, call_next):
@@ -69,6 +81,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if exc.headers:
             response.headers.update(exc.headers)
         return response
+
+    @app.exception_handler(CatalogProviderError)
+    async def handle_catalog_provider_error(
+        request: Request, exc: CatalogProviderError
+    ) -> JSONResponse:
+        if isinstance(exc, (CatalogUnavailableError, CatalogConfigurationError)):
+            status_code = 503
+        elif isinstance(exc, CatalogRateLimitedError):
+            status_code = 429
+        elif isinstance(exc, CatalogQueryNotSupportedError):
+            status_code = 422
+        elif isinstance(exc, CatalogItemNotFoundError):
+            status_code = 404
+        else:
+            status_code = 502
+        return error_response(
+            request,
+            status_code=status_code,
+            code=exc.code,
+            message=exc.safe_message,
+        )
 
     @app.exception_handler(RequestValidationError)
     async def handle_validation_error(

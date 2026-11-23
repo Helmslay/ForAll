@@ -71,6 +71,12 @@ Response:
 
 This is an illustrative DTO, not a real scene response.
 
+Search endpoint behavior:
+- An unconfigured catalog service returns HTTP 503 with `PROVIDER_UNAVAILABLE`; it never returns a fabricated empty success.
+- Provider domain errors use the standard error envelope: `PROVIDER_UNAVAILABLE` and `PROVIDER_CONFIGURATION_ERROR` → 503; `PROVIDER_RATE_LIMITED` → 429; `CATALOG_QUERY_NOT_SUPPORTED` → 422; other catalog provider errors → 502.
+- Request validation errors return HTTP 422 with `VALIDATION_ERROR`.
+- The endpoint accepts no provider endpoint URL. Provider wiring is server-side only.
+
 ## 5. Scene
 GET /api/v1/catalog/scenes/{scene_key}
 
