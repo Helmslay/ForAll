@@ -31,11 +31,14 @@ function isProviderStatus(value: unknown): value is ProviderStatus {
   if (!isRecord(value)) return false
   return (
     typeof value.id === 'string' &&
+    value.id.length > 0 &&
     (value.status === 'success' || value.status === 'partial' || value.status === 'unavailable') &&
     (value.last_checked === undefined ||
       value.last_checked === null ||
       typeof value.last_checked === 'string') &&
-    (value.reason === undefined || value.reason === null || typeof value.reason === 'string')
+    (value.reason === undefined ||
+      value.reason === null ||
+      typeof value.reason === 'string')
   )
 }
 
@@ -44,9 +47,13 @@ function isScene(value: unknown): value is Scene {
   const bands = value.available_bands
   return (
     typeof value.key === 'string' &&
+    value.key.length > 0 &&
     typeof value.provider === 'string' &&
+    value.provider.length > 0 &&
     typeof value.collection === 'string' &&
+    value.collection.length > 0 &&
     typeof value.item_id === 'string' &&
+    value.item_id.length > 0 &&
     typeof value.acquired_at === 'string' &&
     (value.platform === null || typeof value.platform === 'string') &&
     (value.cloud_cover === null || typeof value.cloud_cover === 'number') &&
@@ -61,10 +68,18 @@ function isScene(value: unknown): value is Scene {
     (value.resolution === undefined ||
       value.resolution === null ||
       typeof value.resolution === 'number') &&
-    (value.crs === undefined || value.crs === null || typeof value.crs === 'string') &&
-    (value.nodata === undefined || value.nodata === null || typeof value.nodata === 'number') &&
-    (value.scale === undefined || value.scale === null || typeof value.scale === 'number') &&
-    (value.offset === undefined || value.offset === null || typeof value.offset === 'number')
+    (value.crs === undefined ||
+      value.crs === null ||
+      typeof value.crs === 'string') &&
+    (value.nodata === undefined ||
+      value.nodata === null ||
+      typeof value.nodata === 'number') &&
+    (value.scale === undefined ||
+      value.scale === null ||
+      typeof value.scale === 'number') &&
+    (value.offset === undefined ||
+      value.offset === null ||
+      typeof value.offset === 'number')
   )
 }
 
