@@ -143,7 +143,9 @@ function reset() {
     </section>
 
     <div class="search-actions">
-      <button class="search-submit" type="submit" :disabled="!canSubmit || loading">{{ loading ? 'Поиск…' : 'Найти сцены' }}</button>
+      <button class="search-submit" type="submit" :disabled="!canSubmit || loading">
+        {{ loading ? 'Поиск…' : 'Найти сцены' }}
+      </button>
       <button class="search-reset" type="button" @click="reset">Сбросить</button>
     </div>
 
