@@ -129,8 +129,8 @@ function closePanel() {
           </p>
           <div v-if="searchResponse.providers.length" class="provider-statuses" aria-label="Состояние источников">
             <p v-for="provider in searchResponse.providers" :key="provider.id">
-              {{ provider.id }}: {{ provider.status
-              }}<span v-if="provider.reason"> ({{ provider.reason }})</span>
+              {{ provider.id }}: {{ provider.status }}
+              <span v-if="provider.reason">({{ provider.reason }})</span>
             </p>
           </div>
           <p v-if="searchResponse.items.length === 0" class="catalog-empty" role="status">
