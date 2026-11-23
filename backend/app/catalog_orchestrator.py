@@ -50,7 +50,7 @@ class CatalogOrchestrator:
             raise CatalogUnavailableError()
 
         jobs: list[tuple[StacCatalogAdapter, list[str]]] = []
-        statuses: list[ProviderStatus] = []
+        statuses_by_id: dict[str, ProviderStatus] = {}
         checked_at = datetime.now(UTC)
         for adapter in selected:
             capability = self._capabilities[adapter.capabilities().provider_id]
@@ -60,13 +60,11 @@ class CatalogOrchestrator:
                 if collection in capability.supported_collections
             ]
             if not collections:
-                statuses.append(
-                    ProviderStatus(
-                        id=capability.provider_id,
-                        status="unavailable",
-                        last_checked=checked_at,
-                        reason="collection_not_supported",
-                    )
+                statuses_by_id[capability.provider_id] = ProviderStatus(
+                    id=capability.provider_id,
+                    status="unavailable",
+                    last_checked=checked_at,
+                    reason="collection_not_supported",
                 )
                 continue
             jobs.append((adapter, collections))
@@ -88,17 +86,15 @@ class CatalogOrchestrator:
             checked_at = datetime.now(UTC)
             if isinstance(outcome, Exception):
                 failed_errors.append(outcome)
-                statuses.append(
-                    ProviderStatus(
-                        id=provider_id,
-                        status="unavailable",
-                        last_checked=checked_at,
-                        reason=(
-                            outcome.code
-                            if isinstance(outcome, CatalogProviderError)
-                            else "provider_error"
-                        ),
-                    )
+                statuses_by_id[provider_id] = ProviderStatus(
+                    id=provider_id,
+                    status="unavailable",
+                    last_checked=checked_at,
+                    reason=(
+                        outcome.code
+                        if isinstance(outcome, CatalogProviderError)
+                        else "provider_error"
+                    ),
                 )
                 continue
 
@@ -107,21 +103,17 @@ class CatalogOrchestrator:
             scenes.extend(page_scenes)
             if has_more:
                 partial = True
-                statuses.append(
-                    ProviderStatus(
-                        id=provider_id,
-                        status="partial",
-                        last_checked=checked_at,
-                        reason="more_results_available",
-                    )
+                statuses_by_id[provider_id] = ProviderStatus(
+                    id=provider_id,
+                    status="partial",
+                    last_checked=checked_at,
+                    reason="more_results_available",
                 )
             else:
-                statuses.append(
-                    ProviderStatus(
-                        id=provider_id,
-                        status="success",
-                        last_checked=checked_at,
-                    )
+                statuses_by_id[provider_id] = ProviderStatus(
+                    id=provider_id,
+                    status="success",
+                    last_checked=checked_at,
                 )
 
         if successful == 0:
@@ -137,6 +129,10 @@ class CatalogOrchestrator:
                 raise CatalogRateLimitedError()
             raise CatalogUnavailableError()
 
+        statuses = [
+            statuses_by_id[adapter.capabilities().provider_id]
+            for adapter in selected
+        ]
         if any(status.status == "unavailable" for status in statuses):
             partial = True
 
