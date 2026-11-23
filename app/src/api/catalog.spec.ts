@@ -33,7 +33,14 @@ const result: SearchResponse = {
     },
   ],
   next_cursor: 'opaque-cursor',
-  providers: [{ id: 'earth-search', status: 'partial', last_checked: '2026-06-15T08:00:00Z', reason: 'more_results_available' }],
+  providers: [
+    {
+      id: 'earth-search',
+      status: 'partial',
+      last_checked: '2026-06-15T08:00:00Z',
+      reason: 'more_results_available',
+    },
+  ],
   partial: true,
 }
 
@@ -69,7 +76,14 @@ describe('searchCatalog', () => {
       'fetch',
       vi.fn().mockResolvedValue(
         jsonResponse(
-          { error: { code: 'PROVIDER_UNAVAILABLE', message: 'Каталог временно недоступен', request_id: 'req-1', details: {} } },
+          {
+            error: {
+              code: 'PROVIDER_UNAVAILABLE',
+              message: 'Каталог временно недоступен',
+              request_id: 'req-1',
+              details: {},
+            },
+          },
           503,
         ),
       ),
@@ -85,7 +99,10 @@ describe('searchCatalog', () => {
   })
 
   it('sanitizes malformed non-JSON HTTP error responses', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('private upstream detail', { status: 502 })))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('private upstream detail', { status: 502 })),
+    )
 
     await expect(searchCatalog(request)).rejects.toMatchObject({
       name: 'CatalogApiError',
@@ -123,7 +140,11 @@ describe('searchCatalog', () => {
       signals.push(signal)
       return new Promise<Response>((resolve, reject) => {
         pending.set(signal, resolve)
-        signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true })
+        signal.addEventListener(
+          'abort',
+          () => reject(new DOMException('Aborted', 'AbortError')),
+          { once: true },
+        )
       })
     })
     vi.stubGlobal('fetch', fetchMock)
