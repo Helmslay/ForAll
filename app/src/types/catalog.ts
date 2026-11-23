@@ -6,11 +6,53 @@ export type SearchRequest = {
     from: string
     to: string
   }
-  cloud_cover_lte: number
+  cloud_cover_lte?: number | null
   collections: string[]
-  providers?: string[]
+  providers?: string[] | null
   limit: number
   cursor: string | null
+}
+
+export type Scene = {
+  key: string
+  provider: string
+  collection: string
+  item_id: string
+  acquired_at: string
+  platform: string | null
+  cloud_cover: number | null
+  bbox: [west: number, south: number, east: number, north: number] | null
+  geometry: Record<string, unknown> | null
+  available_bands: ('B02' | 'B03' | 'B04' | 'B08')[]
+  preview_available: boolean
+  resolution?: number | null
+  crs?: string | null
+  nodata?: number | null
+  scale?: number | null
+  offset?: number | null
+}
+
+export type ProviderStatus = {
+  id: string
+  status: 'success' | 'partial' | 'unavailable'
+  last_checked?: string | null
+  reason?: string | null
+}
+
+export type SearchResponse = {
+  items: Scene[]
+  next_cursor: string | null
+  providers: ProviderStatus[]
+  partial: boolean
+}
+
+export type ApiErrorEnvelope = {
+  error: {
+    code: string
+    message: string
+    request_id: string
+    details: Record<string, unknown>
+  }
 }
 
 export function createSearchRequest(input: {
