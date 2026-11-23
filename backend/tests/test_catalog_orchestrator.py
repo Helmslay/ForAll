@@ -431,3 +431,33 @@ async def test_provider_failure_during_continuation_preserves_other_provider_buf
     assert second.providers[0].status == "unavailable"
     assert second.providers[1].status == "success"
     assert second.partial is True
+
+
+@pytest.mark.asyncio
+async def test_cursor_state_overflow_is_reported_without_truncation() -> None:
+    large_geometry = {"type": "Polygon", "coordinates": [[[0, 0]] * 6999 + [[0, 0]]]}
+    first = make_feature("large-1")
+    second = make_feature("large-2")
+    third = make_feature("large-3")
+    first["geometry"] = large_geometry
+    second["geometry"] = large_geometry
+    third["geometry"] = large_geometry
+    adapter = FakeAdapter("provider", features=[first, second, third])
+    result = await CatalogOrchestrator([adapter], cursor_codec=make_cursor_codec()).search(make_request(limit=1))
+    assert len(result.items) == 1
+    assert result.next_cursor is None
+    assert result.partial is True
+    assert result.providers[0].reason == "pagination_state_limit"
+
+
+@pytest.mark.asyncio
+async def test_cursor_token_does_not_contain_upstream_href_or_encryption_key() -> None:
+    href = "https://catalog.example/search?page=2&token=private-upstream-token"
+    codec = make_cursor_codec()
+    result = await CatalogOrchestrator(
+        [FakeAdapter("provider", next_href=href)], cursor_codec=codec
+    ).search(make_request(limit=1))
+    assert result.next_cursor is not None
+    assert href not in result.next_cursor
+    assert "private-upstream-token" not in result.next_cursor
+    assert "c" * 32 not in result.next_cursor
