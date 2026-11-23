@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 
 from app.catalog_provider import (
     CatalogConfigurationError,
-    CatalogProvider,
     CatalogProviderError,
     CatalogQueryNotSupportedError,
     CatalogRateLimitedError,
