@@ -6,9 +6,9 @@ export type SearchRequest = {
     from: string
     to: string
   }
-  cloud_cover_lte?: number
+  cloud_cover_lte?: number | null
   collections: string[]
-  providers?: string[]
+  providers?: string[] | null
   limit: number
   cursor: string | null
 }
