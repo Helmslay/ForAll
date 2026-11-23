@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import SearchPanel from './components/SearchPanel.vue'
@@ -110,12 +110,7 @@ function closePanel() {
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <SearchPanel
-          :aoi="aoiBbox || undefined"
-          :loading="searchLoading"
-          @submit="handleSearch"
-          @reset="resetSearch"
-        />
+        <SearchPanel :aoi="aoiBbox || undefined" :loading="searchLoading" @submit="handleSearch" @reset="resetSearch" />
         <section v-if="searchLoading" class="catalog-state" role="status" aria-live="polite">
           Выполняется поиск сцен…
         </section>
