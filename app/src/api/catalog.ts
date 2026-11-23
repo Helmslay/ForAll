@@ -85,7 +85,7 @@ function isApiErrorEnvelope(value: unknown): value is ApiErrorEnvelope {
 }
 
 function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError'
+  return isRecord(error) && error.name === 'AbortError'
 }
 
 export async function searchCatalog(request: SearchRequest): Promise<SearchResponse> {
