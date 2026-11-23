@@ -181,8 +181,34 @@
 
 **Итог:** DONE по scope WEB-03.10; production diff отсутствует. Следующая задача — WEB-03.11 (typed frontend search client).
 
-## WEB-03.11 — typed frontend search client
-Serialize request, parse errors, abort previous query, DTO types. Tests; no direct fetch in components.
+## WEB-03.11 — typed frontend search client — IN_PROGRESS
+
+**Зависимости:** WEB-03.01–03.10 DONE. Backend contract exists at `POST /api/v1/catalog/search`; `SearchRequest`, `SearchResponse`, `Scene` and `ProviderStatus` are defined in backend DTOs. Frontend already has a request builder in `app/src/types/catalog.ts` and a relative API base path in `app/src/api/config.ts`.
+
+**Scope:**
+- Keep the existing request builder and align its TypeScript DTOs to backend field names and optionality.
+- Add typed frontend DTOs for `Scene`, `ProviderStatus`, `SearchResponse` and the standard `error` envelope.
+- Add a dedicated API client that sends JSON via `POST /api/v1/catalog/search`, including `cursor` unchanged for continuation requests.
+- Parse the standard safe error envelope into a typed `CatalogApiError`; do not expose raw response bodies, server traces or upstream details. Handle malformed/non-JSON error responses safely.
+- A newly started search aborts the previous in-flight search. Propagate aborts as cancellation (do not turn them into user-facing API errors).
+- Keep `fetch` out of Vue components. Do not wire UI, provider configuration or mock scene data in this task.
+
+**Files/modules:** `app/src/api/catalog.ts` (new), `app/src/api/catalog.spec.ts` (new), `app/src/types/catalog.ts` (extend existing DTO types); task/plan/status documentation.
+
+**Acceptance criteria:**
+1. Request is POSTed to relative `/api/v1/catalog/search` with JSON content type and the exact serialized SearchRequest.
+2. Typed response models match backend `SearchResponse` / `Scene` / `ProviderStatus`, including optional metadata and nullable cursor.
+3. HTTP errors decode the standard `{ error: { code, message, request_id, details } }` envelope into a typed error; malformed error bodies remain sanitized and retain HTTP status.
+4. Successful non-JSON or malformed response fails with a safe typed response error rather than an unchecked cast.
+5. Starting a new search aborts the previous request; explicit cancellation is distinguishable from API failure.
+6. Unit tests cover request serialization, successful DTO response, each error parsing path, malformed success payload, and previous-request abort.
+7. No Vue component contains a direct catalog `fetch`; no provider or live upstream is enabled.
+
+**Test plan:** Vitest with mocked `fetch`/Response only; then frontend CI must pass audit, lint, format, typecheck, unit tests, production build, proxy smoke and Compose smoke. No real provider traffic is expected.
+
+**Не входит:** SearchPanel/App wiring, loading/results/empty/partial/pagination UI (WEB-03.12); scene detail/footprint (WEB-03.13); provider selection or real-data/no-VPN validation (G0 remains deferred).
+
+**Статус:** READY подтверждён после проверки зависимостей и контракта; реализация начата в отдельной feature branch.
 
 ## WEB-03.12 — search form/results
 Connect real API; loading/empty/error/partial/pagination states. No mock thumbnails/scene fields. Acceptance: real provider records appear.
