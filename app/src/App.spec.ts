@@ -38,7 +38,9 @@ const response: SearchResponse = {
 beforeEach(() => searchMock.mockReset())
 
 async function submitSearch(wrapper: ReturnType<typeof mountApp>) {
-  await wrapper.findComponent(SearchPanel).setProps({ aoi: [56.1, 58.9, 57.2, 59.8] })
+  await wrapper.findComponent(SearchPanel).setProps({
+    aoi: [56.1, 58.9, 57.2, 59.8],
+  })
   await wrapper.get('#search-date-from').setValue('2026-06-01')
   await wrapper.get('#search-date-to').setValue('2026-06-30')
   await wrapper.get('form').trigger('submit')
@@ -90,10 +92,12 @@ describe('App', () => {
 
     expect(wrapper.get('.panel-toggle').attributes('aria-expanded')).toBe('false')
   })
+
   it('shows loading state and disables the search submit button', async () => {
     searchMock.mockReturnValueOnce(new Promise(() => {}))
     const wrapper = mountApp()
     await submitSearch(wrapper)
+
     expect(wrapper.text()).toContain('Выполняется поиск сцен')
     expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
   })
@@ -103,6 +107,7 @@ describe('App', () => {
     const wrapper = mountApp()
     await submitSearch(wrapper)
     await vi.waitFor(() => expect(wrapper.text()).toContain('scene-1'))
+
     expect(searchMock).toHaveBeenCalledWith(expect.objectContaining({ cursor: null }))
     expect(wrapper.text()).toContain('configured-provider')
     expect(wrapper.text()).toContain('Найдено сцен: 1')
@@ -113,6 +118,7 @@ describe('App', () => {
     const empty = mountApp()
     await submitSearch(empty)
     await vi.waitFor(() => expect(empty.text()).toContain('Каталог не вернул сцен'))
+
     searchMock.mockResolvedValueOnce({
       ...response,
       partial: true,
@@ -125,19 +131,25 @@ describe('App', () => {
   })
 
   it('shows an error and retries', async () => {
-    searchMock.mockRejectedValueOnce(new Error('Каталог временно недоступен')).mockResolvedValueOnce(response)
+    searchMock
+      .mockRejectedValueOnce(new Error('Каталог временно недоступен'))
+      .mockResolvedValueOnce(response)
     const wrapper = mountApp()
     await submitSearch(wrapper)
     await vi.waitFor(() => expect(wrapper.text()).toContain('Каталог временно недоступен'))
     await wrapper.get('.catalog-action').trigger('click')
     await vi.waitFor(() => expect(wrapper.text()).toContain('scene-1'))
+
     expect(searchMock).toHaveBeenCalledTimes(2)
   })
 
   it('loads cursor pages and deduplicates scene keys', async () => {
     searchMock.mockResolvedValueOnce(response).mockResolvedValueOnce({
       ...response,
-      items: [scene, { ...scene, key: 'provider:sentinel-2-l2a:scene-2', item_id: 'scene-2' }],
+      items: [
+        scene,
+        { ...scene, key: 'provider:sentinel-2-l2a:scene-2', item_id: 'scene-2' },
+      ],
       next_cursor: null,
     })
     const wrapper = mountApp()
@@ -145,19 +157,24 @@ describe('App', () => {
     await vi.waitFor(() => expect(wrapper.text()).toContain('scene-1'))
     await wrapper.get('.catalog-action').trigger('click')
     await vi.waitFor(() => expect(wrapper.text()).toContain('scene-2'))
+
     expect(searchMock).toHaveBeenNthCalledWith(2, expect.objectContaining({ cursor: 'cursor-2' }))
     expect(wrapper.findAll('.scene-result')).toHaveLength(2)
   })
 
   it('does not show a pending response after search reset', async () => {
     let resolveSearch!: (value: SearchResponse) => void
-    searchMock.mockReturnValueOnce(new Promise((resolve) => { resolveSearch = resolve }))
+    searchMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveSearch = resolve
+      }),
+    )
     const wrapper = mountApp()
     await submitSearch(wrapper)
     await wrapper.get('.search-reset').trigger('click')
     resolveSearch(response)
     await Promise.resolve()
+
     expect(wrapper.find('.scene-result').exists()).toBe(false)
   })
-
 })
