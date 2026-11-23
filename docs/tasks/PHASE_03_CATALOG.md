@@ -154,7 +154,7 @@
 
 **Тесты:** codec round-trip; tampered ciphertext; wrong key/rotation; expiry; malformed/oversized token; mismatched query/provider/limit; multiple providers advancing independently; buffered overflow across pages; cross-page duplicate; one provider failure while another continues; off-host next href rejected; no href/key in response/logs; missing key fails closed.
 
-**Progress:** AES-256-GCM codec and offline codec tests implemented. Draft PR #63 opened. Exact-head backend CI run `45111419320` SUCCESS; GitLab mirror run `45111373749` SUCCESS. Frontend CI run `45111419200` was still running at the latest check.
+**Progress:** AES-256-GCM codec is integrated into FastAPI via the server-only `SENTINEL_CURSOR_ENCRYPTION_KEY`; invalid/missing configuration disables issuance and continuation fails closed with HTTP 422 `INVALID_CATALOG_CURSOR`. The orchestrator now binds cursors to a canonical request hash, preserves per-provider next hrefs and normalized buffers, emits at most the global limit, deduplicates stable scene keys across pages, isolates continuation failures and reports state-size/key-unavailable partial reasons. Every next href is passed back through the adapter's existing allowlist-checked `get_next_page` transport. Draft PR #63 remains open. Backend CI exact head `5f29f21b88526d3ad5c27e4efc8d0e0ba29178c2`: **140 passed** + Uvicorn smoke SUCCESS; mirror SUCCESS. Additional state-overflow and opaque-token tests have been added after that verified head and are awaiting CI.
 
 **Acceptance:** all above offline tests pass; exact-head backend CI and mirror succeed; no live provider or Russian availability claim. G0 remains deferred. The task is not DONE: orchestrator integration and aggregate multi-provider continuation tests remain.
 
