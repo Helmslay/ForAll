@@ -62,12 +62,6 @@ jobs:
         working-directory: app
         run: npm run lint
 
-      - name: Temporary format and print catalog client
-        working-directory: app
-        run: |
-          npx prettier --write src/api/catalog.ts
-          cat src/api/catalog.ts
-
       - name: Check formatting
         working-directory: app
         run: npm run format:check
