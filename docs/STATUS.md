@@ -45,9 +45,9 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 ## Next task
 
-WEB-03.11 — typed frontend search API client — DONE. PR #65 merged as `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`; exact PR HEAD `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`; GitHub Actions Frontend Build #235 (`45165905441`) and mirror workflow (`45165898039`) SUCCESS for that exact SHA.
+WEB-03.12A — search UI states and cursor pagination — DONE. PR #66 merged as `8a669b28c7c9973bfd51ee17eed04a75320312df`; exact PR head `7d6ab3ca16ad3a73d1557f5b8823cbb72a19e573`; GitHub Actions Frontend Build run `45175830402` SUCCESS (5 files / 30 tests passed); mirror run `45175821338` SUCCESS.
 
-WEB-03.12 — search form/results — BLOCKED. The task requires real provider records for acceptance, but no provider has been approved/enabled and G0/WEB-00.10 remain deferred. Do not connect an unapproved provider or use mock records. Resume only after provider approval or an explicit owner-authorized split of UI-state implementation from provider end-to-end acceptance. No other task in the current catalog sequence is unblocked by this dependency.
+WEB-03.12B — real provider search acceptance — BLOCKED pending explicit provider approval and G0 validation. No provider was selected or activated in WEB-03.12A. Do not claim live Sentinel-2 results or no-VPN availability.
 
 ## Important blockers
 1. No provider has been approved as primary; provider selection is deferred until application-level testing.
