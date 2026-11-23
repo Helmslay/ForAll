@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,6 +16,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Sentinel Explorer API"
     app_version: str = "0.1.0"
+    cursor_encryption_key: SecretStr | None = Field(default=None, repr=False)
 
 
 @lru_cache
