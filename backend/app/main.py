@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.catalog_provider import (
+from app.catalog_cursor import CatalogCursorCodec, InvalidCatalogCursor\nfrom app.catalog_provider import (
     CatalogConfigurationError,
     CatalogItemNotFoundError,
     CatalogProviderError,
@@ -36,7 +36,7 @@ def create_app(
         title=app_settings.app_name,
         version=app_settings.app_version,
     )
-    app.state.catalog_provider = CatalogOrchestrator(catalog_adapters)
+    try:\n        cursor_codec = CatalogCursorCodec.from_env()\n    except ValueError:\n        cursor_codec = None\n    app.state.catalog_provider = CatalogOrchestrator(\n        catalog_adapters, cursor_codec=cursor_codec\n    )
     app.include_router(catalog_router)
 
     @app.middleware("http")
