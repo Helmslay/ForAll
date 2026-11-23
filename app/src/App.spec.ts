@@ -51,9 +51,7 @@ describe('App', () => {
     const wrapper = mountApp()
 
     expect(wrapper.get('header').text()).toContain('Sentinel Explorer')
-    expect(
-      wrapper.get('aside[aria-label="Боковая панель приложения"]').element.tagName,
-    ).toBe('ASIDE')
+    expect(wrapper.get('aside[aria-label="Боковая панель приложения"]').element.tagName).toBe('ASIDE')
     expect(wrapper.get('nav[aria-label="Основная навигация"]').element.tagName).toBe('NAV')
     expect(wrapper.findAll('main')).toHaveLength(1)
     expect(wrapper.get('main#workspace').element.tagName).toBe('MAIN')
@@ -63,9 +61,7 @@ describe('App', () => {
     expect(wrapper.text()).toContain('Измерения')
     expect(wrapper.get('.panel-heading h2').text()).toBe('Поиск сцен')
     expect(wrapper.find('.search-form').exists()).toBe(true)
-    expect(wrapper.get('.context-panel').text()).toContain(
-      'Нарисуйте прямоугольную область интереса на карте.',
-    )
+    expect(wrapper.get('.context-panel').text()).toContain('Нарисуйте прямоугольную область интереса на карте.')
     expect(wrapper.get('.app-statusbar').text()).toContain('Пустой холст OpenLayers')
     expect(wrapper.find('map-canvas-stub').exists()).toBe(true)
   })
@@ -135,9 +131,7 @@ describe('App', () => {
   })
 
   it('shows an error and retries', async () => {
-    searchMock
-      .mockRejectedValueOnce(new Error('Каталог временно недоступен'))
-      .mockResolvedValueOnce(response)
+    searchMock.mockRejectedValueOnce(new Error('Каталог временно недоступен')).mockResolvedValueOnce(response)
     const wrapper = mountApp()
     await submitSearch(wrapper)
     await vi.waitFor(() => expect(wrapper.text()).toContain('Каталог временно недоступен'))
@@ -150,10 +144,7 @@ describe('App', () => {
   it('loads cursor pages and deduplicates scene keys', async () => {
     searchMock.mockResolvedValueOnce(response).mockResolvedValueOnce({
       ...response,
-      items: [
-        scene,
-        { ...scene, key: 'provider:sentinel-2-l2a:scene-2', item_id: 'scene-2' },
-      ],
+      items: [scene, { ...scene, key: 'provider:sentinel-2-l2a:scene-2', item_id: 'scene-2' }],
       next_cursor: null,
     })
     const wrapper = mountApp()
@@ -162,10 +153,7 @@ describe('App', () => {
     await wrapper.get('.catalog-action').trigger('click')
     await vi.waitFor(() => expect(wrapper.text()).toContain('scene-2'))
 
-    expect(searchMock).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ cursor: 'cursor-2' }),
-    )
+    expect(searchMock).toHaveBeenNthCalledWith(2, expect.objectContaining({ cursor: 'cursor-2' }))
     expect(wrapper.findAll('.scene-result')).toHaveLength(2)
   })
 
