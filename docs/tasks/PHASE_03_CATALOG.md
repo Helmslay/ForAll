@@ -110,29 +110,30 @@
 
 **Ограничения:** production app currently has no configured CatalogProvider, so endpoint honestly returns 503 until WEB-03.08 orchestration/server-side wiring is implemented. No real provider traffic, provider approval, cursor pagination, frontend integration or no-VPN availability was tested.
 
-## WEB-03.08 — catalog orchestrator — READY
+## WEB-03.08 — catalog orchestrator — DONE
 
-**Зависимости:** WEB-03.01–03.07 DONE. Имеются `CatalogProvider` protocol, `SearchRequest/SearchResponse/Scene/ProviderStatus` DTO, STAC HTTP transport, configurable `StacCatalogAdapter` и STAC Item normalizer. No provider is selected by default; orchestrator receives an explicit server-side sequence of configured adapters. This task does not add provider selection or production credentials.
+**Зависимости:** WEB-03.01–03.07 DONE. Использованы существующие `CatalogProvider` protocol, catalog DTO, STAC HTTP transport, configurable `StacCatalogAdapter` и STAC Item normalizer.
 
-**Цель:** реализовать агрегатор поверх существующих `StacCatalogAdapter`, совместимый с `CatalogProvider`.
+**Результат:** добавлен `CatalogOrchestrator`, реализующий `CatalogProvider` и принимающий явно настроенный серверный список адаптеров. Фабрика FastAPI принимает этот список через `create_app(..., catalog_adapters=...)`; по умолчанию список пуст, ни один upstream provider не выбран или активирован.
 
-**Scope:**
-- accept explicitly enabled adapters via constructor; reject duplicate provider IDs;
-- select adapters using optional `SearchRequest.providers` and only send collections supported by each adapter;
-- execute eligible adapter searches concurrently; normalize each STAC feature using adapter provider ID and trusted single-collection context where available;
-- merge results in deterministic configured-adapter order, deduplicate only by normalized `Scene.key`, and enforce the request's total `limit`;
-- produce per-provider `ProviderStatus` with UTC `last_checked`; status reasons are safe fixed codes, never raw exception text/URLs;
-- keep successful provider results when another provider fails; set `partial=true` when at least one selected provider failed and at least one succeeded;
-- when no adapter is configured/matches, or all selected adapters fail, raise a safe domain error; if all failures are query-not-supported, preserve that error type, otherwise report unavailable;
-- implement `get_item(scene_key)` by decoding the existing provider:collection:item key and routing only to the matching configured adapter.
+Поиск выполняется параллельно. Оркестратор фильтрует адаптеры по `providers`, передаёт каждому только поддерживаемые запрошенные collections, проверяет collection identity в ответах, нормализует Items в `Scene`, удаляет дубликаты по устойчивому `Scene.key` и ограничивает общий результат параметром `limit`. Порядок результатов и provider statuses детерминирован порядком адаптеров в конфигурации.
 
-**Tests:** multiple adapters success; provider filter; per-adapter collection intersection; parallel fan-out; duplicate Scene.key removal; aggregate limit; one failure plus one success preserves results and marks partial; all-failed/no-adapter safe errors; malformed Item normalization does not leak raw details; get_item routes only to matching adapter and validates normalized key; duplicate provider IDs rejected.
+Сбой одного адаптера не удаляет результаты остальных: формируется `partial=true` и безопасный `ProviderStatus`. Если все адаптеры не справились, возвращается безопасная доменная ошибка; однородные ошибки unsupported query и rate limit сохраняют соответствующий тип. Поставщик с upstream next link помечается `partial/more_results_available`; сам next URL не возвращается. Реализован поиск отдельной сцены по существующему ключу provider:collection:item с проверкой канонической кодировки и идентичности.
 
-**Критерии приёмки:** orchestrator satisfies `CatalogProvider`; no arbitrary URL/client-controlled adapter configuration; adapter failures are isolated; no raw upstream links/exceptions are exposed; deduplication uses only normalized stable identity; result count never exceeds request limit; offline tests pass.
+**Изменённые файлы:**
+- `backend/app/catalog_orchestrator.py`
+- `backend/app/main.py`
+- `backend/tests/test_catalog_orchestrator.py`
+- `docs/API_CONTRACTS.md`
+- эта карточка, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`
 
-**Не входит:** provider selection/configuration in production, live provider traffic, cursor signing or fetching subsequent pages (WEB-03.09), persistent cache, health monitoring (WEB-03.10), frontend integration and no-VPN verification.
+**Тесты:** offline tests cover app-factory wiring, CatalogProvider protocol, parallel fan-out, provider filtering, collection intersection, normalization, unexpected collection rejection, stable-key deduplication, aggregate limit, partial failures, all-failed/no-provider cases, rate-limit/query errors, safe handling of next links and scene-key routing including encoded identity components. Exact PR head `6de5f4d4a39e05c1ab3f442d1d52ba4624fb27e7`: Backend workflow run `45109923307` SUCCESS — **123 passed**, Uvicorn health smoke-check SUCCESS; GitLab mirror run `45109917509` SUCCESS.
 
+**Критерии приёмки:** orchestrator satisfies `CatalogProvider`; no arbitrary URL/client-controlled adapter configuration; adapter failures are isolated; raw upstream links/exceptions are not exposed; deduplication uses normalized stable identity; result count does not exceed request limit; offline CI passed.
 
+**PR:** #62 merged; merge commit `3090165dff88f25aa95dd42699a7fa6d752fcfa3`.
+
+**Ограничения:** production configuration still enables no provider by default. Real provider traffic, credentials, licensing, Russian-network access and no-VPN availability were not tested. Cursor signing and fetching subsequent STAC pages remain WEB-03.09; until then a next link is represented only as a partial provider status.
 
 ## WEB-03.09 — cursor pagination
 Opaque cursor bound to query/provider signature, expiry and tamper protection. Tests duplicate page and mismatched query. Never expose signed next links.
