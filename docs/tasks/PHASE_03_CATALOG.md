@@ -217,15 +217,15 @@
 - `docs/tasks/PHASE_03_CATALOG.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
 
 **Проверки:**
-- Exact application-code commit `d4e57a2ae420bdf0aaad21086642590f762ef881` (before final documentation-only commits): Frontend build workflow run `45134386481` — SUCCESS. Audit policy, npm audit policy, ESLint, Prettier, vue-tsc, Vitest (**23 passed**), Vite production build, Vite proxy health smoke, Docker Compose config/localhost port checks, Compose startup and frontend/API smoke all passed.
-- GitLab mirror run `45134377834` — SUCCESS for the same SHA. No GitLab pipeline was started.
-- PR #65 is open; no unresolved review threads or requested changes. Merge is intentionally held until Buildkite CI is confirmed.
+- Exact current PR head `ecb4f64449d75f637f37a75a4ea4db47e3a576a3`: Frontend build workflow run `45135931803` (Build #228) — SUCCESS. Audit policy, npm audit policy, ESLint, Prettier, vue-tsc, Vitest (**23 passed**), Vite production build, Vite proxy health smoke, Docker Compose config/localhost port checks, Compose startup and frontend/API smoke all passed.
+- GitHub Actions mirror workflow run `45135924169` — SUCCESS; the GitLab mirror branch was updated to the exact PR head. No GitLab pipeline was started.
+- PR #65 is open and mergeable; no unresolved review threads or requested changes. Merge remains held because Web-specific Buildkite evidence is not available.
 
 **Acceptance:** request serialization, typed DTOs, safe error parsing, malformed response handling, previous-query cancellation and no direct catalog fetch in Vue components are verified by tests and exact-head frontend checks.
 
-**Ограничение проверки:** найден `documentation/AI-AUTOMATION-RUNBOOK.md` в GitLab-проекте `kuncevichles-group/sentinel-gis-android` (ветка `audit/full-project-2026-11-13`). Регламент относится к Android pipeline `sentinel-gis-android`; он публикует логи в проект `kuncevichles-group/sentinel-gis-android`, ветка `ci/buildkite-logs`, путь `logs/buildkite/build-N.log`. Последний доступный лог — Buildkite #414 от 2026-11-16; он собирает Android source SHA `60c0a4f8f4a344a5cf62761d0ebd1d45c5cb2408`, а не репозиторий ForAll/Web. Поиск точного Web SHA `a950cdd828f6354d8b5d6578c525476cba284b95` и WEB-03.11 в центральной ветке логов совпадений не дал. GitLab-проект `kuncevichles-group/forall-backup` является только зеркалом refs (`github/*`); у него нет Buildkite/CI ветки, pipeline или commit status для этого SHA. GitHub Actions Frontend build и mirror успешны, но не заменяют требуемое Buildkite evidence. Поэтому WEB-03.11 остаётся IN_REVIEW, PR не слит.
+**Ограничение проверки:** найден `documentation/AI-AUTOMATION-RUNBOOK.md` в GitLab-проекте `kuncevichles-group/sentinel-gis-android` (ветка `audit/full-project-2026-11-13`). Регламент относится к Android pipeline `sentinel-gis-android`; он публикует логи в проект `kuncevichles-group/sentinel-gis-android`, ветка `ci/buildkite-logs`, путь `logs/buildkite/build-N.log`. Последний доступный лог — Buildkite #414 от 2026-11-16; он собирает Android source SHA `60c0a4f8f4a344a5cf62761d0ebd1d45c5cb2408`, а не репозиторий ForAll/Web. Поиск точного текущего Web SHA `ecb4f64449d75f637f37a75a4ea4db47e3a576a3` и WEB-03.11 в центральной ветке логов совпадений не дал. GitLab-проект `kuncevichles-group/forall-backup` является только зеркалом refs (`github/*`); у него нет Buildkite/CI ветки, pipeline или commit status для этого SHA. GitHub Actions Frontend build и mirror успешны, но не заменяют требуемое Buildkite evidence. Поэтому WEB-03.11 остаётся IN_REVIEW, PR не слит.
 
-**Статус:** READY подтверждён после проверки зависимостей и контракта; реализация подготовлена в отдельной feature branch.
+**Статус:** IN_REVIEW; реализация и exact-head GitHub Actions проверки успешны, но Web-specific Buildkite evidence отсутствует.
 
 ## WEB-03.12 — search form/results
 Connect real API; loading/empty/error/partial/pagination states. No mock thumbnails/scene fields. Acceptance: real provider records appear.
