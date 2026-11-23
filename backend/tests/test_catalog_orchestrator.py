@@ -289,6 +289,19 @@ async def test_get_item_routes_by_composite_key_and_checks_identity() -> None:
 
 
 @pytest.mark.asyncio
+async def test_get_item_preserves_encoded_identity_components() -> None:
+    adapter = FakeAdapter("provider")
+    orchestrator = CatalogOrchestrator([adapter])
+
+    scene = await orchestrator.get_item(
+        "provider:sentinel-2-l2a:item%2Fwith%3Aseparators"
+    )
+
+    assert scene.item_id == "item/with:separators"
+    assert scene.key == "provider:sentinel-2-l2a:item%2Fwith%3Aseparators"
+
+
+@pytest.mark.asyncio
 async def test_get_item_rejects_unknown_provider_and_noncanonical_key() -> None:
     orchestrator = CatalogOrchestrator([FakeAdapter("provider")])
 
