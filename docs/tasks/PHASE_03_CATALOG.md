@@ -94,8 +94,25 @@
 
 **Ограничения:** отсутствующие/невалидные обязательные identity, collection или datetime приводят к безопасному `CatalogProviderError`; optional invalid geometry/bbox/cloud/platform are omitted. Geometry check is structural and does not replace a full topology/CRS validator. Raster resolution/CRS/nodata/scale/offset are not inferred from assets. Band detection deliberately requires explicit B02/B03/B04/B08 naming; ambiguous common_name aliases such as `nir` are not guessed. Real provider data and no-VPN access were not tested.
 
-## WEB-03.07 — search endpoint
-POST /catalog/search, validation and standard errors. Tests invalid bbox/date/cloud/limit and valid input. No arbitrary URL.
+## WEB-03.07 — search API endpoint — READY
+
+**Зависимости:** WEB-03.01–03.06 DONE. FastAPI app, request-ID middleware, стандартный error envelope, SearchRequest/SearchResponse DTO и transport-independent CatalogProvider Protocol существуют. WEB-03.08 orchestrator не является блокирующей зависимостью: endpoint принимает CatalogProvider через dependency injection; production wiring оркестратора остаётся отдельной задачей WEB-03.08.
+
+**Цель:** реализовать POST /api/v1/catalog/search согласно API_CONTRACTS.md без выбора/включения конкретного provider и без сетевых вызовов в route.
+
+**Scope:**
+- добавить FastAPI route и подключить его к create_app;
+- принимать только SearchRequest JSON; Pydantic validation выполняется до вызова provider;
+- получать CatalogProvider через явную injectable dependency; отсутствие настроенного provider возвращает безопасную ошибку unavailable, не фиктивный SearchResponse;
+- возвращать SearchResponse из provider без изменения DTO;
+- преобразовывать CatalogProvider domain errors в стандартный error envelope с безопасным code/message; не включать provider URL, href, token или traceback;
+- не принимать endpoint/URL поставщика от клиента; не создавать provider и не выбирать его из env в этой задаче.
+
+**Тесты:** valid payload доходит до fake provider и возвращает DTO; invalid bbox/date/cloud_cover_lte/limit и extra arbitrary URL дают 422 и не вызывают provider; отсутствие provider даёт безопасный unavailable error; domain error даёт стандартный envelope; request ID присутствует в success/error responses.
+
+**Критерии приёмки:** POST /api/v1/catalog/search зарегистрирован; схема запроса/ответа соответствует существующим DTO и API_CONTRACTS.md; валидация выполняется до provider call; injected fake provider вызывается с SearchRequest; provider errors безопасно отображаются; arbitrary provider URL и секреты не принимаются/не раскрываются; offline tests pass.
+
+**Не входит:** оркестрация нескольких adapters (WEB-03.08), cursor signing/pagination (WEB-03.09), выбор/одобрение primary provider, live provider traffic, frontend integration и проверка доступности без VPN.
 
 ## WEB-03.08 — catalog orchestrator
 Call enabled adapters, normalize, deduplicate by real identity, track partial status. Provider failure doesn't erase another provider's results. All fail → clear provider error.
