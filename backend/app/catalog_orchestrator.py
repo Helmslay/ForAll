@@ -191,9 +191,10 @@ class CatalogOrchestrator:
                 raise CatalogRateLimitedError()
             raise CatalogUnavailableError()
 
-        emitted = set(
+        emitted_keys = list(
             payload.get("emitted_keys", []) if request.cursor is not None else []
         )
+        emitted = set(emitted_keys)
         ordered_scenes: list[Scene] = []
         seen = set(emitted)
         for provider_id in provider_ids:
@@ -206,9 +207,8 @@ class CatalogOrchestrator:
                     ordered_scenes.append(scene)
 
         items = ordered_scenes[: request.limit]
-        emitted_keys = list(emitted)
         emitted_keys.extend(scene.key for scene in items)
-        consumed = {scene.key for scene in items}
+        consumed = set(emitted_keys)
         for provider_id in provider_ids:
             retained: list[dict[str, Any]] = []
             local_seen: set[str] = set()
