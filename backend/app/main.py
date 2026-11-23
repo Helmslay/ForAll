@@ -96,6 +96,16 @@ def create_app(
             response.headers.update(exc.headers)
         return response
 
+    @app.exception_handler(InvalidCatalogCursor)
+    async def handle_invalid_catalog_cursor(
+        request: Request, exc: InvalidCatalogCursor
+    ) -> JSONResponse:
+        return error_response(
+            request,
+            status_code=422,
+            code="INVALID_CATALOG_CURSOR",
+            message="Курсор каталога недействителен или устарел",
+        )
     @app.exception_handler(CatalogProviderError)
     async def handle_catalog_provider_error(
         request: Request, exc: CatalogProviderError
