@@ -12,8 +12,7 @@ vi.mock('./api/catalog', () => ({
 
 const MapCanvasStub = defineComponent({
   emits: ['aoi-change'],
-  template:
-    '<button class="map-aoi" @click="$emit(\'aoi-change\', [56.1, 58.9, 57.2, 59.8])">AOI</button>',
+  template: '<button class="map-aoi" @click="$emit(\'aoi-change\', [56.1, 58.9, 57.2, 59.8])">AOI</button>',
 })
 
 function mountApp() {
