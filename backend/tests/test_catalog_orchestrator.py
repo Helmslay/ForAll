@@ -461,3 +461,21 @@ async def test_cursor_token_does_not_contain_upstream_href_or_encryption_key() -
     assert href not in result.next_cursor
     assert "private-upstream-token" not in result.next_cursor
     assert "c" * 32 not in result.next_cursor
+
+
+@pytest.mark.asyncio
+async def test_continuation_fills_remaining_global_page_limit() -> None:
+    adapter = FakeAdapter(
+        "provider",
+        features=[make_feature(f"item-{index}") for index in range(1, 6)],
+        next_href="https://catalog.example/search?page=2",
+        next_pages=[
+            StacSearchPage(tuple(make_feature(f"item-{index}") for index in range(6, 9)), None)
+        ],
+    )
+    orchestrator = CatalogOrchestrator([adapter], cursor_codec=make_cursor_codec())
+    first = await orchestrator.search(make_request(limit=4))
+    assert [scene.item_id for scene in first.items] == ["item-1", "item-2", "item-3", "item-4"]
+    second = await orchestrator.search(make_request(limit=4, cursor=first.next_cursor))
+    assert [scene.item_id for scene in second.items] == ["item-5", "item-6", "item-7", "item-8"]
+    assert second.next_cursor is None
