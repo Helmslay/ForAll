@@ -160,8 +160,26 @@
 
 **Ограничения:** cursor is replayable until its 15-minute expiry; one-time-use protection is not implemented. No provider is enabled by default. Real provider traffic, licensing, raster assets and Russian-network/no-VPN access were not tested. The server must be configured with a stable base64-encoded 32-byte `SENTINEL_CURSOR_ENCRYPTION_KEY` to issue continuation cursors.\n\n**PR:** #63 merged; merge commit `8eff9ea88be22ccd57afb68de8acc377a658709e`.\n\n**Не входит:** provider selection, live source validation, one-time cursor replay prevention, frontend pagination UI, raster access.
 
-## WEB-03.10 — provider status DTO
-Success/partial/unavailable, safe reason and last checked. Hide secrets and raw trace.
+## WEB-03.10 — provider partial status — DONE
+
+**Зависимости:** WEB-03.01–03.09 DONE. `ProviderStatus` DTO, `SearchResponse` and `CatalogOrchestrator` are already part of the backend catalog implementation.
+
+**Результат:** задача закрыта без дублирования существующей реализации. `ProviderStatus` supports exactly `success`, `partial` and `unavailable`, optional UTC `last_checked` and safe `reason`. DTO rejects unknown fields (including traceback-like fields). The orchestrator populates timestamps and safe reason codes for unsupported collections, provider failures, remaining provider pages, unavailable cursor encryption and pagination-state limits. A provider failure remains isolated from successful providers; `SearchResponse.partial` reflects non-success provider statuses. Raw upstream URLs and exception text are not copied into the response.
+
+**Фактически изменённые файлы в рамках исходной реализации:** `backend/app/schemas/catalog.py`, `backend/app/catalog_orchestrator.py`, `backend/tests/test_catalog_schemas.py`, `backend/tests/test_catalog_orchestrator.py`. Эти файлы были реализованы и проверены в предыдущих задачах WEB-03.01/03.08/03.09; в рамках закрытия WEB-03.10 production-код не менялся.
+
+**Проверки и evidence:**
+- `test_provider_status_accepts_known_states_and_utc_timestamp` — проверяет допустимый статус, UTC timestamp и reason.
+- `test_provider_status_rejects_unknown_state_and_extra_fields` — проверяет отклонение неизвестного статуса и дополнительного поля traceback.
+- `test_one_provider_failure_does_not_erase_successful_results` — проверяет независимость провайдеров, safe reason, unavailable/success и partial.
+- `test_unsupported_collection_is_reported_without_blocking_other_provider` и `test_provider_with_next_page_is_explicitly_marked_partial` — проверяют безопасные причины partial/unavailable.
+- Exact PR #63 head `97cb8d199d1508895bc343aca3c8096614181985`: Backend tests run `45113001119` — **145 passed**, Uvicorn smoke SUCCESS. Этот запуск включает указанные тесты; отдельный новый backend workflow для документационного закрытия не требуется.
+
+**Критерии приёмки:** три состояния DTO; UTC `last_checked`; optional safe `reason`; запрет лишних полей; корректные статусы и partial при частичном сбое; отсутствие upstream URL/traceback в ответе — подтверждены существующими тестами и exact-head CI.
+
+**Ограничение / не входит в задачу:** `GET /api/v1/health/providers` из раздела Health в `docs/API_CONTRACTS.md` в приложении отсутствует. WEB-03.10 сформулирована как provider status DTO и статусы в ответе Search, поэтому отдельный health endpoint не добавлялся. Контракт называет его внутренним/защищённым, но проект пока не задаёт механизм аутентификации/авторизации; endpoint нельзя безопасно реализовать до отдельного согласования этого механизма и отдельной задачи. Никаких health details публично не раскрывается.
+
+**Итог:** DONE по scope WEB-03.10; production diff отсутствует. Следующая задача — WEB-03.11 (typed frontend search client).
 
 ## WEB-03.11 — typed frontend search client
 Serialize request, parse errors, abort previous query, DTO types. Tests; no direct fetch in components.
