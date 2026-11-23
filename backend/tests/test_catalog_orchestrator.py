@@ -9,6 +9,7 @@ import pytest
 
 from app.catalog_provider import (
     CatalogCapabilities,
+    CatalogProvider,
     CatalogItemNotFoundError,
     CatalogQueryNotSupportedError,
     CatalogUnavailableError,
@@ -251,6 +252,16 @@ async def test_get_item_rejects_unknown_provider_and_noncanonical_key() -> None:
         await orchestrator.get_item("unknown:sentinel-2-l2a:item")
     with pytest.raises(CatalogItemNotFoundError):
         await orchestrator.get_item("provider:sentinel-2-l2a:item%2fone")
+
+
+def test_orchestrator_exposes_aggregate_catalog_capabilities() -> None:
+    orchestrator = CatalogOrchestrator([FakeAdapter("provider")])
+
+    assert isinstance(orchestrator, CatalogProvider)
+    capabilities = orchestrator.capabilities()
+    assert capabilities.provider_id == "catalog-orchestrator"
+    assert capabilities.supported_collections == frozenset({"sentinel-2-l2a"})
+    assert capabilities.supported_bands == frozenset({"B02", "B03", "B04", "B08"})
 
 
 def test_duplicate_provider_ids_are_rejected() -> None:
