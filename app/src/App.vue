@@ -29,8 +29,6 @@ const navigationItems = [
 function closePanel() {
   panelOpen.value = false
 }
-
-
 </script>
 
 <template>
@@ -126,7 +124,9 @@ function closePanel() {
           <button type="button" class="catalog-action" @click="retrySearch">Повторить поиск</button>
         </section>
         <section v-else-if="searchResponse" class="catalog-results" aria-label="Результаты поиска">
-          <p v-if="searchResponse.partial" class="catalog-partial" role="status">Получены неполные результаты: один или несколько источников вернули частичный ответ.</p>
+          <p v-if="searchResponse.partial" class="catalog-partial" role="status">
+            Получены неполные результаты: один или несколько источников вернули частичный ответ.
+          </p>
           <div v-if="searchResponse.providers.length" class="provider-statuses" aria-label="Состояние источников">
             <p v-for="provider in searchResponse.providers" :key="provider.id">
               {{ provider.id }}: {{ provider.status
@@ -141,8 +141,13 @@ function closePanel() {
             <article v-for="scene in searchResponse.items" :key="scene.key" class="scene-result">
               <h3>{{ scene.item_id }}</h3>
               <p>{{ new Date(scene.acquired_at).toLocaleString() }}</p>
-              <p>{{ scene.platform || 'Платформа не указана' }} · {{ scene.cloud_cover === null ? 'Облачность не указана' : scene.cloud_cover + '%' }}</p>
-              <p class="scene-provider">{{ scene.provider }} · {{ scene.collection }} · {{ scene.available_bands.join(', ') }}</p>
+              <p>
+                {{ scene.platform || 'Платформа не указана' }} ·
+                {{ scene.cloud_cover === null ? 'Облачность не указана' : scene.cloud_cover + '%' }}
+              </p>
+              <p class="scene-provider">
+                {{ scene.provider }} · {{ scene.collection }} · {{ scene.available_bands.join(', ') }}
+              </p>
             </article>
           </template>
           <button
