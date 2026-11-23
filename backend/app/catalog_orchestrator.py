@@ -100,6 +100,8 @@ class CatalogOrchestrator:
         for (adapter, _), outcome in zip(jobs, outcomes, strict=True):
             provider_id = adapter.capabilities().provider_id
             checked_at = datetime.now(UTC)
+            if isinstance(outcome, asyncio.CancelledError):
+                raise outcome
             if isinstance(outcome, Exception):
                 failed_errors.append(outcome)
                 statuses_by_id[provider_id] = ProviderStatus(
@@ -175,14 +177,18 @@ class CatalogOrchestrator:
         )
         page = await adapter.search(adapter_request)
         collection_context = collections[0] if len(collections) == 1 else None
-        scenes = [
-            normalize_stac_item(
-                feature,
-                provider_id=provider_id,
-                collection_id=collection_context,
+        scenes: list[Scene] = []
+        for feature in page.features:
+            item_collection = feature.get("collection")
+            if item_collection is not None and item_collection not in collections:
+                raise CatalogProviderError(provider_id)
+            scenes.append(
+                normalize_stac_item(
+                    feature,
+                    provider_id=provider_id,
+                    collection_id=collection_context,
+                )
             )
-            for feature in page.features
-        ]
         return scenes, page.next_href is not None
 
     async def get_item(self, scene_key: str) -> Scene:
