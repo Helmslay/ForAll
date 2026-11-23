@@ -27,12 +27,8 @@ function isProviderStatus(value: unknown): value is ProviderStatus {
     typeof value.id === 'string' &&
     value.id.length > 0 &&
     (value.status === 'success' || value.status === 'partial' || value.status === 'unavailable') &&
-    (value.last_checked === undefined ||
-      value.last_checked === null ||
-      typeof value.last_checked === 'string') &&
-    (value.reason === undefined ||
-      value.reason === null ||
-      typeof value.reason === 'string')
+    (value.last_checked === undefined || value.last_checked === null || typeof value.last_checked === 'string') &&
+    (value.reason === undefined || value.reason === null || typeof value.reason === 'string')
   )
 }
 
@@ -51,29 +47,16 @@ function isScene(value: unknown): value is Scene {
     typeof value.acquired_at === 'string' &&
     (value.platform === null || typeof value.platform === 'string') &&
     (value.cloud_cover === null || typeof value.cloud_cover === 'number') &&
-    (value.bbox === null ||
-      (Array.isArray(value.bbox) &&
-        value.bbox.length === 4 &&
-        value.bbox.every(Number.isFinite))) &&
+    (value.bbox === null || (Array.isArray(value.bbox) && value.bbox.length === 4 && value.bbox.every(Number.isFinite))) &&
     (value.geometry === null || isRecord(value.geometry)) &&
     Array.isArray(bands) &&
     bands.every((band) => band === 'B02' || band === 'B03' || band === 'B04' || band === 'B08') &&
     typeof value.preview_available === 'boolean' &&
-    (value.resolution === undefined ||
-      value.resolution === null ||
-      typeof value.resolution === 'number') &&
-    (value.crs === undefined ||
-      value.crs === null ||
-      typeof value.crs === 'string') &&
-    (value.nodata === undefined ||
-      value.nodata === null ||
-      typeof value.nodata === 'number') &&
-    (value.scale === undefined ||
-      value.scale === null ||
-      typeof value.scale === 'number') &&
-    (value.offset === undefined ||
-      value.offset === null ||
-      typeof value.offset === 'number')
+    (value.resolution === undefined || value.resolution === null || typeof value.resolution === 'number') &&
+    (value.crs === undefined || value.crs === null || typeof value.crs === 'string') &&
+    (value.nodata === undefined || value.nodata === null || typeof value.nodata === 'number') &&
+    (value.scale === undefined || value.scale === null || typeof value.scale === 'number') &&
+    (value.offset === undefined || value.offset === null || typeof value.offset === 'number')
   )
 }
 
@@ -126,30 +109,17 @@ export async function searchCatalog(request: SearchRequest): Promise<SearchRespo
       }
 
       if (isApiErrorEnvelope(payload)) {
-        throw new CatalogApiError(
-          payload.error.message,
-          response.status,
-          payload.error.code,
-          payload.error.request_id,
-        )
+        throw new CatalogApiError(payload.error.message, response.status, payload.error.code, payload.error.request_id)
       }
 
-      throw new CatalogApiError(
-        'Catalog request failed with HTTP ' + response.status,
-        response.status,
-        'HTTP_ERROR',
-      )
+      throw new CatalogApiError('Catalog request failed with HTTP ' + response.status, response.status, 'HTTP_ERROR')
     }
 
     let payload: unknown
     try {
       payload = await response.json()
     } catch {
-      throw new CatalogApiError(
-        'Catalog returned an invalid response',
-        response.status,
-        'INVALID_CATALOG_RESPONSE',
-      )
+      throw new CatalogApiError('Catalog returned an invalid response', response.status, 'INVALID_CATALOG_RESPONSE')
     }
 
     if (!isSearchResponse(payload)) {
