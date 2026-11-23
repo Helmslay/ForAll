@@ -25,12 +25,7 @@ const scene = {
   cloud_cover: 12.5,
   bbox: [56.1, 58.9, 57.2, 59.8] as [number, number, number, number],
   geometry: null,
-  available_bands: ['B02', 'B03', 'B04', 'B08'] as (
-    | 'B02'
-    | 'B03'
-    | 'B04'
-    | 'B08'
-  )[],
+  available_bands: ['B02', 'B03', 'B04', 'B08'] as SearchResponse['items'][number]['available_bands'],
   preview_available: false,
 }
 const response: SearchResponse = {
