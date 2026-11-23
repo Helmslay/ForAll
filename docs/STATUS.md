@@ -45,7 +45,9 @@ G1 — first local frontend/backend development build verified on the user's Win
 
 ## Next task
 
-WEB-03.11 — typed frontend search API client — IN_REVIEW in PR #65. Current head `8017dbd9c7c555145141b5d33fcc3b021630c482`; GitHub Actions Frontend build #232 (`45163964147`) and mirror workflow (`45163951755`) both SUCCESS for this exact SHA. No unresolved review threads; PR is mergeable. Next implementation task after merge: WEB-03.12 — search form/results. Buildkite is not used for Sentinel Explorer Web CI.
+WEB-03.11 — typed frontend search API client — DONE. PR #65 merged as `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`; exact PR HEAD `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`; GitHub Actions Frontend Build #235 (`45165905441`) and mirror workflow (`45165898039`) SUCCESS for that exact SHA.
+
+Next candidate: WEB-03.12 — search form/results. Its UI wiring can be developed against the existing API client, but the card's acceptance criterion requires real provider records. No provider has been approved or enabled; do not use fixtures/mock records as a substitute or claim the end-to-end criterion is met. Review readiness and split/clarify acceptance before implementation.
 
 ## Important blockers
 1. No provider has been approved as primary; provider selection is deferred until application-level testing.
@@ -65,4 +67,4 @@ Update this file when a milestone or material project decision changes. Do not m
 
 ## Current task
 
-WEB-03.11 — typed frontend search API client — IN_REVIEW, PR #65. Exact current head `8017dbd9c7c555145141b5d33fcc3b021630c482`: GitHub Actions Frontend build #232 (`45163964147`) SUCCESS; mirror workflow (`45163951755`) SUCCESS. Both check-runs completed successfully. Review threads: none; mergeable: true. No Buildkite requirement applies to Web. G0/provider selection remains deferred by explicit user decision; no provider is enabled and no no-VPN claim is made.
+WEB-03.11 — typed frontend search API client — DONE; PR #65 merged as `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`. Exact-head GitHub Actions Frontend Build #235 (`45165905441`) and mirror workflow (`45165898039`) both SUCCESS for `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`. Next candidate WEB-03.12 is not yet declared READY: its acceptance requires real provider records, while provider selection remains deferred and no mock data is allowed. G0 remains OPEN/deferred.
