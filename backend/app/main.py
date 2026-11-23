@@ -5,6 +5,7 @@ from uuid import uuid4
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.catalog_provider import (
     CatalogConfigurationError,
@@ -15,7 +16,6 @@ from app.catalog_provider import (
     CatalogUnavailableError,
 )
 from app.catalog_routes import router as catalog_router
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import Settings, get_settings
 
@@ -86,7 +86,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def handle_catalog_provider_error(
         request: Request, exc: CatalogProviderError
     ) -> JSONResponse:
-        if isinstance(exc, CatalogUnavailableError | CatalogConfigurationError):
+        if isinstance(exc, (CatalogUnavailableError, CatalogConfigurationError)):
             status_code = 503
         elif isinstance(exc, CatalogRateLimitedError):
             status_code = 429
