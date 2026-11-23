@@ -34,6 +34,10 @@ class CatalogCursorCodec:
     @classmethod
     def from_env(cls, name: str = "SENTINEL_CURSOR_ENCRYPTION_KEY") -> "CatalogCursorCodec":
         encoded = os.environ.get(name)
+        return cls.from_encoded_key(encoded)
+
+    @classmethod
+    def from_encoded_key(cls, encoded: str | None) -> "CatalogCursorCodec":
         if not encoded:
             raise ValueError("catalog cursor encryption key is not configured")
         try:
