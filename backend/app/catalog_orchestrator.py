@@ -386,6 +386,8 @@ class CatalogOrchestrator:
         reason: str,
     ) -> None:
         for provider_id in provider_ids:
+            if statuses.get(provider_id) is not None and statuses[provider_id].status == "unavailable":
+                continue
             state = states[provider_id]
             if state["next_href"] is not None or state["buffer"]:
                 statuses[provider_id] = ProviderStatus(
