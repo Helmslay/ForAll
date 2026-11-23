@@ -95,7 +95,7 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 - WEB-03.08 — catalog orchestrator — **DONE** (PR #62 merged as `3090165dff88f25aa95dd42699a7fa6d752fcfa3`; exact-head backend CI run `45109923307` SUCCESS — 123 passed + Uvicorn smoke; mirror run `45109917509` SUCCESS).
 - WEB-03.09 — encrypted aggregate cursor pagination — **DONE** (PR #63 merged as `8eff9ea88be22ccd57afb68de8acc377a658709e`; exact-head Backend tests run `45113001119` — 145 passed + Uvicorn smoke SUCCESS; Frontend build run `45113001304` SUCCESS; GitLab mirror run `45112996458` SUCCESS).
 - WEB-03.10 — provider partial status — **DONE** (реализация и offline tests уже входят в backend DTO/orchestrator; exact-head Backend CI run `45113001119`: 145 passed + Uvicorn smoke SUCCESS; отдельный health status endpoint не входит в scope и требует отдельного решения по auth).
-- WEB-03.11 — frontend search API client — **IN_REVIEW** (PR #65; current head `8017dbd9c7c555145141b5d33fcc3b021630c482`; GitHub Actions Frontend build #232 / run `45163964147` SUCCESS; mirror workflow run `45163951755` SUCCESS; both check-runs for exact SHA SUCCESS. No unresolved review threads; PR mergeable. Buildkite is not part of Web CI. Awaiting merge.)
+- WEB-03.11 — frontend search API client — **DONE** (PR #65 merged as `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`; exact-head `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`; GitHub Actions Frontend Build #235 / run `45165905441` and mirror run `45165898039` SUCCESS; all exact-SHA check-runs passed).
 - WEB-03.12 — search form/results.
 - WEB-03.13 — scene details/footprint.
 
