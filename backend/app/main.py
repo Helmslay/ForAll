@@ -38,7 +38,11 @@ def create_app(
         version=app_settings.app_version,
     )
     try:
-        cursor_codec = CatalogCursorCodec.from_env()
+        cursor_codec = CatalogCursorCodec.from_encoded_key(
+            app_settings.cursor_encryption_key.get_secret_value()
+            if app_settings.cursor_encryption_key is not None
+            else None
+        )
     except ValueError:
         cursor_codec = None
     app.state.catalog_provider = CatalogOrchestrator(
