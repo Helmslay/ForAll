@@ -135,7 +135,7 @@
 
 **Ограничения:** production configuration still enables no provider by default. Real provider traffic, credentials, licensing, Russian-network access and no-VPN availability were not tested. Cursor signing and fetching subsequent STAC pages remain WEB-03.09; until then a next link is represented only as a partial provider status.
 
-## WEB-03.09 — encrypted aggregate cursor pagination — READY
+## WEB-03.09 — encrypted aggregate cursor pagination — IN_PROGRESS
 
 **Зависимости:** WEB-03.01–03.08 DONE. Existing `SearchRequest.cursor`, `SearchResponse.next_cursor`, STAC `next_href` and orchestrator provider fan-out are available. Existing HTTPS host allowlist remains mandatory for every continuation fetch.
 
@@ -154,7 +154,9 @@
 
 **Тесты:** codec round-trip; tampered ciphertext; wrong key/rotation; expiry; malformed/oversized token; mismatched query/provider/limit; multiple providers advancing independently; buffered overflow across pages; cross-page duplicate; one provider failure while another continues; off-host next href rejected; no href/key in response/logs; missing key fails closed.
 
-**Acceptance:** all above offline tests pass; exact-head backend CI and mirror succeed; no live provider or Russian availability claim. G0 remains deferred.
+**Progress:** AES-256-GCM codec and offline codec tests implemented. Draft PR #63 opened. Exact-head backend CI run `45111419320` SUCCESS; GitLab mirror run `45111373749` SUCCESS. Frontend CI run `45111419200` was still running at the latest check.
+
+**Acceptance:** all above offline tests pass; exact-head backend CI and mirror succeed; no live provider or Russian availability claim. G0 remains deferred. The task is not DONE: orchestrator integration and aggregate multi-provider continuation tests remain.
 
 **Не входит:** provider selection, live source validation, one-time cursor replay prevention, frontend pagination UI, raster access.
 
