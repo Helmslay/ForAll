@@ -53,6 +53,7 @@ class FakeAdapter:
         error: Exception | None = None,
         next_href: str | None = None,
         next_pages: list[StacSearchPage] | None = None,
+        next_page_error: Exception | None = None,
         on_search: Callable[[SearchRequest], Any] | None = None,
     ) -> None:
         self._capabilities = CatalogCapabilities(
@@ -64,6 +65,7 @@ class FakeAdapter:
         self.error = error
         self.next_href = next_href
         self.next_pages = list(next_pages or [])
+        self.next_page_error = next_page_error
         self.next_page_requests: list[str] = []
         self.on_search = on_search
         self.requests: list[SearchRequest] = []
@@ -82,6 +84,8 @@ class FakeAdapter:
 
     async def get_next_page(self, next_href: str) -> StacSearchPage:
         self.next_page_requests.append(next_href)
+        if self.next_page_error is not None:
+            raise self.next_page_error
         if not self.next_pages:
             raise AssertionError("unexpected next-page request")
         return self.next_pages.pop(0)
@@ -406,3 +410,22 @@ async def test_missing_cursor_key_fails_closed_without_exposing_upstream_href() 
     assert "secret" not in result.model_dump_json()
     with pytest.raises(InvalidCatalogCursor):
         await CatalogOrchestrator([adapter]).search(make_request(limit=1, cursor="opaque"))
+
+
+@pytest.mark.asyncio
+async def test_provider_failure_during_continuation_preserves_other_provider_buffer() -> None:
+    failed = FakeAdapter(
+        "failed",
+        features=[make_feature("failed-first")],
+        next_href="https://failed.example/search?page=2",
+        next_page_error=CatalogUnavailableError("failed"),
+    )
+    working = FakeAdapter("working", features=[make_feature("working-first")])
+    orchestrator = CatalogOrchestrator([failed, working], cursor_codec=make_cursor_codec())
+    first = await orchestrator.search(make_request(limit=1))
+    second = await orchestrator.search(make_request(limit=1, cursor=first.next_cursor))
+    assert [scene.key for scene in first.items] == ["failed:sentinel-2-l2a:failed-first"]
+    assert [scene.key for scene in second.items] == ["working:sentinel-2-l2a:working-first"]
+    assert second.providers[0].status == "unavailable"
+    assert second.providers[1].status == "success"
+    assert second.partial is True
