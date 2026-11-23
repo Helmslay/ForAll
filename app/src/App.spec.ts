@@ -25,7 +25,12 @@ const scene = {
   cloud_cover: 12.5,
   bbox: [56.1, 58.9, 57.2, 59.8] as [number, number, number, number],
   geometry: null,
-  available_bands: ['B02', 'B03', 'B04', 'B08'] as ('B02' | 'B03' | 'B04' | 'B08')[],
+  available_bands: ['B02', 'B03', 'B04', 'B08'] as (
+    | 'B02'
+    | 'B03'
+    | 'B04'
+    | 'B08'
+  )[],
   preview_available: false,
 }
 const response: SearchResponse = {
@@ -51,7 +56,9 @@ describe('App', () => {
     const wrapper = mountApp()
 
     expect(wrapper.get('header').text()).toContain('Sentinel Explorer')
-    expect(wrapper.get('aside[aria-label="Боковая панель приложения"]').element.tagName).toBe('ASIDE')
+    expect(
+      wrapper.get('aside[aria-label="Боковая панель приложения"]').element.tagName,
+    ).toBe('ASIDE')
     expect(wrapper.get('nav[aria-label="Основная навигация"]').element.tagName).toBe('NAV')
     expect(wrapper.findAll('main')).toHaveLength(1)
     expect(wrapper.get('main#workspace').element.tagName).toBe('MAIN')
@@ -61,7 +68,9 @@ describe('App', () => {
     expect(wrapper.text()).toContain('Измерения')
     expect(wrapper.get('.panel-heading h2').text()).toBe('Поиск сцен')
     expect(wrapper.find('.search-form').exists()).toBe(true)
-    expect(wrapper.get('.context-panel').text()).toContain('Нарисуйте прямоугольную область интереса на карте.')
+    expect(wrapper.get('.context-panel').text()).toContain(
+      'Нарисуйте прямоугольную область интереса на карте.',
+    )
     expect(wrapper.get('.app-statusbar').text()).toContain('Пустой холст OpenLayers')
     expect(wrapper.find('map-canvas-stub').exists()).toBe(true)
   })
@@ -158,7 +167,10 @@ describe('App', () => {
     await wrapper.get('.catalog-action').trigger('click')
     await vi.waitFor(() => expect(wrapper.text()).toContain('scene-2'))
 
-    expect(searchMock).toHaveBeenNthCalledWith(2, expect.objectContaining({ cursor: 'cursor-2' }))
+    expect(searchMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ cursor: 'cursor-2' }),
+    )
     expect(wrapper.findAll('.scene-result')).toHaveLength(2)
   })
 
