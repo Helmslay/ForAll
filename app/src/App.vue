@@ -1,19 +1,14 @@
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import SearchPanel from './components/SearchPanel.vue'
-import { CatalogApiError, searchCatalog } from './api/catalog'
-import { SearchRequest, SearchResponse } from './types/catalog'
+import { useCatalogSearch } from './composables/useCatalogSearch'
 import { normalizeAoiBbox } from './types/catalog'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
 const aoiBbox = ref(normalizeAoiBbox(null))
-const searchLoading = ref(false)
-const searchError = ref('')
-const searchResponse = ref<SearchResponse | null>(null)
-const activeRequest = ref<SearchRequest | null>(null)
-let searchSequence = 0
+const { loading: searchLoading, error: searchError, response: searchResponse, handleSearch, loadMore, retrySearch, resetSearch } = useCatalogSearch()
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -27,61 +22,7 @@ function closePanel() {
   panelOpen.value = false
 }
 
-function isAbortError(error: unknown) {
-  return error instanceof Error && error.name === 'AbortError'
-}
 
-async function runSearch(request: SearchRequest, append = false) {
-  const sequence = ++searchSequence
-  searchLoading.value = true
-  searchError.value = ''
-  if (!append) {
-    activeRequest.value = { ...request, cursor: null }
-    searchResponse.value = null
-  }
-  try {
-    const response = await searchCatalog(request)
-    if (sequence !== searchSequence) return
-    if (append && searchResponse.value) {
-      const existing = new Set(searchResponse.value.items.map((scene) => scene.key))
-      const uniqueItems = response.items.filter((scene) => !existing.has(scene.key))
-      searchResponse.value = {
-        ...response,
-        items: [...searchResponse.value.items, ...uniqueItems],
-        partial: response.partial || searchResponse.value.partial,
-      }
-    } else {
-      searchResponse.value = response
-    }
-  } catch (error) {
-    if (sequence !== searchSequence || isAbortError(error)) return
-    searchError.value = error instanceof CatalogApiError ? error.message : 'Не удалось выполнить поиск каталога.'
-  } finally {
-    if (sequence === searchSequence) searchLoading.value = false
-  }
-}
-
-function handleSearch(request: SearchRequest) {
-  void runSearch(request)
-}
-
-function loadMore() {
-  const cursor = searchResponse.value?.next_cursor
-  if (!cursor || !activeRequest.value || searchLoading.value) return
-  void runSearch({ ...activeRequest.value, cursor }, true)
-}
-
-function retrySearch() {
-  if (activeRequest.value) void runSearch(activeRequest.value)
-}
-
-function resetSearch() {
-  searchSequence += 1
-  searchLoading.value = false
-  searchError.value = ''
-  searchResponse.value = null
-  activeRequest.value = null
-}
 </script>
 
 <template>
