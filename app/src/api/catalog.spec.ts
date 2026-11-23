@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { CatalogApiError, searchCatalog } from './catalog'
+import { searchCatalog } from './catalog'
 import type { SearchRequest, SearchResponse } from '../types/catalog'
 
 const request: SearchRequest = {
