@@ -93,7 +93,7 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 - WEB-03.06 — STAC Item normalizer — **DONE** (PR #60 merged as `29fd0c5e757b6d69b9214d4086f1c7d496ba88df`; exact-head Backend tests run `44726072118` — 91 passed + Uvicorn smoke SUCCESS; mirror run `44726047813` SUCCESS).
 - WEB-03.07 — search API endpoint — **DONE** (PR #61 merged as `b4de0685dce0d6e9c1cde1250a9dbf21c851d9b0`; exact-head backend CI run `45108920988` SUCCESS — 106 passed + Uvicorn smoke; mirror run `45108914359` SUCCESS).
 - WEB-03.08 — catalog orchestrator — **DONE** (PR #62 merged as `3090165dff88f25aa95dd42699a7fa6d752fcfa3`; exact-head backend CI run `45109923307` SUCCESS — 123 passed + Uvicorn smoke; mirror run `45109917509` SUCCESS).
-- WEB-03.09 — cursor pagination.
+- WEB-03.09 — encrypted aggregate cursor pagination — **READY** (AES-256-GCM, 15-minute TTL, query binding, provider continuation/buffer state, 64 KiB cap; see task card).
 - WEB-03.10 — provider partial status.
 - WEB-03.11 — frontend search API client.
 - WEB-03.12 — search form/results.
