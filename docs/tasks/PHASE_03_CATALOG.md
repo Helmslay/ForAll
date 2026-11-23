@@ -94,25 +94,21 @@
 
 **Ограничения:** отсутствующие/невалидные обязательные identity, collection или datetime приводят к безопасному `CatalogProviderError`; optional invalid geometry/bbox/cloud/platform are omitted. Geometry check is structural and does not replace a full topology/CRS validator. Raster resolution/CRS/nodata/scale/offset are not inferred from assets. Band detection deliberately requires explicit B02/B03/B04/B08 naming; ambiguous common_name aliases such as `nir` are not guessed. Real provider data and no-VPN access were not tested.
 
-## WEB-03.07 — search API endpoint — READY
+## WEB-03.07 — search API endpoint — DONE
 
-**Зависимости:** WEB-03.01–03.06 DONE. FastAPI app, request-ID middleware, стандартный error envelope, SearchRequest/SearchResponse DTO и transport-independent CatalogProvider Protocol существуют. WEB-03.08 orchestrator не является блокирующей зависимостью: endpoint принимает CatalogProvider через dependency injection; production wiring оркестратора остаётся отдельной задачей WEB-03.08.
+**Зависимости:** WEB-03.01–03.06 DONE. FastAPI app, request-ID middleware, standard error envelope, SearchRequest/SearchResponse DTO and transport-independent CatalogProvider Protocol were already available. WEB-03.08 orchestration was kept separate; the route resolves an injected CatalogProvider.
 
-**Цель:** реализовать POST /api/v1/catalog/search согласно API_CONTRACTS.md без выбора/включения конкретного provider и без сетевых вызовов в route.
+**Результат:** реализован `POST /api/v1/catalog/search` по контракту `/api/v1`. Route принимает существующий `SearchRequest`, передаёт провайдеру только валидированный DTO и возвращает `SearchResponse`. Provider берётся из server-side `app.state.catalog_provider`; если он не настроен, API возвращает HTTP 503 `PROVIDER_UNAVAILABLE`, а не фиктивный успешный ответ. Добавлен единый mapping доменных ошибок в стандартный error envelope: unavailable/configuration → 503, rate limited → 429, unsupported query → 422, item not found → 404, generic provider error → 502. Client-supplied endpoint URL не принимается. Конкретный provider не выбран и не включён.
 
-**Scope:**
-- добавить FastAPI route и подключить его к create_app;
-- принимать только SearchRequest JSON; Pydantic validation выполняется до вызова provider;
-- получать CatalogProvider через явную injectable dependency; отсутствие настроенного provider возвращает безопасную ошибку unavailable, не фиктивный SearchResponse;
-- возвращать SearchResponse из provider без изменения DTO;
-- преобразовывать CatalogProvider domain errors в стандартный error envelope с безопасным code/message; не включать provider URL, href, token или traceback;
-- не принимать endpoint/URL поставщика от клиента; не создавать provider и не выбирать его из env в этой задаче.
+**Изменённые файлы:** `backend/app/catalog_routes.py`, `backend/app/main.py`, `backend/tests/test_catalog_routes.py`, `docs/API_CONTRACTS.md`, эта карточка, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
 
-**Тесты:** valid payload доходит до fake provider и возвращает DTO; invalid bbox/date/cloud_cover_lte/limit и extra arbitrary URL дают 422 и не вызывают provider; отсутствие provider даёт безопасный unavailable error; domain error даёт стандартный envelope; request ID присутствует в success/error responses.
+**Тесты:** offline route tests cover valid DTO pass-through, invalid bbox/date/cloud/limit, unknown endpoint field, provider not configured, safe mapping of provider errors and request ID. Exact PR head `7b01470a7e0153826ca5f43914e6a2f78d1e40f5`: Backend tests workflow run `45108920988` SUCCESS — **106 passed**, Uvicorn health smoke-check SUCCESS; mirror workflow run `45108914359` SUCCESS.
 
-**Критерии приёмки:** POST /api/v1/catalog/search зарегистрирован; схема запроса/ответа соответствует существующим DTO и API_CONTRACTS.md; валидация выполняется до provider call; injected fake provider вызывается с SearchRequest; provider errors безопасно отображаются; arbitrary provider URL и секреты не принимаются/не раскрываются; offline tests pass.
+**Критерии приёмки:** POST route зарегистрирован; existing DTO contracts retained; validation precedes provider invocation; injected provider receives SearchRequest; missing provider and domain errors use safe error envelope; client cannot supply provider URL; no provider secrets/hrefs/tracebacks exposed. Exact-head CI passed.
 
-**Не входит:** оркестрация нескольких adapters (WEB-03.08), cursor signing/pagination (WEB-03.09), выбор/одобрение primary provider, live provider traffic, frontend integration и проверка доступности без VPN.
+**PR:** #61 merged; merge commit `b4de0685dce0d6e9c1cde1250a9dbf21c851d9b0`.
+
+**Ограничения:** production app currently has no configured CatalogProvider, so endpoint honestly returns 503 until WEB-03.08 orchestration/server-side wiring is implemented. No real provider traffic, provider approval, cursor pagination, frontend integration or no-VPN availability was tested.
 
 ## WEB-03.08 — catalog orchestrator
 Call enabled adapters, normalize, deduplicate by real identity, track partial status. Provider failure doesn't erase another provider's results. All fail → clear provider error.
