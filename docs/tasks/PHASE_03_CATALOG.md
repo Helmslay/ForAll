@@ -205,7 +205,7 @@
 
 ## WEB-03.12A — search UI states and cursor pagination
 
-**Статус:** IN_PROGRESS; owner explicitly authorized splitting WEB-03.12 on 2026-11-23.
+**Статус:** DONE (2026-11-23); PR #66 merged.
 
 **Зависимости:** WEB-03.11 DONE; typed `searchCatalog`, SearchRequest/SearchResponse DTO and backend route exist.
 
@@ -214,6 +214,16 @@
 **Test strategy:** Use synthetic typed SearchResponse objects only inside frontend unit tests. They are not application data or claims of real source availability. Mock the API client; do not activate or select a provider.
 
 **Acceptance:** Search request uses the typed client; loading state and disabled submit are visible; empty/error/partial/provider states render; retry works; next cursor is passed unchanged; duplicate scene keys are not rendered twice; reset prevents stale responses from reappearing; no fabricated thumbnails/metadata or production mock data; frontend lint/format/typecheck/unit tests/build pass.
+
+**Фактический результат:** `App.vue` подключён к composable `useCatalogSearch`; запросы отправляются через typed `searchCatalog`. Добавлены loading/error/retry/empty/partial/provider states, отображение DTO-полей сцены без фиктивных thumbnails и cursor pagination. При переходе на следующую страницу сцены добавляются по стабильному ключу без повторов. Ответы устаревшего запроса игнорируются после нового поиска/reset. Кнопка submit блокируется во время запроса.
+
+**Изменённые файлы:** `app/src/App.vue`, `app/src/composables/useCatalogSearch.ts`, `app/src/components/SearchPanel.vue`, `app/src/components/SearchPanel.spec.ts`, `app/src/App.spec.ts`, `app/src/style.css`, `.github/workflows/frontend-build.yml`, эта карточка, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
+
+**Проверки:** exact PR head `7d6ab3ca16ad3a73d1557f5b8823cbb72a19e573`; GitHub Actions Frontend Build run `45175830402` — SUCCESS; 5 test files / 30 tests passed; audit policy, dependency audit, ESLint, Prettier, vue-tsc, production build, Vite proxy smoke, Compose configuration/localhost checks, Compose startup and frontend/API smoke all passed. Mirror workflow run `45175821338` — SUCCESS. Exact-SHA checks passed.
+
+**PR:** #66 merged as `8a669b28c7c9973bfd51ee17eed04a75320312df`.
+
+**Ограничения:** unit-test responses are synthetic and are not live provider evidence. No provider was selected/activated; real Sentinel-2 results, asset access, licensing and G0/no-VPN availability remain unverified. These remain in WEB-03.12B.
 
 **Non-goals:** Real-provider E2E, provider approval/activation, asset access, scene footprint/selection, thumbnails, and G0/no-VPN claims.
 
