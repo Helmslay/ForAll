@@ -63,6 +63,12 @@ describe('SearchPanel', () => {
     expect(wrapper.emitted('submit')).toBeUndefined()
   })
 
+  it('disables submit while a search is loading', async () => {
+    const wrapper = mount(SearchPanel, { props: { aoi, loading: true } })
+    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.text()).toContain('Поиск…')
+  })
+
   it('resets date and cloud filters while preserving the map AOI', async () => {
     const wrapper = mountPanel()
 
