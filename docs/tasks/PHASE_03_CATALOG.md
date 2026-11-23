@@ -203,8 +203,19 @@
 
 **Status:** DONE.
 
-## WEB-03.12 — search form/results
-Connect real API; loading/empty/error/partial/pagination states. No mock thumbnails/scene fields. Acceptance: real provider records appear.
+## WEB-03.12 — search form/results — BLOCKED
+
+**Scope:** Connect the existing SearchPanel to the typed `searchCatalog` client; implement loading, empty, error, partial-result and cursor-pagination states. Do not add mock thumbnails or fabricated scene fields.
+
+**Dependencies:** WEB-03.11 is DONE (PR #65 merged). Existing frontend SearchRequest/SearchResponse DTOs and backend search endpoint are available.
+
+**Readiness blocker:** Acceptance requires real provider records to appear. No Sentinel-2 provider has been approved or enabled; provider selection (WEB-00.10) and G0 remain explicitly deferred until owner-side application testing. Connecting an unapproved provider or substituting fixtures/mock records would violate project decisions. Therefore the full acceptance criterion cannot currently be verified and this task is not READY.
+
+**Required resolution:** Keep this task BLOCKED until a provider is approved/enabled, or the owner explicitly authorizes splitting the UI-state work from real-provider end-to-end acceptance. Do not silently weaken the acceptance criterion.
+
+**Code inspected:** `app/src/App.vue`, `app/src/components/SearchPanel.vue`, `app/src/components/SearchPanel.spec.ts`, `app/src/api/catalog.ts`, `app/src/types/catalog.ts`. Current SearchPanel only prepares a request and App.vue reports that network search is not connected.
+
+**Status:** BLOCKED — no approved real provider; no mock data permitted.
 
 ## WEB-03.13 — scene detail/footprint
 Select result, highlight real geometry, fit extent, details panel, clear. Verify selection and map remain synchronized.
