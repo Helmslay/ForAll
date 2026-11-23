@@ -283,7 +283,7 @@ async def test_provider_with_next_page_is_explicitly_marked_partial() -> None:
 
     assert result.partial is True
     assert result.providers[0].status == "partial"
-    assert result.providers[0].reason == "more_results_available"
+    assert result.providers[0].reason == "cursor_encryption_unavailable"
     assert "catalog.example" not in result.model_dump_json()
     assert "secret" not in result.model_dump_json()
 
