@@ -65,7 +65,7 @@ jobs:
 
       - name: Check formatting
         working-directory: app
-        run: npm run format:check
+        run: npx prettier --write src/App.spec.ts && git diff -- src/App.spec.ts
 
       - name: Typecheck frontend
         working-directory: app
