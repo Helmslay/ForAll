@@ -181,24 +181,27 @@
 
 **Итог:** DONE по scope WEB-03.10; production diff отсутствует. Следующая задача — WEB-03.11 (typed frontend search client).
 
-## WEB-03.11 — typed frontend search client — IN_REVIEW
+## WEB-03.11 — typed frontend search client — DONE
 
 **Dependencies:** WEB-03.01–03.10 DONE. Backend contract exists at `POST /api/v1/catalog/search`; frontend request builder and relative API base path already exist.
 
 **Scope/result:** Implemented typed DTOs and a dedicated `searchCatalog` client. It POSTs the exact SearchRequest JSON to the relative endpoint, preserves opaque cursors, validates SearchResponse at runtime, parses the standard safe error envelope into `CatalogApiError`, sanitizes malformed/network errors, and aborts the previous in-flight search. AbortError remains cancellation. No Vue component performs direct catalog fetch; no UI wiring, mock scene data, or provider activation was added.
 
-**Changed production files:**
+**Changed files:**
 - `app/src/api/catalog.ts` — typed client and runtime validation.
 - `app/src/types/catalog.ts` — SearchResponse, Scene, ProviderStatus, ApiErrorEnvelope and nullable filter types.
 - `app/src/api/catalog.spec.ts` — six offline tests.
+- `docs/tasks/PHASE_03_CATALOG.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md` — task evidence and tracking.
 
 **Acceptance:** Request serialization, DTO shape validation, safe HTTP error parsing, malformed success/error handling, cancellation, and absence of direct catalog fetch in Vue components are covered by tests. No live provider traffic is part of this task.
 
-**Exact-head validation:** PR #65 head `8017dbd9c7c555145141b5d33fcc3b021630c482`; GitHub Actions Frontend build run `45163964147` (Build #232) — SUCCESS. All 19 build steps passed: dependency/audit policy, lint, format, typecheck, unit tests, production build, Vite proxy smoke, Compose configuration/localhost checks and frontend/API Compose smoke. GitHub Actions mirror workflow run `45163951755` — SUCCESS. Check-runs for this SHA: `build` and `mirror`, both SUCCESS. No unresolved review threads; PR is mergeable.
+**GitHub Actions:** Exact PR head `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`. Frontend Build #235 / run `45165905441` — SUCCESS; all 19 steps passed, including audit policy, audit, lint, format, typecheck, unit tests, production build, Vite proxy smoke, Compose config/localhost checks, Compose startup and frontend/API smoke. Mirror workflow run `45165898039` — SUCCESS. Both check-runs for the exact SHA completed successfully.
 
-**Limitations:** No provider is enabled or selected. Live provider traffic, asset access, licensing and user-side no-VPN availability were not tested; G0 remains deferred by owner decision. Buildkite is used for other projects and is not part of Sentinel Explorer Web CI or this task's acceptance criteria.
+**Review/merge:** PR #65 had no review threads or requested changes and was mergeable. Merged using squash with expected-head guard. Merge commit: `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`.
 
-**Status:** IN_REVIEW pending PR merge.
+**Limitations:** No provider is enabled or selected. Live provider traffic, asset access, licensing and user-side no-VPN availability were not tested; G0 remains deferred by owner decision. Buildkite is not part of Sentinel Explorer Web CI.
+
+**Status:** DONE.
 
 ## WEB-03.12 — search form/results
 Connect real API; loading/empty/error/partial/pagination states. No mock thumbnails/scene fields. Acceptance: real provider records appear.
