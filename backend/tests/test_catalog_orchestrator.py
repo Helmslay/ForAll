@@ -206,6 +206,23 @@ async def test_unsupported_collection_is_reported_without_blocking_other_provide
 
 
 @pytest.mark.asyncio
+async def test_unrequested_collection_in_provider_response_is_rejected() -> None:
+    unexpected = dict(FIXTURE)
+    unexpected["collection"] = "not-requested"
+    bad_provider = FakeAdapter("bad", features=[unexpected])
+    good_provider = FakeAdapter("good")
+
+    result = await CatalogOrchestrator([bad_provider, good_provider]).search(
+        make_request()
+    )
+
+    assert [scene.provider for scene in result.items] == ["good"]
+    assert result.providers[0].status == "unavailable"
+    assert result.providers[0].reason == "CATALOG_PROVIDER_ERROR"
+    assert result.partial is True
+
+
+@pytest.mark.asyncio
 async def test_all_unsupported_queries_preserve_domain_error() -> None:
     adapter = FakeAdapter("provider", error=CatalogQueryNotSupportedError("provider"))
 
