@@ -156,3 +156,17 @@ def test_search_endpoint_maps_provider_errors_to_safe_contract(
     assert body["error"]["details"] == {}
     assert "provider" not in response.text
     assert "traceback" not in response.text.lower()
+
+
+def test_invalid_catalog_cursor_uses_safe_422_contract() -> None:
+    app = create_app()
+    app.state.catalog_provider = __import__("app.catalog_orchestrator", fromlist=["CatalogOrchestrator"]).CatalogOrchestrator()
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/catalog/search",
+            json={**VALID_SEARCH, "cursor": "not-a-valid-cursor"},
+        )
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "INVALID_CATALOG_CURSOR"
+    assert response.json()["error"]["details"] == {}
+    assert "not-a-valid-cursor" not in response.text
