@@ -119,7 +119,7 @@ class CatalogOrchestrator:
             for adapter, _ in jobs
             if request.cursor is None
             or (
-                not provider_states[adapter.capabilities().provider_id]["buffer"]
+                len(provider_states[adapter.capabilities().provider_id]["buffer"]) < request.limit
                 and provider_states[adapter.capabilities().provider_id]["next_href"]
             )
         }
