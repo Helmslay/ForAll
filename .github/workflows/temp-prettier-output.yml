@@ -1,0 +1,36 @@
+name: Temporary Prettier formatter output
+
+on:
+  push:
+    branches:
+      - feat/web-03-11-typed-search-client
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Install locked dependencies
+        working-directory: app
+        run: npm ci
+      - name: Format the task files
+        working-directory: app
+        run: npx prettier --write src/api/catalog.ts src/api/catalog.spec.ts
+      - name: Print formatted files
+        run: |
+          echo "=== app/src/api/catalog.ts ==="
+          cat app/src/api/catalog.ts
+          echo "=== app/src/api/catalog.spec.ts ==="
+          cat app/src/api/catalog.spec.ts
