@@ -205,7 +205,7 @@
 
 ## WEB-03.12A — search UI states and cursor pagination
 
-**Статус:** READY; owner explicitly authorized splitting WEB-03.12 on 2026-11-23.
+**Статус:** IN_PROGRESS; owner explicitly authorized splitting WEB-03.12 on 2026-11-23.
 
 **Зависимости:** WEB-03.11 DONE; typed `searchCatalog`, SearchRequest/SearchResponse DTO and backend route exist.
 
