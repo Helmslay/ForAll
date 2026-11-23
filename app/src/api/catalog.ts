@@ -1,11 +1,5 @@
 import { API_BASE_PATH } from './config'
-import type {
-  ApiErrorEnvelope,
-  ProviderStatus,
-  Scene,
-  SearchRequest,
-  SearchResponse,
-} from '../types/catalog'
+import type { ApiErrorEnvelope, ProviderStatus, Scene, SearchRequest, SearchResponse } from '../types/catalog'
 
 let activeSearch: AbortController | null = null
 
