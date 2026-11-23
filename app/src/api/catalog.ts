@@ -124,11 +124,7 @@ export async function searchCatalog(request: SearchRequest): Promise<SearchRespo
     }
 
     if (!isSearchResponse(payload)) {
-      throw new CatalogApiError(
-        'Catalog returned an invalid response',
-        response.status,
-        'INVALID_CATALOG_RESPONSE',
-      )
+      throw new CatalogApiError('Catalog returned an invalid response', response.status, 'INVALID_CATALOG_RESPONSE')
     }
 
     return payload
