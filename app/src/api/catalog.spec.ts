@@ -102,10 +102,7 @@ describe('searchCatalog', () => {
   })
 
   it('sanitizes malformed non-JSON HTTP error responses', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(new Response('private upstream detail', { status: 502 })),
-    )
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('private upstream detail', { status: 502 })))
 
     await expect(searchCatalog(request)).rejects.toMatchObject({
       name: 'CatalogApiError',
@@ -143,11 +140,7 @@ describe('searchCatalog', () => {
       signals.push(signal)
       return new Promise<Response>((resolve, reject) => {
         pending.set(signal, resolve)
-        signal.addEventListener(
-          'abort',
-          () => reject(new DOMException('Aborted', 'AbortError')),
-          { once: true },
-        )
+        signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true })
       })
     })
     vi.stubGlobal('fetch', fetchMock)
