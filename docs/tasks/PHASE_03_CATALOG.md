@@ -183,49 +183,22 @@
 
 ## WEB-03.11 — typed frontend search client — IN_REVIEW
 
-**Зависимости:** WEB-03.01–03.10 DONE. Backend contract exists at `POST /api/v1/catalog/search`; `SearchRequest`, `SearchResponse`, `Scene` and `ProviderStatus` are defined in backend DTOs. Frontend already has a request builder in `app/src/types/catalog.ts` and a relative API base path in `app/src/api/config.ts`.
+**Dependencies:** WEB-03.01–03.10 DONE. Backend contract exists at `POST /api/v1/catalog/search`; frontend request builder and relative API base path already exist.
 
-**Scope:**
-- Keep the existing request builder and align its TypeScript DTOs to backend field names and optionality.
-- Add typed frontend DTOs for `Scene`, `ProviderStatus`, `SearchResponse` and the standard `error` envelope.
-- Add a dedicated API client that sends JSON via `POST /api/v1/catalog/search`, including `cursor` unchanged for continuation requests.
-- Parse the standard safe error envelope into a typed `CatalogApiError`; do not expose raw response bodies, server traces or upstream details. Handle malformed/non-JSON error responses safely.
-- A newly started search aborts the previous in-flight search. Propagate aborts as cancellation (do not turn them into user-facing API errors).
-- Keep `fetch` out of Vue components. Do not wire UI, provider configuration or mock scene data in this task.
+**Scope/result:** Implemented typed DTOs and a dedicated `searchCatalog` client. It POSTs the exact SearchRequest JSON to the relative endpoint, preserves opaque cursors, validates SearchResponse at runtime, parses the standard safe error envelope into `CatalogApiError`, sanitizes malformed/network errors, and aborts the previous in-flight search. AbortError remains cancellation. No Vue component performs direct catalog fetch; no UI wiring, mock scene data, or provider activation was added.
 
-**Files/modules:** `app/src/api/catalog.ts` (new), `app/src/api/catalog.spec.ts` (new), `app/src/types/catalog.ts` (extend existing DTO types); task/plan/status documentation.
+**Changed production files:**
+- `app/src/api/catalog.ts` — typed client and runtime validation.
+- `app/src/types/catalog.ts` — SearchResponse, Scene, ProviderStatus, ApiErrorEnvelope and nullable filter types.
+- `app/src/api/catalog.spec.ts` — six offline tests.
 
-**Acceptance criteria:**
-1. Request is POSTed to relative `/api/v1/catalog/search` with JSON content type and the exact serialized SearchRequest.
-2. Typed response models match backend `SearchResponse` / `Scene` / `ProviderStatus`, including optional metadata and nullable cursor.
-3. HTTP errors decode the standard `{ error: { code, message, request_id, details } }` envelope into a typed error; malformed error bodies remain sanitized and retain HTTP status.
-4. Successful non-JSON or malformed response fails with a safe typed response error rather than an unchecked cast.
-5. Starting a new search aborts the previous request; explicit cancellation is distinguishable from API failure.
-6. Unit tests cover request serialization, successful DTO response, each error parsing path, malformed success payload, and previous-request abort.
-7. No Vue component contains a direct catalog `fetch`; no provider or live upstream is enabled.
+**Acceptance:** Request serialization, DTO shape validation, safe HTTP error parsing, malformed success/error handling, cancellation, and absence of direct catalog fetch in Vue components are covered by tests. No live provider traffic is part of this task.
 
-**Test plan:** Vitest with mocked `fetch`/Response only; then frontend CI must pass audit, lint, format, typecheck, unit tests, production build, proxy smoke and Compose smoke. No real provider traffic is expected.
+**Exact-head validation:** PR #65 head `8017dbd9c7c555145141b5d33fcc3b021630c482`; GitHub Actions Frontend build run `45163964147` (Build #232) — SUCCESS. All 19 build steps passed: dependency/audit policy, lint, format, typecheck, unit tests, production build, Vite proxy smoke, Compose configuration/localhost checks and frontend/API Compose smoke. GitHub Actions mirror workflow run `45163951755` — SUCCESS. Check-runs for this SHA: `build` and `mirror`, both SUCCESS. No unresolved review threads; PR is mergeable.
 
-**Не входит:** SearchPanel/App wiring, loading/results/empty/partial/pagination UI (WEB-03.12); scene detail/footprint (WEB-03.13); provider selection or real-data/no-VPN validation (G0 remains deferred).
+**Limitations:** No provider is enabled or selected. Live provider traffic, asset access, licensing and user-side no-VPN availability were not tested; G0 remains deferred by owner decision. Buildkite is used for other projects and is not part of Sentinel Explorer Web CI or this task's acceptance criteria.
 
-**Результат реализации:** добавлен типизированный клиент `searchCatalog`. Он отправляет `POST /api/v1/catalog/search` на относительный API path, сериализует полный SearchRequest (включая opaque cursor), проверяет структуру SearchResponse на runtime, разбирает стандартный error envelope в `CatalogApiError`, безопасно обрабатывает malformed HTTP/success responses и нормализует сетевые ошибки без выдачи raw body. При запуске нового поиска предыдущий AbortController отменяется; DOM AbortError проходит как cancellation, не превращаясь в API error.
-
-**Изменённые файлы:**
-- `app/src/api/catalog.ts` — новый typed client и runtime guards.
-- `app/src/api/catalog.spec.ts` — 6 offline tests.
-- `app/src/types/catalog.ts` — SearchResponse, Scene, ProviderStatus, ApiErrorEnvelope и nullable filter types.
-- `docs/tasks/PHASE_03_CATALOG.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
-
-**Проверки:**
-- Exact current PR head `ab9f9b6779adb0575a19a3106d26650ca3611ae0`: Frontend build workflow run `45151336343` (Build #230) — SUCCESS. Audit policy, npm audit policy, ESLint, Prettier, vue-tsc, Vitest (**23 passed**), Vite production build, Vite proxy health smoke, Docker Compose config/localhost port checks, Compose startup and frontend/API smoke all passed.
-- GitHub Actions mirror workflow run `45151327717` — SUCCESS; the GitLab mirror branch was updated to the exact PR head. No GitLab pipeline was started.
-- PR #65 is open and mergeable; no unresolved review threads or requested changes. Merge remains held because Web-specific Buildkite evidence is not available.
-
-**Acceptance:** request serialization, typed DTOs, safe error parsing, malformed response handling, previous-query cancellation and no direct catalog fetch in Vue components are verified by tests and exact-head frontend checks.
-
-**Ограничение проверки Buildkite:** в GitLab-проекте `kuncevichles-group/sentinel-explorer` (ID `89000221`), ветке `fix/android-manifest-alpha3`, найдены `.buildkite/pipeline.yml` и `.buildkite/with-log-upload.sh`. Они используют существующий pipeline `https://buildkite.com/helmslay-corp/plancad-autolabel`; pipeline проверяет старый plugin bundle, а log uploader отправляет результаты в тот же старый проект `sentinel-explorer`, ветку `buildkite-logs`, путь `logs/buildkite/<build>-<step>-retry-<n>.log`. Это не конфигурация Sentinel Explorer Web. По решению пользователя Web зеркалируется в отдельный приватный проект `kuncevichles-group/forall-backup` (ID `89052436`); ветка `github/feat/web-03-11-typed-search-client` соответствует текущему PR head, но `.buildkite` конфигурации там нет. Поэтому историческую конфигурацию нельзя считать проверкой Web или копировать без адаптации. Buildkite run для Web и корректный GitLab log destination не подтверждены; GitLab pipelines не запускались. WEB-03.11 остаётся IN_REVIEW.
-
-**Статус:** IN_REVIEW; реализация и exact-head GitHub Actions проверки успешны, но Web-specific Buildkite evidence отсутствует.
+**Status:** IN_REVIEW pending PR merge.
 
 ## WEB-03.12 — search form/results
 Connect real API; loading/empty/error/partial/pagination states. No mock thumbnails/scene fields. Acceptance: real provider records appear.
