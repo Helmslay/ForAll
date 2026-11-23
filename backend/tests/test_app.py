@@ -1,8 +1,10 @@
+import base64
 import logging
 from datetime import UTC, datetime
 
 from fastapi.testclient import TestClient
 
+from app.catalog_cursor import CatalogCursorCodec
 from app.config import Settings
 from app.main import create_app
 
@@ -98,3 +100,16 @@ def test_unexpected_errors_hide_traceback_and_are_logged(caplog) -> None:
     assert "private internal detail" not in response.text
     assert "Unhandled request error" in caplog.text
     assert "private internal detail" in caplog.text
+
+
+def test_cursor_encryption_key_is_secret_and_loaded_from_settings() -> None:
+    encoded_key = base64.b64encode(b"s" * 32).decode("ascii")
+    settings = Settings(cursor_encryption_key=encoded_key)
+    assert encoded_key not in repr(settings)
+    application = create_app(settings)
+    assert isinstance(application.state.catalog_provider._cursor_codec, CatalogCursorCodec)
+
+
+def test_invalid_cursor_encryption_key_disables_cursor_codec() -> None:
+    application = create_app(Settings(cursor_encryption_key="invalid"))
+    assert application.state.catalog_provider._cursor_codec is None
