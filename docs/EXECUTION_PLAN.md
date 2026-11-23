@@ -96,7 +96,7 @@ Gate G2: пользователь создаёт AOI и видит bbox.
 - WEB-03.09 — encrypted aggregate cursor pagination — **DONE** (PR #63 merged as `8eff9ea88be22ccd57afb68de8acc377a658709e`; exact-head Backend tests run `45113001119` — 145 passed + Uvicorn smoke SUCCESS; Frontend build run `45113001304` SUCCESS; GitLab mirror run `45112996458` SUCCESS).
 - WEB-03.10 — provider partial status — **DONE** (реализация и offline tests уже входят в backend DTO/orchestrator; exact-head Backend CI run `45113001119`: 145 passed + Uvicorn smoke SUCCESS; отдельный health status endpoint не входит в scope и требует отдельного решения по auth).
 - WEB-03.11 — frontend search API client — **DONE** (PR #65 merged as `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`; exact-head `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`; GitHub Actions Frontend Build #235 / run `45165905441` and mirror run `45165898039` SUCCESS; all exact-SHA check-runs passed).
-- WEB-03.12A — search UI states and cursor pagination — **IN_PROGRESS** (owner-authorized split; synthetic responses allowed only in unit tests, never as production data).
+- WEB-03.12A — search UI states and cursor pagination — **DONE** (PR #66 merged as `8a669b28c7c9973bfd51ee17eed04a75320312df`; exact-head `7d6ab3ca16ad3a73d1557f5b8823cbb72a19e573`; GitHub Actions Frontend Build run `45175830402` SUCCESS — 30 tests passed; mirror run `45175821338` SUCCESS).
 - WEB-03.12B — real provider search acceptance — **BLOCKED** (requires WEB-03.12A and explicit provider approval/G0; real scenes required).
 - WEB-03.13 — scene details/footprint (depends on WEB-03.12B real-scene acceptance).
 
