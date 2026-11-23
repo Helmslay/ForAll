@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { createSearchRequest, normalizeAoiBbox } from '../types/catalog'
 
 const props = defineProps({
+  loading: { type: Boolean, default: false },
   aoi: {
     type: Array,
     default: null,
@@ -89,7 +90,7 @@ function reset() {
 
 <template>
   <form class="search-form" @submit.prevent="submit">
-    <p class="search-intro">Параметры поиска Sentinel-2 L2A. Отправка запроса пока не подключена.</p>
+    <p class="search-intro">Параметры поиска Sentinel-2 L2A.</p>
 
     <div class="search-field">
       <label for="search-date-from">Дата от</label>
@@ -142,11 +143,13 @@ function reset() {
     </section>
 
     <div class="search-actions">
-      <button class="search-submit" type="submit" :disabled="!canSubmit">Подготовить поиск</button>
+      <button class="search-submit" type="submit" :disabled="!canSubmit || loading">
+        {{ loading ? 'Поиск…' : 'Найти сцены' }}
+      </button>
       <button class="search-reset" type="button" @click="reset">Сбросить</button>
     </div>
 
-    <p class="search-note" role="status">Здесь формируется SearchRequest. Сетевой поиск не выполняется.</p>
+    <p class="search-note" role="status">Запрос отправляется на серверные источники, настроенные на сервере.</p>
   </form>
 </template>
 

@@ -67,6 +67,4 @@ Update this file when a milestone or material project decision changes. Do not m
 
 ## Current task
 
-WEB-03.11 — typed frontend search API client — DONE; PR #65 merged as `d7a5d99c18b0b21030a9e84c7e5905c95ea4e248`. Exact-head GitHub Actions Frontend Build #235 (`45165905441`) and mirror workflow (`45165898039`) both SUCCESS for `3b3c7a5e657777f4bbcf3e4f125850a4c9d7e9fd`.
-
-Next: WEB-03.12 — search form/results — BLOCKED. Its acceptance criterion requires real provider records, but no provider is approved or enabled; WEB-00.10/G0 remain deferred by owner decision. The SearchPanel currently prepares SearchRequest only; App.vue explicitly states network search is not connected. Do not substitute mock data or silently weaken acceptance. Resolve only through provider approval or an explicit owner-authorized task split.
+WEB-03.12A — search UI states and cursor pagination — IN_PROGRESS (owner-authorized split; no provider activation). WEB-03.12B — real provider search acceptance — BLOCKED pending explicit provider approval/G0.

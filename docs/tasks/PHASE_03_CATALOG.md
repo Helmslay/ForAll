@@ -203,19 +203,31 @@
 
 **Status:** DONE.
 
-## WEB-03.12 — search form/results — BLOCKED
+## WEB-03.12A — search UI states and cursor pagination
 
-**Scope:** Connect the existing SearchPanel to the typed `searchCatalog` client; implement loading, empty, error, partial-result and cursor-pagination states. Do not add mock thumbnails or fabricated scene fields.
+**Статус:** IN_PROGRESS; owner explicitly authorized splitting WEB-03.12 on 2026-11-23.
 
-**Dependencies:** WEB-03.11 is DONE (PR #65 merged). Existing frontend SearchRequest/SearchResponse DTOs and backend search endpoint are available.
+**Зависимости:** WEB-03.11 DONE; typed `searchCatalog`, SearchRequest/SearchResponse DTO and backend route exist.
 
-**Readiness blocker:** Acceptance requires real provider records to appear. No Sentinel-2 provider has been approved or enabled; provider selection (WEB-00.10) and G0 remain explicitly deferred until owner-side application testing. Connecting an unapproved provider or substituting fixtures/mock records would violate project decisions. Therefore the full acceptance criterion cannot currently be verified and this task is not READY.
+**Scope:** Connect SearchPanel to `searchCatalog`; implement loading, empty, safe error/retry, partial provider status and cursor pagination. Render only fields present in returned Scene DTO. Merge pages by stable `Scene.key` and prevent stale responses from replacing reset/newer state.
 
-**Required resolution:** Keep this task BLOCKED until a provider is approved/enabled, or the owner explicitly authorizes splitting the UI-state work from real-provider end-to-end acceptance. Do not silently weaken the acceptance criterion.
+**Test strategy:** Use synthetic typed SearchResponse objects only inside frontend unit tests. They are not application data or claims of real source availability. Mock the API client; do not activate or select a provider.
 
-**Code inspected:** `app/src/App.vue`, `app/src/components/SearchPanel.vue`, `app/src/components/SearchPanel.spec.ts`, `app/src/api/catalog.ts`, `app/src/types/catalog.ts`. Current SearchPanel only prepares a request and App.vue reports that network search is not connected.
+**Acceptance:** Search request uses the typed client; loading state and disabled submit are visible; empty/error/partial/provider states render; retry works; next cursor is passed unchanged; duplicate scene keys are not rendered twice; reset prevents stale responses from reappearing; no fabricated thumbnails/metadata or production mock data; frontend lint/format/typecheck/unit tests/build pass.
 
-**Status:** BLOCKED — no approved real provider; no mock data permitted.
+**Non-goals:** Real-provider E2E, provider approval/activation, asset access, scene footprint/selection, thumbnails, and G0/no-VPN claims.
+
+## WEB-03.12B — real provider search acceptance — BLOCKED
+
+**Dependencies:** WEB-03.12A DONE; provider approval/selection (WEB-00.10) and G0 owner-side source validation.
+
+**Scope:** Verify that the configured, explicitly approved provider returns real Sentinel-2 records through the application. Preserve truthful provider partial/unavailable statuses.
+
+**Blocker:** No primary provider is approved or enabled. User deferred WEB-00.10/G0 until testing the completed app. Do not choose or activate a provider without owner approval.
+
+**Acceptance:** At least one real Sentinel-2 scene is returned and displayed from the approved provider; provider status/errors are truthful; evidence records provider/configuration and test context. Synthetic records do not count.
+
+**Status:** BLOCKED pending provider approval and G0 validation.
 
 ## WEB-03.13 — scene detail/footprint
 Select result, highlight real geometry, fit extent, details panel, clear. Verify selection and map remain synchronized.

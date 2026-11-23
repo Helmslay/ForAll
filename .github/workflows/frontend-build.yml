@@ -10,6 +10,7 @@ on:
       - "docs/STATUS.md"
       - "docs/EXECUTION_PLAN.md"
       - "docs/tasks/PHASE_01_FOUNDATION.md"
+      - "docs/tasks/PHASE_03_CATALOG.md"
       - ".github/workflows/frontend-build.yml"
 
 permissions:
