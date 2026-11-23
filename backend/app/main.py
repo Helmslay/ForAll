@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.catalog_cursor import CatalogCursorCodec, InvalidCatalogCursor
 from app.catalog_provider import (
     CatalogConfigurationError,
     CatalogItemNotFoundError,
@@ -36,7 +37,17 @@ def create_app(
         title=app_settings.app_name,
         version=app_settings.app_version,
     )
-    app.state.catalog_provider = CatalogOrchestrator(catalog_adapters)
+    try:
+        cursor_codec = CatalogCursorCodec.from_encoded_key(
+            app_settings.cursor_encryption_key.get_secret_value()
+            if app_settings.cursor_encryption_key is not None
+            else None
+        )
+    except ValueError:
+        cursor_codec = None
+    app.state.catalog_provider = CatalogOrchestrator(
+        catalog_adapters, cursor_codec=cursor_codec
+    )
     app.include_router(catalog_router)
 
     @app.middleware("http")
@@ -89,6 +100,16 @@ def create_app(
             response.headers.update(exc.headers)
         return response
 
+    @app.exception_handler(InvalidCatalogCursor)
+    async def handle_invalid_catalog_cursor(
+        request: Request, exc: InvalidCatalogCursor
+    ) -> JSONResponse:
+        return error_response(
+            request,
+            status_code=422,
+            code="INVALID_CATALOG_CURSOR",
+            message="Курсор каталога недействителен или устарел",
+        )
     @app.exception_handler(CatalogProviderError)
     async def handle_catalog_provider_error(
         request: Request, exc: CatalogProviderError
