@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import SearchPanel from './components/SearchPanel.vue'
 import { CatalogApiError, searchCatalog } from './api/catalog'
-import type { SearchRequest, SearchResponse } from './types/catalog'
+import { SearchRequest, SearchResponse } from './types/catalog'
 import { normalizeAoiBbox } from './types/catalog'
 
 const projectName = 'Sentinel Explorer'
