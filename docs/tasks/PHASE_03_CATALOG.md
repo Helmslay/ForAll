@@ -158,7 +158,7 @@
 
 **Acceptance:** AES-256-GCM codec, expiry/tamper/key/query binding, encrypted aggregate continuation, per-provider buffering, global limit, cross-page deduplication, continuation partial failure, allowlist revalidation, 64 KiB fail-closed behavior, secret settings and safe HTTP 422 mapping are covered by offline tests. Exact-head backend, frontend and mirror workflows all SUCCESS. No live provider or Russian availability claim was made. G0 remains deferred.
 
-**Ограничения:** cursor is replayable until its 15-minute expiry; one-time-use protection is not implemented. No provider is enabled by default. Real provider traffic, licensing, raster assets and Russian-network/no-VPN access were not tested. The server must be configured with a stable base64-encoded 32-byte `SENTINEL_CURSOR_ENCRYPTION_KEY` to issue continuation cursors.\n\n**PR:** #63 (ready to merge; merge commit SHA to be recorded after merge).\n\n**Не входит:** provider selection, live source validation, one-time cursor replay prevention, frontend pagination UI, raster access.
+**Ограничения:** cursor is replayable until its 15-minute expiry; one-time-use protection is not implemented. No provider is enabled by default. Real provider traffic, licensing, raster assets and Russian-network/no-VPN access were not tested. The server must be configured with a stable base64-encoded 32-byte `SENTINEL_CURSOR_ENCRYPTION_KEY` to issue continuation cursors.\n\n**PR:** #63 merged; merge commit `8eff9ea88be22ccd57afb68de8acc377a658709e`.\n\n**Не входит:** provider selection, live source validation, one-time cursor replay prevention, frontend pagination UI, raster access.
 
 ## WEB-03.10 — provider status DTO
 Success/partial/unavailable, safe reason and last checked. Hide secrets and raw trace.
