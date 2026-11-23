@@ -394,6 +394,8 @@ async def test_cursor_rejects_query_and_provider_changes() -> None:
     first = await orchestrator.search(make_request(limit=1))
     with pytest.raises(InvalidCatalogCursor):
         await orchestrator.search(make_request(limit=1, cursor=first.next_cursor, bbox=[59.2, 56.7, 59.5, 56.9]))
+    with pytest.raises(InvalidCatalogCursor):
+        await orchestrator.search(make_request(limit=2, cursor=first.next_cursor))
     other = CatalogOrchestrator([FakeAdapter("different")], cursor_codec=make_cursor_codec())
     with pytest.raises(InvalidCatalogCursor):
         await other.search(make_request(limit=1, cursor=first.next_cursor))
