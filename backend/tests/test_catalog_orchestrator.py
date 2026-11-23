@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import pytest
+from fastapi.testclient import TestClient
 
 from app.catalog_provider import (
     CatalogCapabilities,
@@ -18,6 +19,7 @@ from app.catalog_provider import (
 from app.schemas.catalog import SearchRequest
 from app.stac_adapter import StacSearchPage
 from app.catalog_orchestrator import CatalogOrchestrator
+from app.main import create_app
 
 FIXTURE = json.loads(
     (Path(__file__).parent / "fixtures" / "stac" / "valid_item.json").read_text()
@@ -82,6 +84,31 @@ class FakeAdapter:
         item["collection"] = collection_id
         item["id"] = item_id
         return item
+
+
+def test_app_factory_wires_explicit_adapters_to_search_route() -> None:
+    adapter = FakeAdapter("configured")
+    app = create_app(catalog_adapters=[adapter])
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/catalog/search",
+            json={
+                "bbox": [59.3, 56.7, 59.5, 56.9],
+                "datetime": {
+                    "from": "2025-06-01T00:00:00Z",
+                    "to": "2025-06-30T23:59:59Z",
+                },
+                "collections": ["sentinel-2-l2a"],
+                "providers": None,
+                "limit": 20,
+                "cursor": None,
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json()["items"][0]["provider"] == "configured"
+    assert response.json()["providers"][0]["id"] == "configured"
 
 
 @pytest.mark.asyncio
