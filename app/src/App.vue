@@ -2,12 +2,18 @@
 import { ref } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import SearchPanel from './components/SearchPanel.vue'
+import { CatalogApiError, searchCatalog } from './api/catalog'
+import type { SearchRequest, SearchResponse } from './types/catalog'
 import { normalizeAoiBbox } from './types/catalog'
 
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
 const aoiBbox = ref(normalizeAoiBbox(null))
-const searchPrepared = ref(false)
+const searchLoading = ref(false)
+const searchError = ref('')
+const searchResponse = ref<SearchResponse | null>(null)
+const activeRequest = ref<SearchRequest | null>(null)
+let searchSequence = 0
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -21,12 +27,60 @@ function closePanel() {
   panelOpen.value = false
 }
 
-function handleSearch() {
-  searchPrepared.value = true
+function isAbortError(error: unknown) {
+  return error instanceof Error && error.name === 'AbortError'
+}
+
+async function runSearch(request: SearchRequest, append = false) {
+  const sequence = ++searchSequence
+  searchLoading.value = true
+  searchError.value = ''
+  if (!append) {
+    activeRequest.value = { ...request, cursor: null }
+    searchResponse.value = null
+  }
+  try {
+    const response = await searchCatalog(request)
+    if (sequence !== searchSequence) return
+    if (append && searchResponse.value) {
+      const existing = new Set(searchResponse.value.items.map((scene) => scene.key))
+      const uniqueItems = response.items.filter((scene) => !existing.has(scene.key))
+      searchResponse.value = {
+        ...response,
+        items: [...searchResponse.value.items, ...uniqueItems],
+        partial: response.partial || searchResponse.value.partial,
+      }
+    } else {
+      searchResponse.value = response
+    }
+  } catch (error) {
+    if (sequence !== searchSequence || isAbortError(error)) return
+    searchError.value = error instanceof CatalogApiError ? error.message : 'Не удалось выполнить поиск каталога.'
+  } finally {
+    if (sequence === searchSequence) searchLoading.value = false
+  }
+}
+
+function handleSearch(request: SearchRequest) {
+  void runSearch(request)
+}
+
+function loadMore() {
+  const cursor = searchResponse.value?.next_cursor
+  if (!cursor || !activeRequest.value || searchLoading.value) return
+  void runSearch({ ...activeRequest.value, cursor }, true)
+}
+
+function retrySearch() {
+  if (activeRequest.value) void runSearch(activeRequest.value)
 }
 
 function resetSearch() {
-  searchPrepared.value = false
+  searchSequence += 1
+  searchLoading.value = false
+  searchError.value = ''
+  searchResponse.value = null
+  activeRequest.value = null
 }
 </script>
 
@@ -109,10 +163,29 @@ function resetSearch() {
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <SearchPanel :aoi="aoiBbox || undefined" @submit="handleSearch" @reset="resetSearch" />
-        <p v-if="searchPrepared" class="search-prepared" role="status">
-          Параметры подготовлены. Сетевой поиск пока не подключён.
-        </p>
+        <SearchPanel :aoi="aoiBbox || undefined" :loading="searchLoading" @submit="handleSearch" @reset="resetSearch" />
+        <section v-if="searchLoading" class="catalog-state" role="status" aria-live="polite">Выполняется поиск сцен…</section>
+        <section v-else-if="searchError" class="catalog-state catalog-error" role="alert">
+          <p>{{ searchError }}</p>
+          <button type="button" class="catalog-action" @click="retrySearch">Повторить поиск</button>
+        </section>
+        <section v-else-if="searchResponse" class="catalog-results" aria-label="Результаты поиска">
+          <p v-if="searchResponse.partial" class="catalog-partial" role="status">Получены неполные результаты: один или несколько источников вернули частичный ответ.</p>
+          <div v-if="searchResponse.providers.length" class="provider-statuses" aria-label="Состояние источников">
+            <p v-for="provider in searchResponse.providers" :key="provider.id">{{ provider.id }}: {{ provider.status }}<span v-if="provider.reason"> ({{ provider.reason }})</span></p>
+          </div>
+          <p v-if="searchResponse.items.length === 0" class="catalog-empty" role="status">Каталог не вернул сцен по заданным параметрам.</p>
+          <template v-else>
+            <p class="catalog-count">Найдено сцен: {{ searchResponse.items.length }}</p>
+            <article v-for="scene in searchResponse.items" :key="scene.key" class="scene-result">
+              <h3>{{ scene.item_id }}</h3>
+              <p>{{ new Date(scene.acquired_at).toLocaleString() }}</p>
+              <p>{{ scene.platform || 'Платформа не указана' }} · {{ scene.cloud_cover === null ? 'Облачность не указана' : scene.cloud_cover + '%' }}</p>
+              <p class="scene-provider">{{ scene.provider }} · {{ scene.collection }} · {{ scene.available_bands.join(', ') }}</p>
+            </article>
+          </template>
+          <button v-if="searchResponse.next_cursor" type="button" class="catalog-action" :disabled="searchLoading" @click="loadMore">Загрузить ещё</button>
+        </section>
       </aside>
     </div>
 
