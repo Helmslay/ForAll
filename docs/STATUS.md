@@ -67,4 +67,4 @@ Update this file when a milestone or material project decision changes. Do not m
 
 ## Current task
 
-WEB-03.12A — search UI states and cursor pagination — IN_PROGRESS (owner-authorized split; no provider activation). WEB-03.12B — real provider search acceptance — BLOCKED pending explicit provider approval/G0.
+WEB-03.12A — search UI states and cursor pagination — DONE (PR #66 merged). Next: WEB-03.12B — real provider search acceptance — BLOCKED pending explicit provider approval/G0.
