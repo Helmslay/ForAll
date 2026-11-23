@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent } from 'vue'
 import App from './App.vue'
-import SearchPanel from './components/SearchPanel.vue'
 import { searchCatalog } from './api/catalog'
 import type { SearchResponse } from './types/catalog'
 
@@ -10,8 +10,14 @@ vi.mock('./api/catalog', () => ({
   searchCatalog: vi.fn(),
 }))
 
+const MapCanvasStub = defineComponent({
+  emits: ['aoi-change'],
+  template:
+    '<button class="map-aoi" @click="$emit(\'aoi-change\', [56.1, 58.9, 57.2, 59.8])">AOI</button>',
+})
+
 function mountApp() {
-  return mount(App, { global: { stubs: { MapCanvas: true } } })
+  return mount(App, { global: { stubs: { MapCanvas: MapCanvasStub } } })
 }
 
 const searchMock = vi.mocked(searchCatalog)
@@ -38,9 +44,7 @@ const response: SearchResponse = {
 beforeEach(() => searchMock.mockReset())
 
 async function submitSearch(wrapper: ReturnType<typeof mountApp>) {
-  await wrapper.findComponent(SearchPanel).setProps({
-    aoi: [56.1, 58.9, 57.2, 59.8],
-  })
+  await wrapper.get('.map-aoi').trigger('click')
   await wrapper.get('#search-date-from').setValue('2026-06-01')
   await wrapper.get('#search-date-to').setValue('2026-06-30')
   await wrapper.get('form').trigger('submit')
@@ -63,7 +67,7 @@ describe('App', () => {
     expect(wrapper.find('.search-form').exists()).toBe(true)
     expect(wrapper.get('.context-panel').text()).toContain('Нарисуйте прямоугольную область интереса на карте.')
     expect(wrapper.get('.app-statusbar').text()).toContain('Пустой холст OpenLayers')
-    expect(wrapper.find('map-canvas-stub').exists()).toBe(true)
+    expect(wrapper.find('.map-aoi').exists()).toBe(true)
   })
 
   it('opens and closes the contextual panel using touch-sized controls', async () => {
@@ -94,12 +98,14 @@ describe('App', () => {
   })
 
   it('shows loading state and disables the search submit button', async () => {
-    searchMock.mockReturnValueOnce(new Promise(() => {}))
+    let resolveSearch!: (value: SearchResponse) => void
+    searchMock.mockReturnValueOnce(new Promise((resolve) => { resolveSearch = resolve }))
     const wrapper = mountApp()
     await submitSearch(wrapper)
 
     expect(wrapper.text()).toContain('Выполняется поиск сцен')
     expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
+    resolveSearch(response)
   })
 
   it('renders API scenes and provider status', async () => {
