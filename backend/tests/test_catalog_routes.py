@@ -12,6 +12,7 @@ from app.catalog_provider import (
     CatalogRateLimitedError,
     CatalogUnavailableError,
 )
+from app.catalog_orchestrator import CatalogOrchestrator
 from app.main import create_app
 from app.schemas.catalog import SearchRequest, SearchResponse
 
@@ -160,7 +161,7 @@ def test_search_endpoint_maps_provider_errors_to_safe_contract(
 
 def test_invalid_catalog_cursor_uses_safe_422_contract() -> None:
     app = create_app()
-    app.state.catalog_provider = __import__("app.catalog_orchestrator", fromlist=["CatalogOrchestrator"]).CatalogOrchestrator()
+    app.state.catalog_provider = CatalogOrchestrator()
     with TestClient(app) as client:
         response = client.post(
             "/api/v1/catalog/search",
