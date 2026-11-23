@@ -181,7 +181,7 @@
 
 **Итог:** DONE по scope WEB-03.10; production diff отсутствует. Следующая задача — WEB-03.11 (typed frontend search client).
 
-## WEB-03.11 — typed frontend search client — IN_PROGRESS
+## WEB-03.11 — typed frontend search client — IN_REVIEW
 
 **Зависимости:** WEB-03.01–03.10 DONE. Backend contract exists at `POST /api/v1/catalog/search`; `SearchRequest`, `SearchResponse`, `Scene` and `ProviderStatus` are defined in backend DTOs. Frontend already has a request builder in `app/src/types/catalog.ts` and a relative API base path in `app/src/api/config.ts`.
 
@@ -208,7 +208,24 @@
 
 **Не входит:** SearchPanel/App wiring, loading/results/empty/partial/pagination UI (WEB-03.12); scene detail/footprint (WEB-03.13); provider selection or real-data/no-VPN validation (G0 remains deferred).
 
-**Статус:** READY подтверждён после проверки зависимостей и контракта; реализация начата в отдельной feature branch.
+**Результат реализации:** добавлен типизированный клиент `searchCatalog`. Он отправляет `POST /api/v1/catalog/search` на относительный API path, сериализует полный SearchRequest (включая opaque cursor), проверяет структуру SearchResponse на runtime, разбирает стандартный error envelope в `CatalogApiError`, безопасно обрабатывает malformed HTTP/success responses и нормализует сетевые ошибки без выдачи raw body. При запуске нового поиска предыдущий AbortController отменяется; DOM AbortError проходит как cancellation, не превращаясь в API error.
+
+**Изменённые файлы:**
+- `app/src/api/catalog.ts` — новый typed client и runtime guards.
+- `app/src/api/catalog.spec.ts` — 6 offline tests.
+- `app/src/types/catalog.ts` — SearchResponse, Scene, ProviderStatus, ApiErrorEnvelope и nullable filter types.
+- `docs/tasks/PHASE_03_CATALOG.md`, `docs/EXECUTION_PLAN.md`, `docs/STATUS.md`.
+
+**Проверки:**
+- Exact PR head `d4e57a2ae420bdf0aaad21086642590f762ef881`: Frontend build workflow run `45134386481` — SUCCESS. Audit policy, npm audit policy, ESLint, Prettier, vue-tsc, Vitest (**23 passed**), Vite production build, Vite proxy health smoke, Docker Compose config/localhost port checks, Compose startup and frontend/API smoke all passed.
+- GitLab mirror run `45134377834` — SUCCESS for the same SHA. No GitLab pipeline was started.
+- PR #65 is open; no unresolved review threads or requested changes. Merge is intentionally held until Buildkite CI is confirmed.
+
+**Acceptance:** request serialization, typed DTOs, safe error parsing, malformed response handling, previous-query cancellation and no direct catalog fetch in Vue components are verified by tests and exact-head frontend checks.
+
+**Ограничение проверки:** проектный CI должен запускаться в Buildkite, а результаты доставляться в GitLab. В доступных подключениях Buildkite не представлен; GitLab mirror branch has no pipeline and no commit statuses for this SHA. GitHub Actions Frontend build is successful but is not treated as a substitute for the required Buildkite run. Therefore task remains IN_REVIEW and PR is not merged until the Buildkite result is confirmed.
+
+**Статус:** READY подтверждён после проверки зависимостей и контракта; реализация подготовлена в отдельной feature branch.
 
 ## WEB-03.12 — search form/results
 Connect real API; loading/empty/error/partial/pagination states. No mock thumbnails/scene fields. Acceptance: real provider records appear.
