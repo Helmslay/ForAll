@@ -8,7 +8,15 @@ import { normalizeAoiBbox } from './types/catalog'
 const projectName = 'Sentinel Explorer'
 const panelOpen = ref(false)
 const aoiBbox = ref(normalizeAoiBbox(null))
-const { loading: searchLoading, error: searchError, response: searchResponse, handleSearch, loadMore, retrySearch, resetSearch } = useCatalogSearch()
+const {
+  loading: searchLoading,
+  error: searchError,
+  response: searchResponse,
+  handleSearch,
+  loadMore,
+  retrySearch,
+  resetSearch,
+} = useCatalogSearch()
 
 const navigationItems = [
   { label: 'Обзор', symbol: '⌖', active: true },
@@ -104,8 +112,15 @@ function closePanel() {
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <SearchPanel :aoi="aoiBbox || undefined" :loading="searchLoading" @submit="handleSearch" @reset="resetSearch" />
-        <section v-if="searchLoading" class="catalog-state" role="status" aria-live="polite">Выполняется поиск сцен…</section>
+        <SearchPanel
+          :aoi="aoiBbox || undefined"
+          :loading="searchLoading"
+          @submit="handleSearch"
+          @reset="resetSearch"
+        />
+        <section v-if="searchLoading" class="catalog-state" role="status" aria-live="polite">
+          Выполняется поиск сцен…
+        </section>
         <section v-else-if="searchError" class="catalog-state catalog-error" role="alert">
           <p>{{ searchError }}</p>
           <button type="button" class="catalog-action" @click="retrySearch">Повторить поиск</button>
@@ -113,9 +128,14 @@ function closePanel() {
         <section v-else-if="searchResponse" class="catalog-results" aria-label="Результаты поиска">
           <p v-if="searchResponse.partial" class="catalog-partial" role="status">Получены неполные результаты: один или несколько источников вернули частичный ответ.</p>
           <div v-if="searchResponse.providers.length" class="provider-statuses" aria-label="Состояние источников">
-            <p v-for="provider in searchResponse.providers" :key="provider.id">{{ provider.id }}: {{ provider.status }}<span v-if="provider.reason"> ({{ provider.reason }})</span></p>
+            <p v-for="provider in searchResponse.providers" :key="provider.id">
+              {{ provider.id }}: {{ provider.status
+              }}<span v-if="provider.reason"> ({{ provider.reason }})</span>
+            </p>
           </div>
-          <p v-if="searchResponse.items.length === 0" class="catalog-empty" role="status">Каталог не вернул сцен по заданным параметрам.</p>
+          <p v-if="searchResponse.items.length === 0" class="catalog-empty" role="status">
+            Каталог не вернул сцен по заданным параметрам.
+          </p>
           <template v-else>
             <p class="catalog-count">Найдено сцен: {{ searchResponse.items.length }}</p>
             <article v-for="scene in searchResponse.items" :key="scene.key" class="scene-result">
@@ -125,7 +145,15 @@ function closePanel() {
               <p class="scene-provider">{{ scene.provider }} · {{ scene.collection }} · {{ scene.available_bands.join(', ') }}</p>
             </article>
           </template>
-          <button v-if="searchResponse.next_cursor" type="button" class="catalog-action" :disabled="searchLoading" @click="loadMore">Загрузить ещё</button>
+          <button
+            v-if="searchResponse.next_cursor"
+            type="button"
+            class="catalog-action"
+            :disabled="searchLoading"
+            @click="loadMore"
+          >
+            Загрузить ещё
+          </button>
         </section>
       </aside>
     </div>
