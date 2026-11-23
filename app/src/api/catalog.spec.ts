@@ -4,7 +4,10 @@ import type { SearchRequest, SearchResponse } from '../types/catalog'
 
 const request: SearchRequest = {
   bbox: [56.1, 58.9, 57.2, 59.8],
-  datetime: { from: '2026-06-01T00:00:00Z', to: '2026-06-30T23:59:59Z' },
+  datetime: {
+    from: '2026-06-01T00:00:00Z',
+    to: '2026-06-30T23:59:59Z',
+  },
   cloud_cover_lte: 25,
   collections: ['sentinel-2-l2a'],
   limit: 20,
