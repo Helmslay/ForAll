@@ -110,8 +110,29 @@
 
 **Ограничения:** production app currently has no configured CatalogProvider, so endpoint honestly returns 503 until WEB-03.08 orchestration/server-side wiring is implemented. No real provider traffic, provider approval, cursor pagination, frontend integration or no-VPN availability was tested.
 
-## WEB-03.08 — catalog orchestrator
-Call enabled adapters, normalize, deduplicate by real identity, track partial status. Provider failure doesn't erase another provider's results. All fail → clear provider error.
+## WEB-03.08 — catalog orchestrator — READY
+
+**Зависимости:** WEB-03.01–03.07 DONE. Имеются `CatalogProvider` protocol, `SearchRequest/SearchResponse/Scene/ProviderStatus` DTO, STAC HTTP transport, configurable `StacCatalogAdapter` и STAC Item normalizer. No provider is selected by default; orchestrator receives an explicit server-side sequence of configured adapters. This task does not add provider selection or production credentials.
+
+**Цель:** реализовать агрегатор поверх существующих `StacCatalogAdapter`, совместимый с `CatalogProvider`.
+
+**Scope:**
+- accept explicitly enabled adapters via constructor; reject duplicate provider IDs;
+- select adapters using optional `SearchRequest.providers` and only send collections supported by each adapter;
+- execute eligible adapter searches concurrently; normalize each STAC feature using adapter provider ID and trusted single-collection context where available;
+- merge results in deterministic configured-adapter order, deduplicate only by normalized `Scene.key`, and enforce the request's total `limit`;
+- produce per-provider `ProviderStatus` with UTC `last_checked`; status reasons are safe fixed codes, never raw exception text/URLs;
+- keep successful provider results when another provider fails; set `partial=true` when at least one selected provider failed and at least one succeeded;
+- when no adapter is configured/matches, or all selected adapters fail, raise a safe domain error; if all failures are query-not-supported, preserve that error type, otherwise report unavailable;
+- implement `get_item(scene_key)` by decoding the existing provider:collection:item key and routing only to the matching configured adapter.
+
+**Tests:** multiple adapters success; provider filter; per-adapter collection intersection; parallel fan-out; duplicate Scene.key removal; aggregate limit; one failure plus one success preserves results and marks partial; all-failed/no-adapter safe errors; malformed Item normalization does not leak raw details; get_item routes only to matching adapter and validates normalized key; duplicate provider IDs rejected.
+
+**Критерии приёмки:** orchestrator satisfies `CatalogProvider`; no arbitrary URL/client-controlled adapter configuration; adapter failures are isolated; no raw upstream links/exceptions are exposed; deduplication uses only normalized stable identity; result count never exceeds request limit; offline tests pass.
+
+**Не входит:** provider selection/configuration in production, live provider traffic, cursor signing or fetching subsequent pages (WEB-03.09), persistent cache, health monitoring (WEB-03.10), frontend integration and no-VPN verification.
+
+
 
 ## WEB-03.09 — cursor pagination
 Opaque cursor bound to query/provider signature, expiry and tamper protection. Tests duplicate page and mismatched query. Never expose signed next links.
