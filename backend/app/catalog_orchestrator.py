@@ -39,6 +39,22 @@ class CatalogOrchestrator:
             for capability, adapter in zip(capabilities, self._adapters, strict=True)
         }
 
+    def capabilities(self) -> CatalogCapabilities:
+        """Return the union of configured adapter capabilities."""
+        return CatalogCapabilities(
+            provider_id="catalog-orchestrator",
+            supported_collections=frozenset(
+                collection
+                for capability in self._capabilities.values()
+                for collection in capability.supported_collections
+            ),
+            supported_bands=frozenset(
+                band
+                for capability in self._capabilities.values()
+                for band in capability.supported_bands
+            ),
+        )
+
     async def search(self, request: SearchRequest) -> SearchResponse:
         selected = [
             adapter
