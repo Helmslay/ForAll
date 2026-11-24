@@ -30,7 +30,7 @@ on:
 
 permissions:
   actions: read
-  contents: read
+  contents: write
 
 concurrency:
   group: sentinel-control-approval-relay-${{ inputs.issue_number }}
@@ -297,6 +297,7 @@ jobs:
               "app_tree_sha": manifest["app_tree_sha"],
               "build_run_id": build_run_id,
               "build_run_attempt": build_attempt,
+              "release_tag": args["release_tag"],
               "approved_at_utc": datetime.now(timezone.utc).isoformat(),
               "approval_id": str(__import__("uuid").uuid4()),
           }
