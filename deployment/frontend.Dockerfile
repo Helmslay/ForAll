@@ -23,4 +23,5 @@ RUN chown -R root:root /usr/share/nginx/html \
 
 USER 101:101
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx"]
+CMD ["-g", "daemon off;"]
