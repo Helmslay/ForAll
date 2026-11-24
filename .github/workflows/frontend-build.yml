@@ -88,6 +88,9 @@ jobs:
           echo "source_commit=$EXPECTED_APP_SOURCE_SHA"
           echo "app_tree_sha=$expected_tree"
 
+      - name: Validate public approval relay workflow YAML
+        run: ruby -e 'require "yaml"; YAML.parse_file(".github/workflows/sentinel-control-approval-relay.yml")'
+
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
