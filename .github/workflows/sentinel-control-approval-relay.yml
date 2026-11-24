@@ -1,5 +1,5 @@
 name: Sentinel Control Approval Relay
-run-name: Sentinel deploy approval #${{ inputs.issue_number }}
+run-name: 'Sentinel deploy approval #${{ inputs.issue_number }}'
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ concurrency:
 
 jobs:
   approve:
-    if: github.repository == 'Helmslay/ForAll' && github.ref == 'refs/heads/main' && github.actor == 'Helmslay'
+    if: github.repository == 'Helmslay/ForAll' && github.ref == 'refs/heads/main' && github.actor == 'Helmslay' && inputs.confirmation == 'I_APPROVE'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
