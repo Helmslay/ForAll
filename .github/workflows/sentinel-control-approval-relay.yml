@@ -280,7 +280,7 @@ jobs:
               "build_run_id": build_run_id,
               "build_run_attempt": build_attempt,
               "approved_at_utc": datetime.now(timezone.utc).isoformat(),
-              "approval_id": __import__("uuid").uuid4().hex,
+              "approval_id": str(__import__("uuid").uuid4()),
           }
           Path("approval-attestation.json").write_text(
               json.dumps(attestation, sort_keys=True, separators=(",", ":")) + "\n",
