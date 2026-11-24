@@ -186,10 +186,6 @@ jobs:
         if: always()
         run: docker compose -f compose.yaml down --volumes
 
-      - name: Stop Docker Compose development stack
-        if: always()
-        run: docker compose -f compose.yaml down --volumes
-
       - name: Validate preview Compose configuration
         run: docker compose -f deployment/compose.preview.yaml config --quiet
 
