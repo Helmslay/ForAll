@@ -1,0 +1,404 @@
+name: Sentinel Control Approval Relay
+run-name: Sentinel deploy approval relay
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_title_sha256:
+        description: "SHA-256 of the exact approved title in the private control Issue"
+        required: true
+        type: string
+      request_sha256:
+        description: "SHA-256 of the exact raw JSON body in the private control Issue"
+        required: true
+        type: string
+      artifact_id:
+        description: "Verified Sentinel Explorer Web build artifact ID"
+        required: true
+        type: string
+      archive_sha256:
+        description: "SHA-256 of the exact verified ZIP archive"
+        required: true
+        type: string
+      source_commit_sha:
+        description: "ForAll main source commit SHA"
+        required: true
+        type: string
+      app_tree_sha:
+        description: "SHA-1 tree object ID of the app/ subtree"
+        required: true
+        type: string
+      build_run_id:
+        description: "Successful ForAll frontend-build workflow run ID"
+        required: true
+        type: string
+      build_run_attempt:
+        description: "Successful ForAll frontend-build run attempt"
+        required: true
+        type: string
+      release_tag:
+        description: "Fresh random sentinel-control- plus 32 lowercase hex characters"
+        required: true
+        type: string
+      confirmation:
+        description: "Explicitly approve this exact request and build artifact"
+        required: true
+        type: choice
+        options:
+          - I_APPROVE
+          - CANCEL
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: sentinel-control-approval-relay-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  approve:
+    if: github.repository == 'Helmslay/ForAll' && github.ref == 'refs/heads/main' && github.actor == 'Helmslay' && github.run_attempt == 1 && inputs.confirmation == 'I_APPROVE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch artifact metadata
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+        run: |
+          set -Eeuo pipefail
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]{0,15}$ ]] || { echo "artifact_id_invalid" >&2; exit 2; }
+          curl --fail --silent --show-error \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/Helmslay/ForAll/actions/artifacts/$ARTIFACT_ID" \
+            -o artifact-metadata.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          value = json.loads(Path("artifact-metadata.json").read_text(encoding="utf-8"))
+          if value.get("id") != int(__import__("os").environ["ARTIFACT_ID"]):
+              raise SystemExit("artifact_identity_mismatch")
+          if value.get("expired") is not False:
+              raise SystemExit("artifact_expired_or_unavailable")
+          digest = value.get("digest")
+          if not isinstance(digest, str) or not digest.startswith("sha256:") or len(digest) != 71:
+              raise SystemExit("artifact_digest_missing")
+          run = value.get("workflow_run")
+          if not isinstance(run, dict) or run.get("repository_id") != 1461236096:
+              raise SystemExit("artifact_repository_mismatch")
+          if run.get("head_branch") != "main":
+              raise SystemExit("artifact_not_from_main")
+          Path("build-run-id.txt").write_text(str(run.get("id", "")), encoding="ascii")
+          PY
+          BUILD_RUN_ID="$(cat build-run-id.txt)"
+          [[ "$BUILD_RUN_ID" =~ ^[1-9][0-9]{0,15}$ ]] || { echo "build_run_id_invalid" >&2; exit 2; }
+          curl --fail --silent --show-error \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/Helmslay/ForAll/actions/runs/$BUILD_RUN_ID" \
+            -o build-run.json
+          curl --fail --silent --show-error --location \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/Helmslay/ForAll/actions/artifacts/$ARTIFACT_ID/zip" \
+            -o build-artifact.zip
+
+      - name: Verify approved request and build artifact
+        id: verify
+        shell: bash
+        env:
+          ISSUE_TITLE_SHA256: ${{ inputs.issue_title_sha256 }}
+          REQUEST_SHA256: ${{ inputs.request_sha256 }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARCHIVE_SHA256: ${{ inputs.archive_sha256 }}
+          SOURCE_COMMIT_SHA: ${{ inputs.source_commit_sha }}
+          APP_TREE_SHA: ${{ inputs.app_tree_sha }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+          BUILD_RUN_ATTEMPT: ${{ inputs.build_run_attempt }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          RELAY_RUN_ID: ${{ github.run_id }}
+          RELAY_RUN_ATTEMPT: ${{ github.run_attempt }}
+          RELAY_SHA: ${{ github.sha }}
+          RELAY_ACTOR: ${{ github.actor }}
+          RELAY_REPOSITORY: ${{ github.repository }}
+          RELAY_WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          set -Eeuo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          import stat
+          import zipfile
+          from datetime import datetime, timezone
+          from pathlib import Path, PurePosixPath
+
+          env = os.environ
+          def fail(code):
+              raise SystemExit(code)
+
+          if env["CONFIRMATION"] != "I_APPROVE":
+              fail("explicit_approval_missing")
+          if env["RELAY_REPOSITORY"] != "Helmslay/ForAll":
+              fail("relay_repository_mismatch")
+          if env["RELAY_WORKFLOW_REF"] != "Helmslay/ForAll/.github/workflows/sentinel-control-approval-relay.yml@refs/heads/main":
+              fail("relay_workflow_ref_mismatch")
+          if env["RELAY_ACTOR"] != "Helmslay":
+              fail("dispatcher_not_allowed")
+          if not re.fullmatch(r"[0-9a-f]{64}", env["ISSUE_TITLE_SHA256"]):
+              fail("issue_title_sha256_invalid")
+          if not re.fullmatch(r"[0-9a-f]{64}", env["REQUEST_SHA256"]):
+              fail("request_sha256_invalid")
+          if not re.fullmatch(r"[1-9][0-9]{0,15}", env["ARTIFACT_ID"]):
+              fail("artifact_id_invalid")
+          if not re.fullmatch(r"[0-9a-f]{64}", env["ARCHIVE_SHA256"]):
+              fail("archive_sha256_invalid")
+          if not re.fullmatch(r"[0-9a-f]{40}", env["SOURCE_COMMIT_SHA"]):
+              fail("source_commit_sha_invalid")
+          if not re.fullmatch(r"[0-9a-f]{40}", env["APP_TREE_SHA"]):
+              fail("app_tree_sha_invalid")
+          if not re.fullmatch(r"[1-9][0-9]{0,15}", env["BUILD_RUN_ID"]):
+              fail("build_run_id_invalid")
+          if not re.fullmatch(r"[1-9][0-9]{0,5}", env["BUILD_RUN_ATTEMPT"]):
+              fail("build_run_attempt_invalid")
+          if not re.fullmatch(r"sentinel-control-[0-9a-f]{32}", env["RELEASE_TAG"]):
+              fail("release_tag_invalid")
+
+          metadata = json.loads(Path("artifact-metadata.json").read_text(encoding="utf-8"))
+          expected_artifact_name = re.fullmatch(r"sentinel-explorer-web-([0-9]{1,15})-([1-9][0-9]{0,5})", metadata.get("name", ""))
+          if not expected_artifact_name:
+              fail("build_artifact_name_invalid")
+          build_run_id = int(expected_artifact_name.group(1))
+          build_attempt = int(expected_artifact_name.group(2))
+          if build_run_id != int(env["BUILD_RUN_ID"]):
+              fail("artifact_build_run_mismatch")
+          if metadata.get("id") != int(env["ARTIFACT_ID"]) or metadata.get("expired") is not False:
+              fail("artifact_metadata_mismatch")
+          if metadata.get("digest") != "sha256:" + hashlib.sha256(Path("build-artifact.zip").read_bytes()).hexdigest() or metadata.get("digest") != "sha256:" + env["ARCHIVE_SHA256"]:
+              fail("artifact_archive_digest_mismatch")
+
+          build_run = json.loads(Path("build-run.json").read_text(encoding="utf-8"))
+          if (
+              build_run.get("id") != build_run_id
+              or build_run.get("workflow_id") != 421319307
+              or build_run.get("path") != ".github/workflows/frontend-build.yml"
+              or build_run.get("head_branch") != "main"
+              or build_run.get("event") != "push"
+              or build_run.get("status") != "completed"
+              or build_run.get("conclusion") != "success"
+              or build_run.get("run_attempt") != build_attempt
+              or build_run.get("head_sha") != env["SOURCE_COMMIT_SHA"]
+              or int(env["BUILD_RUN_ID"]) != build_run_id
+              or int(env["BUILD_RUN_ATTEMPT"]) != build_attempt
+          ):
+              fail("build_run_not_verified")
+
+          archive = Path("build-artifact.zip")
+          if not zipfile.is_zipfile(archive):
+              fail("build_artifact_not_zip")
+          with zipfile.ZipFile(archive) as zf:
+              infos = zf.infolist()
+              if not 1 <= len(infos) <= 1002:
+                  fail("build_artifact_file_count_invalid")
+              names = set()
+              total = 0
+              payload = {}
+              for info in infos:
+                  name = info.filename
+                  if not isinstance(name, str) or not name or "\\" in name or name.startswith("/"):
+                      fail("build_artifact_path_invalid")
+                  path = PurePosixPath(name)
+                  if any(part in {"", ".", ".."} for part in path.parts) or len(path.parts) > 16:
+                      fail("build_artifact_path_invalid")
+                  if any(part.startswith(".") for part in path.parts):
+                      fail("build_artifact_hidden_path")
+                  if name in names:
+                      fail("build_artifact_duplicate_path")
+                  names.add(name)
+                  mode = (info.external_attr >> 16) & 0xFFFF
+                  kind = stat.S_IFMT(mode)
+                  if kind not in (0, stat.S_IFREG, stat.S_IFDIR):
+                      fail("build_artifact_special_file")
+                  if info.is_dir():
+                      continue
+                  if info.file_size > 32 * 1024 * 1024:
+                      fail("build_artifact_file_too_large")
+                  total += info.file_size
+                  if total > 128 * 1024 * 1024:
+                      fail("build_artifact_total_too_large")
+                  payload[name] = zf.read(info)
+              required = {"index.html", "release-manifest.json", "SHA256SUMS.txt"}
+              if not required.issubset(payload):
+                  fail("build_artifact_required_files_missing")
+              manifest = json.loads(payload["release-manifest.json"].decode("utf-8"))
+              if (
+                  manifest.get("schema_version") != 1
+                  or manifest.get("repository") != "Helmslay/ForAll"
+                  or manifest.get("source_commit_sha") != env["SOURCE_COMMIT_SHA"]
+                  or manifest.get("build_commit_sha") != env["SOURCE_COMMIT_SHA"]
+                  or manifest.get("workflow_run_id") != build_run_id
+                  or manifest.get("workflow_run_attempt") != build_attempt
+                  or not re.fullmatch(r"[0-9a-f]{40}", manifest.get("app_tree_sha", ""))
+                  or manifest.get("app_tree_sha") != env["APP_TREE_SHA"]
+                  or manifest.get("workflow_run_id") != int(env["BUILD_RUN_ID"])
+                  or manifest.get("workflow_run_attempt") != int(env["BUILD_RUN_ATTEMPT"])
+                  or manifest.get("workflow_ref") != "Helmslay/ForAll/.github/workflows/frontend-build.yml@refs/heads/main"
+              ):
+                  fail("build_manifest_binding_mismatch")
+              checksum_lines = payload["SHA256SUMS.txt"].decode("utf-8", errors="strict").splitlines()
+              checksums = {}
+              for line in checksum_lines:
+                  match = re.fullmatch(r"([0-9a-f]{64})  (.+)", line)
+                  if not match:
+                      fail("checksum_manifest_invalid")
+                  path = match.group(2)
+                  if path.startswith("./"):
+                      path = path[2:]
+                  if path in checksums:
+                      fail("checksum_manifest_duplicate")
+                  checksums[path] = match.group(1)
+              expected_paths = set(payload) - {"SHA256SUMS.txt"}
+              if set(checksums) != expected_paths:
+                  fail("checksum_manifest_file_set_mismatch")
+              for path, digest in checksums.items():
+                  if hashlib.sha256(payload[path]).hexdigest() != digest:
+                      fail("build_file_checksum_mismatch")
+
+          if env["ARCHIVE_SHA256"] != hashlib.sha256(archive.read_bytes()).hexdigest():
+              fail("request_archive_digest_mismatch")
+          attestation = {
+              "schema_version": 1,
+              "status": "approved",
+              "repository": "Helmslay/ForAll",
+              "repository_id": 1461236096,
+              "relay_workflow_path": ".github/workflows/sentinel-control-approval-relay.yml",
+              "relay_run_id": int(env["RELAY_RUN_ID"]),
+              "relay_run_attempt": int(env["RELAY_RUN_ATTEMPT"]),
+              "relay_sha": env["RELAY_SHA"],
+              "relay_actor": env["RELAY_ACTOR"],
+              "issue_title_sha256": env["ISSUE_TITLE_SHA256"],
+              "request_sha256": env["REQUEST_SHA256"],
+              "artifact_id": int(env["ARTIFACT_ID"]),
+              "artifact_name": metadata["name"],
+              "artifact_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+              "source_commit_sha": env["SOURCE_COMMIT_SHA"],
+              "app_tree_sha": manifest["app_tree_sha"],
+              "build_run_id": build_run_id,
+              "build_run_attempt": build_attempt,
+              "release_tag": env["RELEASE_TAG"],
+              "approved_at_utc": datetime.now(timezone.utc).isoformat(),
+              "approval_id": str(__import__("uuid").uuid4()),
+          }
+          Path("approval-attestation.json").write_text(
+              json.dumps(attestation, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Publish public relay package as a GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELAY_RUN_ID: ${{ github.run_id }}
+          RELAY_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -Eeuo pipefail
+          RELEASE_TAG="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          attestation = json.loads(Path("approval-attestation.json").read_text(encoding="utf-8"))
+          print(attestation["release_tag"])
+          PY
+          )"
+          [[ "$RELEASE_TAG" =~ ^sentinel-control-[0-9a-f]{32}$ ]] || { echo "release_tag_invalid" >&2; exit 2; }
+          python - "$RELEASE_TAG" "$RELAY_RUN_ID" "$RELAY_RUN_ATTEMPT" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          tag, run_id, attempt = sys.argv[1:]
+          payload = {
+              "tag_name": tag,
+              "target_commitish": "main",
+              "name": "Sentinel deployment package " + run_id,
+              "body": "Verified Sentinel Explorer Web artifact and approval attestation. Relay run: " + run_id + " attempt " + attempt + ".",
+              "draft": False,
+              "prerelease": True,
+              "make_latest": "false",
+          }
+          Path("release-request.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+          PY
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/json" \
+            --data-binary @release-request.json \
+            "https://api.github.com/repos/Helmslay/ForAll/releases" \
+            -o release-response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          value = json.loads(Path("release-response.json").read_text(encoding="utf-8"))
+          upload = value.get("upload_url")
+          if (
+              value.get("draft") is not False
+              or value.get("prerelease") is not True
+              or not isinstance(upload, str)
+              or not upload.startswith("https://uploads.github.com/repos/Helmslay/ForAll/releases/")
+              or "{?" not in upload
+          ):
+              raise SystemExit("release_creation_response_invalid")
+          base = upload.split("{?", 1)[0]
+          parsed = urlsplit(base)
+          if parsed.scheme != "https" or parsed.netloc != "uploads.github.com" or parsed.query or parsed.fragment:
+              raise SystemExit("release_upload_url_invalid")
+          Path("release-upload-url.txt").write_text(base, encoding="ascii")
+          PY
+          UPLOAD_URL="$(cat release-upload-url.txt)"
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/zip" \
+            --data-binary @build-artifact.zip \
+            "$UPLOAD_URL?name=sentinel-explorer-web.zip" \
+            -o site-asset-response.json
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/json" \
+            --data-binary @approval-attestation.json \
+            "$UPLOAD_URL?name=approval-attestation.json" \
+            -o approval-asset-response.json
+          python - <<'PY'
+          import hashlib
+          import json
+          import re
+          from pathlib import Path
+          for path, name, expected in (
+              ("site-asset-response.json", "sentinel-explorer-web.zip", hashlib.sha256(Path("build-artifact.zip").read_bytes()).hexdigest()),
+              ("approval-asset-response.json", "approval-attestation.json", hashlib.sha256(Path("approval-attestation.json").read_bytes()).hexdigest()),
+          ):
+              value = json.loads(Path(path).read_text(encoding="utf-8"))
+              if (
+                  value.get("name") != name
+                  or value.get("state") != "uploaded"
+                  or value.get("digest") != "sha256:" + expected
+              ):
+                  raise SystemExit("release_asset_upload_verification_failed")
+          PY
+
