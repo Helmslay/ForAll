@@ -10,6 +10,7 @@ on:
       - ".dockerignore"
       - "compose.yaml"
       - ".github/workflows/frontend-build.yml"
+      - ".github/workflows/sentinel-control-approval-relay.yml"
   pull_request:
     paths:
       - "app/**"
