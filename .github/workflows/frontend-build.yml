@@ -218,8 +218,8 @@ jobs:
           PY
           (
             cd dist
-            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
-            sha256sum --check SHA256SUMS
+            find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+            sha256sum --check SHA256SUMS.txt
           )
 
       - name: Upload verified production frontend artifact
