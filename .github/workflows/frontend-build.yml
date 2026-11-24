@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "app/**"
+      - "backend/**"
+      - "deployment/**"
+      - ".dockerignore"
       - "compose.yaml"
       - "docs/LOCAL_DEVELOPMENT.md"
       - "docs/START_HERE.md"
@@ -30,7 +33,7 @@ jobs:
   build:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Validate source commit SHA
         id: source
@@ -183,6 +186,47 @@ jobs:
         if: always()
         run: docker compose -f compose.yaml down --volumes
 
+      - name: Stop Docker Compose development stack
+        if: always()
+        run: docker compose -f compose.yaml down --volumes
+
+      - name: Validate preview Compose configuration
+        run: docker compose -f deployment/compose.preview.yaml config --quiet
+
+      - name: Start hardened preview stack
+        run: docker compose -p sentinel-preview -f deployment/compose.preview.yaml up -d --build --wait --wait-timeout 240
+
+      - name: Smoke-check preview frontend and API
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          curl --fail --silent --show-error http://127.0.0.1:8080/healthz
+          curl --fail --silent --show-error http://127.0.0.1:8080/ > /tmp/sentinel-preview-index.html
+          grep -q '<div id="app"></div>' /tmp/sentinel-preview-index.html
+          curl --fail --silent --show-error http://127.0.0.1:8080/api/v1/health > /tmp/sentinel-preview-health.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          health = json.loads(Path("/tmp/sentinel-preview-health.json").read_text(encoding="utf-8"))
+          assert health["status"] == "ok"
+          assert health["app_version"] == "0.1.0-preview"
+          assert health["timestamp"]
+          PY
+          status="$(curl --silent --show-error --output /tmp/sentinel-preview-catalog-error.json --write-out '%{http_code}' -H 'Content-Type: application/json' --data-binary '{"bbox":[56.0,57.0,58.0,59.0],"datetime":{"from":"2025-06-01T00:00:00Z","to":"2025-09-01T23:59:59Z"},"cloud_cover_lte":20,"collections":["sentinel-2-l2a"],"providers":null,"limit":20,"cursor":null}' http://127.0.0.1:8080/api/v1/catalog/search)"
+          test "$status" = "503"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          error = json.loads(Path("/tmp/sentinel-preview-catalog-error.json").read_text(encoding="utf-8"))
+          assert error["error"]["code"] == "PROVIDER_UNAVAILABLE"
+          assert error["error"]["request_id"]
+          PY
+
+      - name: Stop hardened preview stack
+        if: always()
+        run: docker compose -p sentinel-preview -f deployment/compose.preview.yaml down --volumes
       - name: Create release manifest and SHA-256 checksums
         working-directory: app
         shell: bash
