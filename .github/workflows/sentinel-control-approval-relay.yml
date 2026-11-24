@@ -158,12 +158,20 @@ jobs:
           if request.get("operation") != "publish_site_artifact":
               fail("operation_not_publish_site_artifact")
           args = request.get("arguments")
-          if not isinstance(args, dict) or set(args) != {"artifact_id", "source_commit_sha"}:
+          if not isinstance(args, dict) or set(args) != {"artifact_id", "archive_sha256", "source_commit_sha", "app_tree_sha", "build_run_id", "build_run_attempt"}:
               fail("request_arguments_invalid")
           if type(args.get("artifact_id")) is not int or args["artifact_id"] != int(env["ARTIFACT_ID"]):
               fail("request_artifact_id_mismatch")
           if not isinstance(args.get("source_commit_sha"), str) or not re.fullmatch(r"[0-9a-f]{40}", args["source_commit_sha"]):
               fail("request_source_sha_invalid")
+          if not isinstance(args.get("archive_sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", args["archive_sha256"]):
+              fail("request_archive_sha_invalid")
+          if not isinstance(args.get("app_tree_sha"), str) or not re.fullmatch(r"[0-9a-f]{40}", args["app_tree_sha"]):
+              fail("request_app_tree_sha_invalid")
+          if type(args.get("build_run_id")) is not int or args["build_run_id"] <= 0:
+              fail("request_build_run_id_invalid")
+          if type(args.get("build_run_attempt")) is not int or args["build_run_attempt"] <= 0:
+              fail("request_build_attempt_invalid")
 
           metadata = json.loads(Path("artifact-metadata.json").read_text(encoding="utf-8"))
           expected_artifact_name = re.fullmatch(r"sentinel-explorer-web-([0-9]{1,15})-([1-9][0-9]{0,5})", metadata.get("name", ""))
@@ -189,6 +197,8 @@ jobs:
               or build_run.get("conclusion") != "success"
               or build_run.get("run_attempt") != build_attempt
               or build_run.get("head_sha") != args["source_commit_sha"]
+              or args["build_run_id"] != build_run_id
+              or args["build_run_attempt"] != build_attempt
           ):
               fail("build_run_not_verified")
 
@@ -238,6 +248,9 @@ jobs:
                   or manifest.get("workflow_run_id") != build_run_id
                   or manifest.get("workflow_run_attempt") != build_attempt
                   or not re.fullmatch(r"[0-9a-f]{40}", manifest.get("app_tree_sha", ""))
+                  or manifest.get("app_tree_sha") != args["app_tree_sha"]
+                  or manifest.get("workflow_run_id") != args["build_run_id"]
+                  or manifest.get("workflow_run_attempt") != args["build_run_attempt"]
                   or manifest.get("workflow_ref") != "Helmslay/ForAll/.github/workflows/frontend-build.yml@refs/heads/main"
               ):
                   fail("build_manifest_binding_mismatch")
@@ -260,6 +273,8 @@ jobs:
                   if hashlib.sha256(payload[path]).hexdigest() != digest:
                       fail("build_file_checksum_mismatch")
 
+          if args["archive_sha256"] != hashlib.sha256(archive.read_bytes()).hexdigest():
+              fail("request_archive_digest_mismatch")
           attestation = {
               "schema_version": 1,
               "status": "approved",
