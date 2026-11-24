@@ -12,25 +12,68 @@ on:
       - "docs/tasks/PHASE_01_FOUNDATION.md"
       - "docs/tasks/PHASE_03_CATALOG.md"
       - ".github/workflows/frontend-build.yml"
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: "Exact 40-character commit SHA to build"
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: frontend-build-${{ github.event.pull_request.number }}
+  group: frontend-build-${{ github.event.pull_request.number || inputs.source_sha || github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout pull request branch
+      - name: Validate source commit SHA
+        id: source
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha || github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -Eeuo pipefail
+          if [[ ! "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid source commit SHA" >&2
+            exit 2
+          fi
+          printf 'sha=%s\n' "$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout requested source commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ steps.source.outputs.sha }}
+          fetch-depth: 1
           persist-credentials: false
+
+      - name: Verify application source tree
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          EXPECTED_APP_SOURCE_SHA: ${{ github.event.pull_request.base.sha || inputs.source_sha || github.sha }}
+        run: |
+          set -Eeuo pipefail
+          if [[ ! "$EXPECTED_APP_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid expected application source SHA" >&2
+            exit 2
+          fi
+          git fetch --no-tags --depth=1 origin "$EXPECTED_APP_SOURCE_SHA"
+          built_tree="$(git rev-parse "$SOURCE_SHA:app")"
+          expected_tree="$(git rev-parse "$EXPECTED_APP_SOURCE_SHA:app")"
+          if [[ "$built_tree" != "$expected_tree" ]]; then
+            echo "Application tree differs from the intended source commit" >&2
+            echo "built_app_tree=$built_tree" >&2
+            echo "expected_app_tree=$expected_tree" >&2
+            exit 1
+          fi
+          echo "source_commit=$EXPECTED_APP_SOURCE_SHA"
+          echo "app_tree_sha=$expected_tree"
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -140,3 +183,50 @@ jobs:
         if: always()
         run: docker compose -f compose.yaml down --volumes
 
+      - name: Create release manifest and SHA-256 checksums
+        working-directory: app
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          EXPECTED_APP_SOURCE_SHA: ${{ github.event.pull_request.base.sha || inputs.source_sha || github.sha }}
+        run: |
+          set -Eeuo pipefail
+          test -s dist/index.html
+          app_tree_sha="$(git rev-parse "$EXPECTED_APP_SOURCE_SHA:app")"
+          python - "$EXPECTED_APP_SOURCE_SHA" "$SOURCE_SHA" "$app_tree_sha" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_REPOSITORY" "$GITHUB_WORKFLOW_REF" <<'PY'
+          import json
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          source_sha, build_sha, app_tree_sha, run_id, run_attempt, repository, workflow_ref = sys.argv[1:]
+          manifest = {
+              "schema_version": 1,
+              "repository": repository,
+              "source_commit_sha": source_sha,
+              "build_commit_sha": build_sha,
+              "app_tree_sha": app_tree_sha,
+              "workflow_ref": workflow_ref,
+              "workflow_run_id": int(run_id),
+              "workflow_run_attempt": int(run_attempt),
+              "built_at_utc": datetime.now(timezone.utc).isoformat(),
+          }
+          Path("dist/release-manifest.json").write_text(
+              json.dumps(manifest, sort_keys=True, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          (
+            cd dist
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+            sha256sum --check SHA256SUMS
+          )
+
+      - name: Upload verified production frontend artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sentinel-explorer-web-${{ github.run_id }}-${{ github.run_attempt }}
+          path: app/dist/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
