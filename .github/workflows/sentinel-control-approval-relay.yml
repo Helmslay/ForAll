@@ -38,7 +38,7 @@ concurrency:
 
 jobs:
   approve:
-    if: github.repository == 'Helmslay/ForAll' && github.ref == 'refs/heads/main' && github.actor == 'Helmslay' && inputs.confirmation == 'I_APPROVE'
+    if: github.repository == 'Helmslay/ForAll' && github.ref == 'refs/heads/main' && github.actor == 'Helmslay' && github.run_attempt == 1 && inputs.confirmation == 'I_APPROVE'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
