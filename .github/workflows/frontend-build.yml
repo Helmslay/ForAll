@@ -216,8 +216,11 @@ jobs:
               encoding="utf-8",
           )
           PY
-          find dist -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > dist/SHA256SUMS
-          (cd dist && sha256sum --check SHA256SUMS)
+          (
+            cd dist
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+            sha256sum --check SHA256SUMS
+          )
 
       - name: Upload verified production frontend artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
