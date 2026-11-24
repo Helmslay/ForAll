@@ -1,23 +1,43 @@
 name: Sentinel Control Approval Relay
-run-name: 'Sentinel deploy approval #${{ inputs.issue_number }}'
+run-name: Sentinel deploy approval relay
 
 on:
   workflow_dispatch:
     inputs:
-      issue_number:
-        description: "Issue number in Helmslay/sentinel-explorer-agent"
+      issue_title_sha256:
+        description: "SHA-256 of the exact approved title in the private control Issue"
         required: true
         type: string
-      issue_title:
-        description: "Exact current Issue title, beginning with [APPROVED]"
-        required: true
-        type: string
-      request_body:
-        description: "Exact JSON body currently stored in the private control Issue"
+      request_sha256:
+        description: "SHA-256 of the exact raw JSON body in the private control Issue"
         required: true
         type: string
       artifact_id:
         description: "Verified Sentinel Explorer Web build artifact ID"
+        required: true
+        type: string
+      archive_sha256:
+        description: "SHA-256 of the exact verified ZIP archive"
+        required: true
+        type: string
+      source_commit_sha:
+        description: "ForAll main source commit SHA"
+        required: true
+        type: string
+      app_tree_sha:
+        description: "SHA-1 tree object ID of the app/ subtree"
+        required: true
+        type: string
+      build_run_id:
+        description: "Successful ForAll frontend-build workflow run ID"
+        required: true
+        type: string
+      build_run_attempt:
+        description: "Successful ForAll frontend-build run attempt"
+        required: true
+        type: string
+      release_tag:
+        description: "Fresh random sentinel-control- plus 32 lowercase hex characters"
         required: true
         type: string
       confirmation:
@@ -94,10 +114,15 @@ jobs:
         id: verify
         shell: bash
         env:
-          ISSUE_NUMBER: ${{ inputs.issue_number }}
-          ISSUE_TITLE: ${{ inputs.issue_title }}
-          REQUEST_BODY: ${{ inputs.request_body }}
+          ISSUE_TITLE_SHA256: ${{ inputs.issue_title_sha256 }}
+          REQUEST_SHA256: ${{ inputs.request_sha256 }}
           ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARCHIVE_SHA256: ${{ inputs.archive_sha256 }}
+          SOURCE_COMMIT_SHA: ${{ inputs.source_commit_sha }}
+          APP_TREE_SHA: ${{ inputs.app_tree_sha }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+          BUILD_RUN_ATTEMPT: ${{ inputs.build_run_attempt }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
           CONFIRMATION: ${{ inputs.confirmation }}
           RELAY_RUN_ID: ${{ github.run_id }}
           RELAY_RUN_ATTEMPT: ${{ github.run_attempt }}
@@ -129,51 +154,24 @@ jobs:
               fail("relay_workflow_ref_mismatch")
           if env["RELAY_ACTOR"] != "Helmslay":
               fail("dispatcher_not_allowed")
-          if not re.fullmatch(r"[1-9][0-9]{0,8}", env["ISSUE_NUMBER"]):
-              fail("issue_number_invalid")
+          if not re.fullmatch(r"[0-9a-f]{64}", env["ISSUE_TITLE_SHA256"]):
+              fail("issue_title_sha256_invalid")
+          if not re.fullmatch(r"[0-9a-f]{64}", env["REQUEST_SHA256"]):
+              fail("request_sha256_invalid")
           if not re.fullmatch(r"[1-9][0-9]{0,15}", env["ARTIFACT_ID"]):
               fail("artifact_id_invalid")
-          title = env["ISSUE_TITLE"]
-          if not isinstance(title, str) or not title.startswith("[APPROVED] ") or len(title) > 256:
-              fail("issue_title_not_approved")
-          if not re.fullmatch(r"[0-9]{1,15}", env["RELAY_RUN_ID"]):
-              fail("relay_run_id_invalid")
-          if not re.fullmatch(r"[0-9]{1,6}", env["RELAY_RUN_ATTEMPT"]):
-              fail("relay_run_attempt_invalid")
-          if not re.fullmatch(r"[0-9a-f]{40}", env["RELAY_SHA"]):
-              fail("relay_sha_invalid")
-
-          body = env["REQUEST_BODY"]
-          encoded_body = body.encode("utf-8", errors="strict")
-          if not encoded_body or len(encoded_body) > 16 * 1024:
-              fail("request_body_size_invalid")
-          try:
-              request = json.loads(body)
-          except (json.JSONDecodeError, RecursionError):
-              fail("request_body_not_json")
-          if not isinstance(request, dict) or set(request) != {"version", "operation", "arguments"}:
-              fail("request_schema_invalid")
-          if type(request.get("version")) is not int or request["version"] != 1:
-              fail("request_version_invalid")
-          if request.get("operation") != "publish_site_artifact":
-              fail("operation_not_publish_site_artifact")
-          args = request.get("arguments")
-          if not isinstance(args, dict) or set(args) != {"artifact_id", "archive_sha256", "source_commit_sha", "app_tree_sha", "build_run_id", "build_run_attempt", "release_tag"}:
-              fail("request_arguments_invalid")
-          if type(args.get("artifact_id")) is not int or args["artifact_id"] != int(env["ARTIFACT_ID"]):
-              fail("request_artifact_id_mismatch")
-          if not isinstance(args.get("source_commit_sha"), str) or not re.fullmatch(r"[0-9a-f]{40}", args["source_commit_sha"]):
-              fail("request_source_sha_invalid")
-          if not isinstance(args.get("archive_sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", args["archive_sha256"]):
-              fail("request_archive_sha_invalid")
-          if not isinstance(args.get("app_tree_sha"), str) or not re.fullmatch(r"[0-9a-f]{40}", args["app_tree_sha"]):
-              fail("request_app_tree_sha_invalid")
-          if type(args.get("build_run_id")) is not int or args["build_run_id"] <= 0:
-              fail("request_build_run_id_invalid")
-          if type(args.get("build_run_attempt")) is not int or args["build_run_attempt"] <= 0:
-              fail("request_build_attempt_invalid")
-          if not isinstance(args.get("release_tag"), str) or not re.fullmatch(r"sentinel-control-[0-9a-f]{32}", args["release_tag"]):
-              fail("request_release_tag_invalid")
+          if not re.fullmatch(r"[0-9a-f]{64}", env["ARCHIVE_SHA256"]):
+              fail("archive_sha256_invalid")
+          if not re.fullmatch(r"[0-9a-f]{40}", env["SOURCE_COMMIT_SHA"]):
+              fail("source_commit_sha_invalid")
+          if not re.fullmatch(r"[0-9a-f]{40}", env["APP_TREE_SHA"]):
+              fail("app_tree_sha_invalid")
+          if not re.fullmatch(r"[1-9][0-9]{0,15}", env["BUILD_RUN_ID"]):
+              fail("build_run_id_invalid")
+          if not re.fullmatch(r"[1-9][0-9]{0,5}", env["BUILD_RUN_ATTEMPT"]):
+              fail("build_run_attempt_invalid")
+          if not re.fullmatch(r"sentinel-control-[0-9a-f]{32}", env["RELEASE_TAG"]):
+              fail("release_tag_invalid")
 
           metadata = json.loads(Path("artifact-metadata.json").read_text(encoding="utf-8"))
           expected_artifact_name = re.fullmatch(r"sentinel-explorer-web-([0-9]{1,15})-([1-9][0-9]{0,5})", metadata.get("name", ""))
@@ -181,11 +179,11 @@ jobs:
               fail("build_artifact_name_invalid")
           build_run_id = int(expected_artifact_name.group(1))
           build_attempt = int(expected_artifact_name.group(2))
-          if build_run_id != int(Path("build-run-id.txt").read_text(encoding="ascii")):
+          if build_run_id != int(env["BUILD_RUN_ID"]):
               fail("artifact_build_run_mismatch")
           if metadata.get("id") != int(env["ARTIFACT_ID"]) or metadata.get("expired") is not False:
               fail("artifact_metadata_mismatch")
-          if metadata.get("digest") != "sha256:" + hashlib.sha256(Path("build-artifact.zip").read_bytes()).hexdigest():
+          if metadata.get("digest") != "sha256:" + hashlib.sha256(Path("build-artifact.zip").read_bytes()).hexdigest() or metadata.get("digest") != "sha256:" + env["ARCHIVE_SHA256"]:
               fail("artifact_archive_digest_mismatch")
 
           build_run = json.loads(Path("build-run.json").read_text(encoding="utf-8"))
@@ -198,9 +196,9 @@ jobs:
               or build_run.get("status") != "completed"
               or build_run.get("conclusion") != "success"
               or build_run.get("run_attempt") != build_attempt
-              or build_run.get("head_sha") != args["source_commit_sha"]
-              or args["build_run_id"] != build_run_id
-              or args["build_run_attempt"] != build_attempt
+              or build_run.get("head_sha") != env["SOURCE_COMMIT_SHA"]
+              or int(env["BUILD_RUN_ID"]) != build_run_id
+              or int(env["BUILD_RUN_ATTEMPT"]) != build_attempt
           ):
               fail("build_run_not_verified")
 
@@ -245,14 +243,14 @@ jobs:
               if (
                   manifest.get("schema_version") != 1
                   or manifest.get("repository") != "Helmslay/ForAll"
-                  or manifest.get("source_commit_sha") != args["source_commit_sha"]
+                  or manifest.get("source_commit_sha") != env["SOURCE_COMMIT_SHA"]
                   or manifest.get("build_commit_sha") != args["source_commit_sha"]
                   or manifest.get("workflow_run_id") != build_run_id
                   or manifest.get("workflow_run_attempt") != build_attempt
                   or not re.fullmatch(r"[0-9a-f]{40}", manifest.get("app_tree_sha", ""))
-                  or manifest.get("app_tree_sha") != args["app_tree_sha"]
-                  or manifest.get("workflow_run_id") != args["build_run_id"]
-                  or manifest.get("workflow_run_attempt") != args["build_run_attempt"]
+                  or manifest.get("app_tree_sha") != env["APP_TREE_SHA"]
+                  or manifest.get("workflow_run_id") != int(env["BUILD_RUN_ID"])
+                  or manifest.get("workflow_run_attempt") != int(env["BUILD_RUN_ATTEMPT"])
                   or manifest.get("workflow_ref") != "Helmslay/ForAll/.github/workflows/frontend-build.yml@refs/heads/main"
               ):
                   fail("build_manifest_binding_mismatch")
@@ -275,7 +273,7 @@ jobs:
                   if hashlib.sha256(payload[path]).hexdigest() != digest:
                       fail("build_file_checksum_mismatch")
 
-          if args["archive_sha256"] != hashlib.sha256(archive.read_bytes()).hexdigest():
+          if env["ARCHIVE_SHA256"] != hashlib.sha256(archive.read_bytes()).hexdigest():
               fail("request_archive_digest_mismatch")
           attestation = {
               "schema_version": 1,
@@ -287,9 +285,8 @@ jobs:
               "relay_run_attempt": int(env["RELAY_RUN_ATTEMPT"]),
               "relay_sha": env["RELAY_SHA"],
               "relay_actor": env["RELAY_ACTOR"],
-              "issue_number": int(env["ISSUE_NUMBER"]),
-              "issue_title_sha256": hashlib.sha256(title.encode("utf-8")).hexdigest(),
-              "request_sha256": hashlib.sha256(encoded_body).hexdigest(),
+              "issue_title_sha256": env["ISSUE_TITLE_SHA256"],
+              "request_sha256": env["REQUEST_SHA256"],
               "artifact_id": int(env["ARTIFACT_ID"]),
               "artifact_name": metadata["name"],
               "artifact_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
@@ -297,7 +294,7 @@ jobs:
               "app_tree_sha": manifest["app_tree_sha"],
               "build_run_id": build_run_id,
               "build_run_attempt": build_attempt,
-              "release_tag": args["release_tag"],
+              "release_tag": env["RELEASE_TAG"],
               "approved_at_utc": datetime.now(timezone.utc).isoformat(),
               "approval_id": str(__import__("uuid").uuid4()),
           }
