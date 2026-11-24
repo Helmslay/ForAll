@@ -53,7 +53,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: sentinel-control-approval-relay-${{ inputs.issue_number }}
+  group: sentinel-control-approval-relay-${{ inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
@@ -244,7 +244,7 @@ jobs:
                   manifest.get("schema_version") != 1
                   or manifest.get("repository") != "Helmslay/ForAll"
                   or manifest.get("source_commit_sha") != env["SOURCE_COMMIT_SHA"]
-                  or manifest.get("build_commit_sha") != args["source_commit_sha"]
+                  or manifest.get("build_commit_sha") != env["SOURCE_COMMIT_SHA"]
                   or manifest.get("workflow_run_id") != build_run_id
                   or manifest.get("workflow_run_attempt") != build_attempt
                   or not re.fullmatch(r"[0-9a-f]{40}", manifest.get("app_tree_sha", ""))
@@ -290,7 +290,7 @@ jobs:
               "artifact_id": int(env["ARTIFACT_ID"]),
               "artifact_name": metadata["name"],
               "artifact_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
-              "source_commit_sha": args["source_commit_sha"],
+              "source_commit_sha": env["SOURCE_COMMIT_SHA"],
               "app_tree_sha": manifest["app_tree_sha"],
               "build_run_id": build_run_id,
               "build_run_attempt": build_attempt,
