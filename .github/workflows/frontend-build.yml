@@ -43,7 +43,7 @@ jobs:
             echo "Invalid source commit SHA" >&2
             exit 2
           fi
-          printf 'sha=%s\\n' "$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          printf 'sha=%s\n' "$SOURCE_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Checkout requested source commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -212,7 +212,7 @@ jobs:
               "built_at_utc": datetime.now(timezone.utc).isoformat(),
           }
           Path("dist/release-manifest.json").write_text(
-              json.dumps(manifest, sort_keys=True, indent=2) + "\\n",
+              json.dumps(manifest, sort_keys=True, indent=2) + "\n",
               encoding="utf-8",
           )
           PY
