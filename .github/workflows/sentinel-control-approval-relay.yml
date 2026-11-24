@@ -1,4 +1,5 @@
 name: Sentinel Control Approval Relay
+run-name: Sentinel deploy approval #${{ inputs.issue_number }}
 
 on:
   workflow_dispatch:
