@@ -28,6 +28,7 @@ VALID_ENV = {
     "CONFIRMATION": "I_APPROVE",
     "REQUEST_SHA256": "a" * 64,
     "TITLE_SHA256": "b" * 64,
+    "ISSUE_BINDING_SHA256": "e" * 64,
     "RELEASE_TAG": "sentinel-command-" + "c" * 32,
     "GITHUB_SHA": "d" * 40,
     "GITHUB_RUN_ID": "123456789",
@@ -44,12 +45,13 @@ class CommandApprovalAttestationTests(unittest.TestCase):
                 "schema_version", "status", "repository", "repository_id",
                 "workflow_path", "workflow_run_id", "workflow_run_attempt",
                 "workflow_sha", "workflow_actor", "workflow_actor_id",
-                "request_sha256", "title_sha256", "release_tag",
+                "request_sha256", "title_sha256", "issue_binding_sha256", "release_tag",
                 "approved_at_utc", "approval_id",
             },
         )
         self.assertEqual(value["request_sha256"], "a" * 64)
         self.assertEqual(value["title_sha256"], "b" * 64)
+        self.assertEqual(value["issue_binding_sha256"], "e" * 64)
         self.assertEqual(value["workflow_run_id"], 123456789)
         self.assertEqual(value["workflow_run_attempt"], 1)
         self.assertEqual(value["workflow_actor_id"], 151124217)
@@ -76,6 +78,7 @@ class CommandApprovalAttestationTests(unittest.TestCase):
         for key, value in (
             ("REQUEST_SHA256", "not-a-hash"),
             ("TITLE_SHA256", "f" * 63),
+            ("ISSUE_BINDING_SHA256", "not-a-binding-hash"),
             ("RELEASE_TAG", "sentinel-command-" + "G" * 32),
             ("GITHUB_SHA", "e" * 39),
             ("GITHUB_RUN_ID", "0"),
