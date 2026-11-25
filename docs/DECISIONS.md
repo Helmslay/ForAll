@@ -93,7 +93,7 @@ Use this log for decisions affecting more than one module. Format: status, conte
 
 ## ADR-018 — публичный hash-only relay для approval команд Sentinel
 
-**Status:** Accepted by explicit user direction (2026-11-25). Public ForAll implementation merged in PR #72 as `2b8127669f3b368e8b801b1d6cb225f65c12272b`; private Sentinel verifier integration and live command acceptance remain pending. The public relay is not an executable authorization by itself.
+**Status:** Accepted by explicit user direction (2026-11-25). Public implementation merged in ForAll PRs #72/#73 (code merge commits `2b8127669f3b368e8b801b1d6cb225f65c12272b` and `0bac23ea77ccddc2332aae070a80c412912d9405`). Private verifier merged in Sentinel PR #89 and its stable file-pin hardening in PR #91. The integration is not deployed or live-tested on the VPS; the public relay is not an executable authorization by itself.
 
 **Context:** The private `Helmslay/sentinel-explorer-agent` approval workflow was routed to a dedicated Windows runner, but that runner could not register because Kaspersky HTTPS inspection is administratively locked and Schannel could not complete certificate-revocation validation for the GitHub Actions token endpoint. The existing Pocket Forester runner is a separate repository runner; its successful GitHub checkout does not make it reusable by the private Sentinel repository. The public ForAll repository already hosts a constrained approval relay for Sentinel website publication.
 
@@ -101,13 +101,13 @@ Use this log for decisions affecting more than one module. Format: status, conte
 - Add a dedicated, isolated `tools/sentinel_control_relay/` module and separate `workflow_dispatch` workflow in the public `Helmslay/ForAll` repository for hash-only approval attestations of typed private Sentinel commands.
 - The public workflow runs only on ForAll `main`, only under the configured owner identity and exact workflow path, with a first-attempt guard.
 - Its only request-specific inputs are SHA-256 of the exact raw private Issue body, SHA-256 of the exact approved Issue title, an opaque `issue_binding_sha256`, and a fresh opaque release tag. The binding hash commits to private repository ID, Issue ID/number, both hashes, release tag and a per-request random nonce; ForAll never receives the nonce or Issue identifiers. The raw Issue, title, command/arguments, private repository credentials and Ed25519 keys must never be sent to ForAll.
-- The workflow emits a short-lived, one-time public prerelease containing exactly one `approval-attestation.json` asset. The attestation identifies the hashes, operator, repository, workflow commit/run/attempt, timestamp and random approval ID.
+- The workflow emits a short-lived, one-time public prerelease containing exactly one `approval-attestation.json` asset. The attestation identifies the hashes, operator, repository, workflow file identity/run/attempt, timestamp and random approval ID.
 - The private Sentinel VPS remains the trust decision point: it re-fetches the private Issue using its GitHub App, validates the typed request and requester, verifies exact hash bindings and the exact trusted public workflow run, rejects stale/reused attestations, then signs locally with the VPS-held Ed25519 key. The public relay never signs commands or executes them.
 - Keep the existing public site-publication relay as a separate workflow and preserve its artifact verification path.
 - Do not require changes to Kaspersky policy or use the Pocket Forester runner for cross-repository execution.
 
 **Consequences and rollout:**
 - Public relay code and documentation live under `tools/sentinel_control_relay/`; the GitHub workflow must remain under `.github/workflows/`.
-- The exact merged ForAll workflow commit becomes a trust anchor in the private Sentinel verifier. That private integration is a separate reviewed task. Until it is complete and deployed, a generated public attestation must not be treated as an executable command approval.
+- The private Sentinel verifier pins the exact Git blob SHA of `.github/workflows/sentinel-control-command-approval.yml` (`e081709fe55a4d41869ecdc3d2ec6069b0f06ab7`) and `tools/sentinel_control_relay/approval.py` (`79a3fc361f028fe7fdee1ae9a383c77d036fc53d`) at the run's source SHA. Documentation-only commits on ForAll main do not invalidate these pins; changing either executable file requires a reviewed private trust-anchor update. Until guarded VPS deployment and a live read-only test complete, a generated public attestation must not be treated as an executable command approval.
 - Public release assets disclose only hashes and workflow metadata. Hashes are not credentials, but operators must not use this relay to attest to low-entropy secrets or confidential values.
 - The existing issue-triggered private Windows approval workflow is retired only after the private verifier integration and end-to-end read-only test are complete.
