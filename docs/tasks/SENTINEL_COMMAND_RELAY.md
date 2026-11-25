@@ -1,6 +1,6 @@
 # OPS-CTRL-01 — public hash-only Sentinel command approval relay
 
-**Status:** IN_REVIEW — public code and private verifier merged; live workflow smoke and guarded VPS deployment remain  
+**Status:** IN_REVIEW — public relay and private verifier merged; live workflow smoke and guarded VPS deployment remain  
 **Owner authorization:** explicit user direction, 2026-11-25  
 **Dependencies:** existing ForAll public release relay; Sentinel VPS-local Ed25519 signer design  
 **Goal:** add an isolated, public GitHub Actions relay in ForAll that attests to approval of a private Sentinel command using only SHA-256 hashes, without using the private repository's hosted Actions quota or the blocked Windows/Kaspersky runner registration path.
@@ -41,7 +41,7 @@
 - Tools offline tests run `45607534453` — SUCCESS; all 27 tests passed, including 4 relay tests.
 - Frontend build/Compose run `45607534618` — SUCCESS.
 - GitLab mirror run `45607524536` — SUCCESS.
-- The manual `workflow_dispatch` has not been executed. Private Sentinel verifier integration is not merged or deployed.
+- The manual `workflow_dispatch` has not been executed. Private Sentinel verifier integration is merged but not deployed.
 
 ## Validation
 
@@ -51,4 +51,4 @@
 
 ## Follow-up dependency
 
-A separate Sentinel Agent task must implement the private-side lookup and exact-run verification, bind the release tag into the private request metadata without passing it to the signed operation arguments, retire the issue-triggered private Windows approval workflow, run CircleCI Python 3.11/3.14, and test the complete read-only flow. The VPS must not consume this public attestation before that work is merged and deployed.
+The remaining work is to perform a manual public `workflow_dispatch` smoke, deploy the merged private verifier through the guarded VPS update procedure, and complete one fresh read-only Issue from approval to result comment and `control:done`. Do not retire the issue-triggered private Windows workflow until this E2E succeeds.
