@@ -20,9 +20,9 @@ WORKFLOW_PATH = ".github/workflows/sentinel-control-command-approval.yml"
 WORKFLOW_REF = f"{REPOSITORY}/{WORKFLOW_PATH}@refs/heads/main"
 ALLOWED_ACTOR = "Helmslay"
 ALLOWED_ACTOR_ID = "151124217"
-RELEASE_TAG_RE = re.compile(r"sentinel-command-[0-9a-f]{32}\\Z")
-SHA256_RE = re.compile(r"[0-9a-f]{64}\\Z")
-SHA40_RE = re.compile(r"[0-9a-f]{40}\\Z")
+RELEASE_TAG_RE = re.compile(r"sentinel-command-[0-9a-f]{32}\Z")
+SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
+SHA40_RE = re.compile(r"[0-9a-f]{40}\Z")
 
 
 class ApprovalInputError(ValueError):
