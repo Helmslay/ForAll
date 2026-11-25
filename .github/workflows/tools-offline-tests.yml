@@ -7,10 +7,12 @@ on:
     paths:
       - "tools/**"
       - ".github/workflows/tools-offline-tests.yml"
+      - ".github/workflows/sentinel-control-command-approval.yml"
   pull_request:
     paths:
       - "tools/**"
       - ".github/workflows/tools-offline-tests.yml"
+      - ".github/workflows/sentinel-control-command-approval.yml"
 
 permissions:
   contents: read
@@ -38,4 +40,4 @@ jobs:
         run: python -m unittest discover -s tools -p 'test_*.py' -v
 
       - name: Compile diagnostic tools
-        run: python -m py_compile tools/check_stac.py tools/test_check_stac.py tools/search_stac.py tools/test_search_stac.py
+        run: python -m py_compile tools/check_stac.py tools/test_check_stac.py tools/search_stac.py tools/test_search_stac.py tools/sentinel_control_relay/approval.py tools/sentinel_control_relay/test_approval.py

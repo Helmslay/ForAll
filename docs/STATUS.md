@@ -1,6 +1,6 @@
 # Project status
 
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-25
 
 ## Repository state
 - Presentation landing page: present at `/index.html`; GIS-first redesign LP-01 is complete in PR #9. The concept map is explicitly illustrative; browser GIS functionality is not claimed as implemented.
@@ -68,3 +68,6 @@ Update this file when a milestone or material project decision changes. Do not m
 ## Current task
 
 WEB-03.12A — search UI states and cursor pagination — DONE (PR #66 merged). Next: WEB-03.12B — real provider search acceptance — BLOCKED pending explicit provider approval/G0.
+
+## Supporting automation — 2026-11-25
+- OPS-CTRL-01 — a dedicated public hash-only approval relay for the separate private Sentinel Agent has been added on branch `feat/sentinel-command-approval-relay`. The module is isolated under `tools/sentinel_control_relay/`; the public workflow emits a hash-only attestation and does not sign or execute commands. Status: IN_REVIEW pending exact-head offline CI and private Sentinel verifier integration. This does not change the browser GIS roadmap or G0–G8 status.
