@@ -8,11 +8,11 @@ on:
       - "tools/**"
       - ".github/workflows/tools-offline-tests.yml"
       - ".github/workflows/sentinel-control-command-approval.yml"
-      - ".github/workflows/sentinel-control-command-approval.yml"
   pull_request:
     paths:
       - "tools/**"
       - ".github/workflows/tools-offline-tests.yml"
+      - ".github/workflows/sentinel-control-command-approval.yml"
 
 permissions:
   contents: read
