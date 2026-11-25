@@ -33,7 +33,7 @@ The private VPS must independently:
    allowlist;
 3. compare both raw SHA-256 values with the attestation;
 4. verify the exact public workflow run, attempt, repository ID, workflow path,
-   pinned `main` commit, actor ID, run success and timestamp interval;
+   pinned workflow/helper file blob SHAs, actor ID, run success and timestamp interval;
 5. reject expired, mismatched, reused or missing attestations;
 6. recompute and compare the opaque Issue binding, then reserve the attestation ID/tag in a durable private approval replay ledger;
 7. only then create the local Ed25519 envelope and publish the typed request.
