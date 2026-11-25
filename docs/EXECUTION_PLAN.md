@@ -212,4 +212,4 @@ Scope выполнен; архитектура соблюдена; lint/typechec
 
 These tasks support the separately maintained private Sentinel Explorer Agent; they do not implement browser-GIS features and must not alter product gates G0–G8.
 
-- OPS-CTRL-01 — public hash-only Sentinel command approval relay in `tools/sentinel_control_relay/` — **IN_REVIEW** (PR work in progress; public workflow and offline tests added; private Sentinel verifier integration and live read-only acceptance are separate follow-up work). Card: `tasks/SENTINEL_COMMAND_RELAY.md`.
+- OPS-CTRL-01 — public hash-only Sentinel command approval relay in `tools/sentinel_control_relay/` — **IN_REVIEW** (PR #72 merged as `2b8127669f3b368e8b801b1d6cb225f65c12272b`; exact-head Tools offline tests `45607534453`, Frontend build `45607534618`, and mirror `45607524536` all SUCCESS. Manual workflow-dispatch smoke and private Sentinel verifier integration remain separate follow-up work). Card: `tasks/SENTINEL_COMMAND_RELAY.md`.
