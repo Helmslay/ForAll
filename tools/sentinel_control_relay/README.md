@@ -11,6 +11,7 @@ The public workflow receives only:
 
 - SHA-256 of the exact raw JSON body of one private Sentinel Issue;
 - SHA-256 of its exact approved title (including the `[APPROVED] ` prefix);
+- SHA-256 of a canonical binding that includes the private repository ID, Issue ID/number, request hash, title hash, unique release tag and a per-request random nonce. The workflow never receives the nonce or the Issue identifiers.
 - a fresh, opaque release tag `sentinel-command-<32 lowercase hex>`;
 - an explicit `I_APPROVE` confirmation.
 
@@ -34,7 +35,8 @@ The private VPS must independently:
 4. verify the exact public workflow run, attempt, repository ID, workflow path,
    pinned `main` commit, actor ID, run success and timestamp interval;
 5. reject expired, mismatched, reused or missing attestations;
-6. only then create the local Ed25519 envelope and publish the typed request.
+6. recompute and compare the opaque Issue binding, then reserve the attestation ID/tag in a durable private approval replay ledger;
+7. only then create the local Ed25519 envelope and publish the typed request.
 
 The private VPS remains the trust decision point. No private signing key is
 present in ForAll or in GitHub Actions.
@@ -45,11 +47,11 @@ Workflow: `.github/workflows/sentinel-control-command-approval.yml`
 
 1. Prepare an open, unapproved Issue in `Helmslay/sentinel-explorer-agent`.
 2. Make the final intended title begin with `[APPROVED] `.
-3. Compute SHA-256 over the **exact raw UTF-8 Issue body** and exact title.
+3. Compute SHA-256 over the **exact raw UTF-8 Issue body** and exact title. Generate a fresh random approval nonce and compute the opaque binding hash over the private repository ID, Issue ID/number, both hashes, release tag and nonce using the private canonical JSON profile.
 4. Generate a new `sentinel-command-<32 lowercase hex>` tag. The same tag must
    not be reused for another request.
 5. In public `Helmslay/ForAll`, open Actions → **Sentinel Control Command
-   Approval** → Run workflow on `main`; supply those two hashes, the tag and
+   Approval** → Run workflow on `main`; supply the two content hashes, the opaque Issue-binding hash, the tag and
    select `I_APPROVE` only after reviewing the pair.
 6. The public workflow validates its own repository/ref/workflow/actor context,
    writes the hash-only attestation and creates a prerelease with exactly one
