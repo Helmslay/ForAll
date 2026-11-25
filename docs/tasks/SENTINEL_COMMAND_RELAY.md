@@ -27,6 +27,7 @@
 
 1. The workflow can only complete on ForAll `main`, from the configured owner identity, on the exact workflow path and first run attempt.
 2. Invalid repository/ref/event/actor/hash/tag/confirmation inputs are rejected by the pure attestation builder.
+3. The opaque Issue-binding hash is included in the attestation without exposing Issue number/ID or the nonce.
 3. The output schema has no raw Issue content, arguments, credentials or signing key.
 4. The public Release carries only one asset named `approval-attestation.json`.
 5. Offline unit tests and Python compilation pass on Python 3.12.
