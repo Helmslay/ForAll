@@ -41,7 +41,7 @@
 - Tools offline tests run `45607534453` — SUCCESS; all 27 tests passed, including 4 relay tests.
 - Frontend build/Compose run `45607534618` — SUCCESS.
 - GitLab mirror run `45607524536` — SUCCESS.
-- The manual `workflow_dispatch` has not been executed. Private Sentinel verifier integration is merged but not deployed.
+- The manual `workflow_dispatch` has not been executed. Private Sentinel verifier integration and its workflow/helper blob pins are merged but not deployed.
 
 ## Validation
 
