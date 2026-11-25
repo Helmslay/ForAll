@@ -1,6 +1,6 @@
 # OPS-CTRL-01 — public hash-only Sentinel command approval relay
 
-**Status:** IN_REVIEW  
+**Status:** IN_REVIEW — public code merged; live workflow smoke and private verifier remain  
 **Owner authorization:** explicit user direction, 2026-11-25  
 **Dependencies:** existing ForAll public release relay; Sentinel VPS-local Ed25519 signer design  
 **Goal:** add an isolated, public GitHub Actions relay in ForAll that attests to approval of a private Sentinel command using only SHA-256 hashes, without using the private repository's hosted Actions quota or the blocked Windows/Kaspersky runner registration path.
@@ -32,6 +32,15 @@
 5. Offline unit tests and Python compilation pass on Python 3.12.
 6. Existing site-publication relay workflow remains unchanged.
 7. Project decision and operating limitations are documented.
+
+## Result — 2026-11-25
+
+- PR #72 merged: `2b8127669f3b368e8b801b1d6cb225f65c12272b`.
+- Exact PR head: `271a3d7630ed15d1287eeb8ecd62665eaac8f679`.
+- Tools offline tests run `45607534453` — SUCCESS; all 27 tests passed, including 4 relay tests.
+- Frontend build/Compose run `45607534618` — SUCCESS.
+- GitLab mirror run `45607524536` — SUCCESS.
+- The manual `workflow_dispatch` has not been executed. Private Sentinel verifier integration is not merged or deployed.
 
 ## Validation
 
