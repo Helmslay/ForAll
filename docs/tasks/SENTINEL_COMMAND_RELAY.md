@@ -1,6 +1,6 @@
 # OPS-CTRL-01 — public hash-only Sentinel command approval relay
 
-**Status:** IN_REVIEW — public code merged; live workflow smoke and private verifier remain  
+**Status:** IN_REVIEW — public code and private verifier merged; live workflow smoke and guarded VPS deployment remain  
 **Owner authorization:** explicit user direction, 2026-11-25  
 **Dependencies:** existing ForAll public release relay; Sentinel VPS-local Ed25519 signer design  
 **Goal:** add an isolated, public GitHub Actions relay in ForAll that attests to approval of a private Sentinel command using only SHA-256 hashes, without using the private repository's hosted Actions quota or the blocked Windows/Kaspersky runner registration path.
