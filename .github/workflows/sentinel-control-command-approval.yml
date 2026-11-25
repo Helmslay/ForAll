@@ -11,12 +11,16 @@ on:
         description: "SHA-256 of the exact [APPROVED] Issue title in the private Sentinel Issue"
         required: true
         type: string
+      issue_binding_sha256:
+        description: "Opaque SHA-256 binding this approval to one private Issue identity; do not enter an Issue number"
+        required: true
+        type: string
       release_tag:
         description: "Fresh random sentinel-command- plus 32 lowercase hex characters"
         required: true
         type: string
       confirmation:
-        description: "Approve only this exact pair of hashes"
+        description: "Approve only this exact hash-bound request"
         required: true
         type: choice
         options:
@@ -56,6 +60,7 @@ jobs:
         env:
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           TITLE_SHA256: ${{ inputs.title_sha256 }}
+          ISSUE_BINDING_SHA256: ${{ inputs.issue_binding_sha256 }}
           RELEASE_TAG: ${{ inputs.release_tag }}
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
@@ -63,10 +68,16 @@ jobs:
           python3 tools/sentinel_control_relay/approval.py create --output "$RUNNER_TEMP/approval-attestation.json"
           python3 - "$RUNNER_TEMP/approval-attestation.json" <<'PY'
           import json
+          import os
           import sys
           from pathlib import Path
+
           value = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          if value.get("status") != "approved" or value.get("release_tag") != __import__("os").environ["RELEASE_TAG"]:
+          if (
+              value.get("status") != "approved"
+              or value.get("release_tag") != os.environ["RELEASE_TAG"]
+              or value.get("issue_binding_sha256") != os.environ["ISSUE_BINDING_SHA256"]
+          ):
               raise SystemExit("attestation_binding_failed")
           PY
 
@@ -78,5 +89,33 @@ jobs:
           ATTESTATION_PATH: ${{ runner.temp }}/approval-attestation.json
         run: |
           set -Eeuo pipefail
-          gh release create "$RELEASE_TAG" "$ATTESTATION_PATH"             --repo "$GITHUB_REPOSITORY"             --title "Sentinel command approval $GITHUB_RUN_ID"             --notes "Opaque hash-bound approval attestation only. The private Issue body, title and command arguments are not published."             --prerelease             --target "$GITHUB_SHA"
-          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,assets             --jq 'if .tagName == env.RELEASE_TAG and (.isDraft == false) and (.isPrerelease == true) and ([.assets[].name] == ["approval-attestation.json"]) then "release_verified" else error("release_verification_failed") end'
+          gh release create "$RELEASE_TAG" "$ATTESTATION_PATH" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Sentinel command approval $GITHUB_RUN_ID" \
+            --notes "Opaque hash-bound approval attestation only. No private Issue identifiers, title, body or command arguments are published." \
+            --prerelease \
+            --target "$GITHUB_SHA"
+
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json tagName,targetCommitish,isDraft,isPrerelease,assets \
+            > "$RUNNER_TEMP/release-view.json"
+
+          python3 - "$RUNNER_TEMP/release-view.json" <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          value = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          assets = value.get("assets")
+          if (
+              value.get("tagName") != os.environ["RELEASE_TAG"]
+              or value.get("targetCommitish") != os.environ["GITHUB_SHA"]
+              or value.get("isDraft") is not False
+              or value.get("isPrerelease") is not True
+              or not isinstance(assets, list)
+              or len(assets) != 1
+              or assets[0].get("name") != "approval-attestation.json"
+          ):
+              raise SystemExit("release_verification_failed")
+          PY
