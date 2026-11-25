@@ -35,6 +35,7 @@
 | tasks/PHASE_06_LOCAL_VECTORS_FOREST.md | Локальные данные и лесные слои |
 | tasks/PHASE_07_OFFLINE_ANALYTICS.md | Офлайн и аналитика |
 | tasks/PHASE_08_RELEASE.md | Production и выпуск |
+| tools/sentinel_control_relay/README.md | Изолированный hash-only approval relay для отдельного Sentinel Agent |
 
 ## Статусы
 - PLANNED — запланировано.
