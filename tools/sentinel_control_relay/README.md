@@ -34,8 +34,8 @@ The private VPS must independently:
 3. compare both raw SHA-256 values with the attestation;
 4. verify the exact public workflow run, attempt, repository ID, workflow path,
    pinned workflow/helper file blob SHAs, actor ID, run success and timestamp interval;
-5. reject expired, mismatched, reused or missing attestations;
-6. recompute and compare the opaque Issue binding, then reserve the attestation ID/tag in a durable private approval replay ledger;
+5. reject expired, mismatched, copied or missing attestations;
+6. require that the current Issue remains eligible for signing and let the existing durable issuer outbox, monotonic sequence and Issue state transition prevent a second publication. A release tag cannot be re-created in GitHub; the Issue binding prevents copying the attestation to a different Issue;
 7. only then create the local Ed25519 envelope and publish the typed request.
 
 The private VPS remains the trust decision point. No private signing key is
@@ -47,9 +47,8 @@ Workflow: `.github/workflows/sentinel-control-command-approval.yml`
 
 1. Prepare an open, unapproved Issue in `Helmslay/sentinel-explorer-agent`.
 2. Make the final intended title begin with `[APPROVED] `.
-3. Compute SHA-256 over the **exact raw UTF-8 Issue body** and exact title. Generate a fresh random approval nonce and compute the opaque binding hash over the private repository ID, Issue ID/number, both hashes, release tag and nonce using the private canonical JSON profile.
-4. Generate a new `sentinel-command-<32 lowercase hex>` tag. The same tag must
-   not be reused for another request.
+3. Generate a fresh random approval nonce and a new unique `sentinel-command-<32 lowercase hex>` tag. Do not reuse the tag for another request.
+4. Compute SHA-256 over the **exact raw UTF-8 Issue body** and exact title. Compute the opaque binding hash over the private repository ID, Issue ID/number, both hashes, release tag and nonce using the private canonical JSON profile.
 5. In public `Helmslay/ForAll`, open Actions → **Sentinel Control Command
    Approval** → Run workflow on `main`; supply the two content hashes, the opaque Issue-binding hash, the tag and
    select `I_APPROVE` only after reviewing the pair.
@@ -74,9 +73,4 @@ private repository.
 
 ## Integration status
 
-The public attestation generator and workflow are implemented here. The private
-Sentinel verifier must pin the exact merged ForAll workflow commit and add the
-corresponding approval lookup before typed commands can use this route. Until
-that private integration is reviewed and deployed, keep using the already
-confirmed read-only Issue #56 history as historical evidence only; do not treat
-a new public release as an executable approval.
+The public attestation generator and workflow are implemented here. The private Sentinel verifier is merged and pins the workflow/helper blob SHA values above at the public run's source SHA. Documentation-only commits on ForAll main do not invalidate the pin; changes to either executable file require a reviewed private trust-anchor update. The private changes are not deployed on the VPS yet; a generated public attestation must not be treated as an executable approval until guarded deployment and a live read-only result test complete.
