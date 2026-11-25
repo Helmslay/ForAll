@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from tools.sentinel_control_relay.approval import (
+from sentinel_control_relay.approval import (
     ALLOWED_ACTOR,
     ALLOWED_ACTOR_ID,
     REPOSITORY,
