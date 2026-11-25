@@ -19,9 +19,9 @@
 - Do not modify the existing site publication relay or its trust anchor.
 - Do not send private Issue data, command arguments, keys or tokens to ForAll.
 - Do not sign commands or execute them in the public workflow.
-- Do not change Sentinel VPS services, keyrings, sequence state or replay ledgers.
+- Do not change Sentinel VPS services, keyrings, sequence state or replay ledgers from this public module.
 - Do not change Pocket Forester or either Windows runner installation.
-- Do not claim end-to-end Sentinel command approval until the private verifier is integrated and independently tests the public workflow run.
+- Do not claim end-to-end Sentinel command approval until the merged verifier is deployed on the VPS and a fresh live read-only Issue completes.
 
 ## Acceptance criteria
 
