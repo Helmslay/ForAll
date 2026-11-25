@@ -1,0 +1,82 @@
+name: Sentinel Control Command Approval
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_sha256:
+        description: "SHA-256 of the exact raw JSON body in the private Sentinel Issue"
+        required: true
+        type: string
+      title_sha256:
+        description: "SHA-256 of the exact [APPROVED] Issue title in the private Sentinel Issue"
+        required: true
+        type: string
+      release_tag:
+        description: "Fresh random sentinel-command- plus 32 lowercase hex characters"
+        required: true
+        type: string
+      confirmation:
+        description: "Approve only this exact pair of hashes"
+        required: true
+        type: choice
+        options:
+          - CANCEL
+          - I_APPROVE
+        default: CANCEL
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sentinel-command-approval-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  attest:
+    if: >-
+      github.repository == 'Helmslay/ForAll' &&
+      github.repository_id == '1461236096' &&
+      github.ref == 'refs/heads/main' &&
+      github.workflow_ref == 'Helmslay/ForAll/.github/workflows/sentinel-control-command-approval.yml@refs/heads/main' &&
+      github.actor == 'Helmslay' &&
+      github.actor_id == '151124217' &&
+      github.run_attempt == 1 &&
+      inputs.confirmation == 'I_APPROVE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Create hash-only attestation
+        shell: bash
+        env:
+          REQUEST_SHA256: ${{ inputs.request_sha256 }}
+          TITLE_SHA256: ${{ inputs.title_sha256 }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -Eeuo pipefail
+          python3 tools/sentinel_control_relay/approval.py create --output "$RUNNER_TEMP/approval-attestation.json"
+          python3 - "$RUNNER_TEMP/approval-attestation.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          value = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          if value.get("status") != "approved" or value.get("release_tag") != __import__("os").environ["RELEASE_TAG"]:
+              raise SystemExit("attestation_binding_failed")
+          PY
+
+      - name: Publish one-time public attestation
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          ATTESTATION_PATH: ${{ runner.temp }}/approval-attestation.json
+        run: |
+          set -Eeuo pipefail
+          gh release create "$RELEASE_TAG" "$ATTESTATION_PATH"             --repo "$GITHUB_REPOSITORY"             --title "Sentinel command approval $GITHUB_RUN_ID"             --notes "Opaque hash-bound approval attestation only. The private Issue body, title and command arguments are not published."             --prerelease             --target "$GITHUB_SHA"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,assets             --jq 'if .tagName == env.RELEASE_TAG and (.isDraft == false) and (.isPrerelease == true) and ([.assets[].name] == ["approval-attestation.json"]) then "release_verified" else error("release_verification_failed") end'
