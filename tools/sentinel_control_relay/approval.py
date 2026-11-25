@@ -57,12 +57,15 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
 
     request_sha = env.get("REQUEST_SHA256", "")
     title_sha = env.get("TITLE_SHA256", "")
+    issue_binding_sha = env.get("ISSUE_BINDING_SHA256", "")
     release_tag = env.get("RELEASE_TAG", "")
     workflow_sha = env.get("GITHUB_SHA", "")
     if not SHA256_RE.fullmatch(request_sha):
         raise ApprovalInputError("request_sha256_invalid")
     if not SHA256_RE.fullmatch(title_sha):
         raise ApprovalInputError("title_sha256_invalid")
+    if not SHA256_RE.fullmatch(issue_binding_sha):
+        raise ApprovalInputError("issue_binding_sha256_invalid")
     if not RELEASE_TAG_RE.fullmatch(release_tag):
         raise ApprovalInputError("release_tag_invalid")
     if not SHA40_RE.fullmatch(workflow_sha):
@@ -85,6 +88,7 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
         "workflow_actor_id": int(ALLOWED_ACTOR_ID),
         "request_sha256": request_sha,
         "title_sha256": title_sha,
+        "issue_binding_sha256": issue_binding_sha,
         "release_tag": release_tag,
         "approved_at_utc": approved_at,
         "approval_id": str(uuid.uuid4()),
