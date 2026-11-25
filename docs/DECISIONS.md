@@ -93,7 +93,7 @@ Use this log for decisions affecting more than one module. Format: status, conte
 
 ## ADR-018 — публичный hash-only relay для approval команд Sentinel
 
-**Status:** Accepted by explicit user direction (2026-11-25). Implementation is split across ForAll and the private Sentinel Agent; the public relay is not an executable authorization by itself.
+**Status:** Accepted by explicit user direction (2026-11-25). Public ForAll implementation merged in PR #72 as `2b8127669f3b368e8b801b1d6cb225f65c12272b`; private Sentinel verifier integration and live command acceptance remain pending. The public relay is not an executable authorization by itself.
 
 **Context:** The private `Helmslay/sentinel-explorer-agent` approval workflow was routed to a dedicated Windows runner, but that runner could not register because Kaspersky HTTPS inspection is administratively locked and Schannel could not complete certificate-revocation validation for the GitHub Actions token endpoint. The existing Pocket Forester runner is a separate repository runner; its successful GitHub checkout does not make it reusable by the private Sentinel repository. The public ForAll repository already hosts a constrained approval relay for Sentinel website publication.
 
