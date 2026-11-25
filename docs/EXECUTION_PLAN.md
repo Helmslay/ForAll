@@ -207,3 +207,9 @@ Scope выполнен; архитектура соблюдена; lint/typechec
 
 ## 10. Инструменты разработки
 - DEV-00.01 — локальный Windows Runner для автоматических тестов — **IN_PROGRESS** (зависимость WEB-00.02 DONE; требуется однократная регистрация Windows x64 runner и первый успешный запуск).
+
+## 11. Supporting automation (outside the Sentinel Explorer Web product roadmap)
+
+These tasks support the separately maintained private Sentinel Explorer Agent; they do not implement browser-GIS features and must not alter product gates G0–G8.
+
+- OPS-CTRL-01 — public hash-only Sentinel command approval relay in `tools/sentinel_control_relay/` — **IN_REVIEW** (PR work in progress; public workflow and offline tests added; private Sentinel verifier integration and live read-only acceptance are separate follow-up work). Card: `tasks/SENTINEL_COMMAND_RELAY.md`.
