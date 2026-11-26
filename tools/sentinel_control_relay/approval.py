@@ -1,7 +1,9 @@
 """Create an opaque, hash-bound Sentinel command approval attestation.
 
-This helper runs only inside the public ForAll workflow. It receives hashes,
-never the private Issue body, title, command arguments, or any secret.
+The public ForAll workflow receives only hashes and a fresh tag. For automated
+Issue-event runs, the only trigger data is a public relay Issue created by the
+trusted operator; its body contains no private Issue identifiers or command
+arguments.
 """
 from __future__ import annotations
 
@@ -19,10 +21,19 @@ REPOSITORY_ID = "1461236096"
 WORKFLOW_PATH = ".github/workflows/sentinel-control-command-approval.yml"
 WORKFLOW_REF = f"{REPOSITORY}/{WORKFLOW_PATH}@refs/heads/main"
 ALLOWED_ACTOR = "Helmslay"
-ALLOWED_ACTOR_ID = "151124217"
+ALLOWED_ACTOR_ID = 151124217
+RELAY_BOT_LOGIN = "sentinel-explorer-control-plane[bot]"
+RELAY_BOT_ID = 358728370
+PUBLIC_ISSUE_TITLE_PREFIX = "Sentinel command relay "
 RELEASE_TAG_RE = re.compile(r"sentinel-command-[0-9a-f]{32}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 SHA40_RE = re.compile(r"[0-9a-f]{40}\Z")
+MAX_EVENT_BYTES = 64 * 1024
+MAX_PUBLIC_ISSUE_BODY_BYTES = 4096
+ISSUE_BODY_FIELDS = {
+    "request_sha256", "title_sha256", "issue_binding_sha256",
+    "release_tag", "confirmation",
+}
 
 
 class ApprovalInputError(ValueError):
@@ -38,6 +49,98 @@ def _positive_int(value: str, field: str, *, maximum: int = 2**63 - 1) -> int:
     return parsed
 
 
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ApprovalInputError("duplicate_json_key")
+        result[key] = value
+    return result
+
+
+def _issue_event_inputs(env: Mapping[str, str]) -> dict[str, str]:
+    event_path = env.get("GITHUB_EVENT_PATH", "")
+    if not event_path:
+        raise ApprovalInputError("issue_event_path_missing")
+    path = Path(event_path)
+    try:
+        info = path.stat()
+        if not path.is_file() or info.st_size > MAX_EVENT_BYTES:
+            raise ApprovalInputError("issue_event_invalid")
+        event = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_unique_object,
+        )
+    except ApprovalInputError:
+        raise
+    except (OSError, UnicodeError, json.JSONDecodeError, RecursionError):
+        raise ApprovalInputError("issue_event_invalid") from None
+
+    if not isinstance(event, dict):
+        raise ApprovalInputError("issue_event_invalid")
+    issue = event.get("issue")
+    sender = event.get("sender")
+    repository = event.get("repository")
+    if (
+        event.get("action") != "opened"
+        or not isinstance(issue, dict)
+        or "pull_request" in issue
+        or issue.get("state") != "open"
+        or not isinstance(issue.get("title"), str)
+        or not isinstance(issue.get("body"), str)
+        or len(issue["body"].encode("utf-8")) > MAX_PUBLIC_ISSUE_BODY_BYTES
+        or not isinstance(issue.get("user"), dict)
+        or issue["user"].get("id") != RELAY_BOT_ID
+        or issue["user"].get("login") != RELAY_BOT_LOGIN
+        or not isinstance(sender, dict)
+        or sender.get("id") != RELAY_BOT_ID
+        or sender.get("login") != RELAY_BOT_LOGIN
+        or not isinstance(repository, dict)
+        or repository.get("id") != int(REPOSITORY_ID)
+        or repository.get("full_name") != REPOSITORY
+    ):
+        raise ApprovalInputError("issue_event_identity_mismatch")
+
+    try:
+        payload = json.loads(
+            issue["body"],
+            object_pairs_hook=_unique_object,
+        )
+    except ApprovalInputError:
+        raise
+    except (json.JSONDecodeError, RecursionError):
+        raise ApprovalInputError("issue_payload_invalid") from None
+    if (
+        not isinstance(payload, dict)
+        or set(payload) != ISSUE_BODY_FIELDS
+        or any(not isinstance(payload.get(key), str) for key in ISSUE_BODY_FIELDS)
+    ):
+        raise ApprovalInputError("issue_payload_schema_invalid")
+
+    release_tag = payload["release_tag"]
+    expected_title = PUBLIC_ISSUE_TITLE_PREFIX + release_tag
+    if issue["title"] != expected_title:
+        raise ApprovalInputError("issue_title_mismatch")
+    if payload["confirmation"] != "I_APPROVE":
+        raise ApprovalInputError("explicit_confirmation_missing")
+    return payload
+
+
+def _approval_inputs(env: Mapping[str, str]) -> dict[str, str]:
+    event_name = env.get("GITHUB_EVENT_NAME")
+    if event_name == "workflow_dispatch":
+        return {
+            "request_sha256": env.get("REQUEST_SHA256", ""),
+            "title_sha256": env.get("TITLE_SHA256", ""),
+            "issue_binding_sha256": env.get("ISSUE_BINDING_SHA256", ""),
+            "release_tag": env.get("RELEASE_TAG", ""),
+            "confirmation": env.get("CONFIRMATION", ""),
+        }
+    if event_name == "issues":
+        return _issue_event_inputs(env)
+    raise ApprovalInputError("github_event_name_mismatch")
+
+
 def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
     """Validate the immutable GitHub workflow context and build the attestation."""
     expected = {
@@ -46,20 +149,28 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
         "GITHUB_REF": "refs/heads/main",
         "GITHUB_WORKFLOW_REF": WORKFLOW_REF,
         "GITHUB_WORKFLOW": "Sentinel Control Command Approval",
-        "GITHUB_EVENT_NAME": "workflow_dispatch",
-        "GITHUB_ACTOR": ALLOWED_ACTOR,
-        "GITHUB_ACTOR_ID": ALLOWED_ACTOR_ID,
-        "CONFIRMATION": "I_APPROVE",
     }
     for key, value in expected.items():
         if env.get(key) != value:
             raise ApprovalInputError(key.lower() + "_mismatch")
 
-    request_sha = env.get("REQUEST_SHA256", "")
-    title_sha = env.get("TITLE_SHA256", "")
-    issue_binding_sha = env.get("ISSUE_BINDING_SHA256", "")
-    release_tag = env.get("RELEASE_TAG", "")
-    workflow_sha = env.get("GITHUB_SHA", "")
+    event_name = env.get("GITHUB_EVENT_NAME")
+    if event_name == "workflow_dispatch":
+        expected_actor, expected_actor_id = ALLOWED_ACTOR, str(ALLOWED_ACTOR_ID)
+    elif event_name == "issues":
+        expected_actor, expected_actor_id = RELAY_BOT_LOGIN, str(RELAY_BOT_ID)
+    else:
+        raise ApprovalInputError("github_event_name_mismatch")
+    if env.get("GITHUB_ACTOR") != expected_actor:
+        raise ApprovalInputError("github_actor_mismatch")
+    if env.get("GITHUB_ACTOR_ID") != expected_actor_id:
+        raise ApprovalInputError("github_actor_id_mismatch")
+
+    inputs = _approval_inputs(env)
+    request_sha = inputs["request_sha256"]
+    title_sha = inputs["title_sha256"]
+    issue_binding_sha = inputs["issue_binding_sha256"]
+    release_tag = inputs["release_tag"]
     if not SHA256_RE.fullmatch(request_sha):
         raise ApprovalInputError("request_sha256_invalid")
     if not SHA256_RE.fullmatch(title_sha):
@@ -68,6 +179,10 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
         raise ApprovalInputError("issue_binding_sha256_invalid")
     if not RELEASE_TAG_RE.fullmatch(release_tag):
         raise ApprovalInputError("release_tag_invalid")
+    if inputs["confirmation"] != "I_APPROVE":
+        raise ApprovalInputError("explicit_confirmation_missing")
+
+    workflow_sha = env.get("GITHUB_SHA", "")
     if not SHA40_RE.fullmatch(workflow_sha):
         raise ApprovalInputError("workflow_sha_invalid")
 
@@ -84,8 +199,8 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
         "workflow_run_id": run_id,
         "workflow_run_attempt": run_attempt,
         "workflow_sha": workflow_sha,
-        "workflow_actor": ALLOWED_ACTOR,
-        "workflow_actor_id": int(ALLOWED_ACTOR_ID),
+        "workflow_actor": expected_actor,
+        "workflow_actor_id": int(expected_actor_id),
         "request_sha256": request_sha,
         "title_sha256": title_sha,
         "issue_binding_sha256": issue_binding_sha,
