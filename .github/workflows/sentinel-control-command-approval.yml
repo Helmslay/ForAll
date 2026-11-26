@@ -27,12 +27,14 @@ on:
           - CANCEL
           - I_APPROVE
         default: CANCEL
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 concurrency:
-  group: sentinel-command-approval-${{ inputs.release_tag }}
+  group: sentinel-command-approval-${{ github.event_name == 'issues' && github.event.issue.id || inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
@@ -45,7 +47,10 @@ jobs:
       github.actor == 'Helmslay' &&
       github.actor_id == '151124217' &&
       github.run_attempt == 1 &&
-      inputs.confirmation == 'I_APPROVE'
+      ((github.event_name == 'workflow_dispatch' && inputs.confirmation == 'I_APPROVE') ||
+      (github.event_name == 'issues' && github.event.action == 'opened' &&
+       github.event.issue.user.id == 151124217 &&
+       startsWith(github.event.issue.title, 'Sentinel command relay ')))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -58,11 +63,11 @@ jobs:
       - name: Create hash-only attestation
         shell: bash
         env:
-          REQUEST_SHA256: ${{ inputs.request_sha256 }}
-          TITLE_SHA256: ${{ inputs.title_sha256 }}
-          ISSUE_BINDING_SHA256: ${{ inputs.issue_binding_sha256 }}
-          RELEASE_TAG: ${{ inputs.release_tag }}
-          CONFIRMATION: ${{ inputs.confirmation }}
+          REQUEST_SHA256: ${{ inputs.request_sha256 || '' }}
+          TITLE_SHA256: ${{ inputs.title_sha256 || '' }}
+          ISSUE_BINDING_SHA256: ${{ inputs.issue_binding_sha256 || '' }}
+          RELEASE_TAG: ${{ inputs.release_tag || '' }}
+          CONFIRMATION: ${{ inputs.confirmation || '' }}
         run: |
           set -Eeuo pipefail
           python3 tools/sentinel_control_relay/approval.py create --output "$RUNNER_TEMP/approval-attestation.json"
@@ -73,10 +78,23 @@ jobs:
           from pathlib import Path
 
           value = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          event_name = os.environ["GITHUB_EVENT_NAME"]
+          if event_name == "issues":
+              event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+              expected = json.loads(event["issue"]["body"])
+          else:
+              expected = {
+                  "release_tag": os.environ["RELEASE_TAG"],
+                  "issue_binding_sha256": os.environ["ISSUE_BINDING_SHA256"],
+                  "request_sha256": os.environ["REQUEST_SHA256"],
+                  "title_sha256": os.environ["TITLE_SHA256"],
+              }
           if (
               value.get("status") != "approved"
-              or value.get("release_tag") != os.environ["RELEASE_TAG"]
-              or value.get("issue_binding_sha256") != os.environ["ISSUE_BINDING_SHA256"]
+              or value.get("release_tag") != expected["release_tag"]
+              or value.get("issue_binding_sha256") != expected["issue_binding_sha256"]
+              or value.get("request_sha256") != expected["request_sha256"]
+              or value.get("title_sha256") != expected["title_sha256"]
           ):
               raise SystemExit("attestation_binding_failed")
           PY
@@ -85,10 +103,18 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag }}
           ATTESTATION_PATH: ${{ runner.temp }}/approval-attestation.json
         run: |
           set -Eeuo pipefail
+          RELEASE_TAG="$(python3 - "$ATTESTATION_PATH" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))["release_tag"])
+          PY
+          )"
+          [[ "$RELEASE_TAG" =~ ^sentinel-command-[0-9a-f]{32}$ ]] || { echo "release_tag_invalid" >&2; exit 2; }
+          export RELEASE_TAG
           gh release create "$RELEASE_TAG" "$ATTESTATION_PATH" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Sentinel command approval $GITHUB_RUN_ID" \
