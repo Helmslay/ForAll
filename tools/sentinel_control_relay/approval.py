@@ -22,6 +22,8 @@ WORKFLOW_PATH = ".github/workflows/sentinel-control-command-approval.yml"
 WORKFLOW_REF = f"{REPOSITORY}/{WORKFLOW_PATH}@refs/heads/main"
 ALLOWED_ACTOR = "Helmslay"
 ALLOWED_ACTOR_ID = 151124217
+RELAY_BOT_LOGIN = "sentinel-explorer-control-plane[bot]"
+RELAY_BOT_ID = 358728370
 PUBLIC_ISSUE_TITLE_PREFIX = "Sentinel command relay "
 RELEASE_TAG_RE = re.compile(r"sentinel-command-[0-9a-f]{32}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
@@ -88,9 +90,11 @@ def _issue_event_inputs(env: Mapping[str, str]) -> dict[str, str]:
         or not isinstance(issue.get("body"), str)
         or len(issue["body"].encode("utf-8")) > MAX_PUBLIC_ISSUE_BODY_BYTES
         or not isinstance(issue.get("user"), dict)
-        or issue["user"].get("id") != ALLOWED_ACTOR_ID
+        or issue["user"].get("id") != RELAY_BOT_ID
+        or issue["user"].get("login") != RELAY_BOT_LOGIN
         or not isinstance(sender, dict)
-        or sender.get("id") != ALLOWED_ACTOR_ID
+        or sender.get("id") != RELAY_BOT_ID
+        or sender.get("login") != RELAY_BOT_LOGIN
         or not isinstance(repository, dict)
         or repository.get("id") != int(REPOSITORY_ID)
         or repository.get("full_name") != REPOSITORY
@@ -145,12 +149,22 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
         "GITHUB_REF": "refs/heads/main",
         "GITHUB_WORKFLOW_REF": WORKFLOW_REF,
         "GITHUB_WORKFLOW": "Sentinel Control Command Approval",
-        "GITHUB_ACTOR": ALLOWED_ACTOR,
-        "GITHUB_ACTOR_ID": str(ALLOWED_ACTOR_ID),
     }
     for key, value in expected.items():
         if env.get(key) != value:
             raise ApprovalInputError(key.lower() + "_mismatch")
+
+    event_name = env.get("GITHUB_EVENT_NAME")
+    if event_name == "workflow_dispatch":
+        expected_actor, expected_actor_id = ALLOWED_ACTOR, str(ALLOWED_ACTOR_ID)
+    elif event_name == "issues":
+        expected_actor, expected_actor_id = RELAY_BOT_LOGIN, str(RELAY_BOT_ID)
+    else:
+        raise ApprovalInputError("github_event_name_mismatch")
+    if env.get("GITHUB_ACTOR") != expected_actor:
+        raise ApprovalInputError("github_actor_mismatch")
+    if env.get("GITHUB_ACTOR_ID") != expected_actor_id:
+        raise ApprovalInputError("github_actor_id_mismatch")
 
     inputs = _approval_inputs(env)
     request_sha = inputs["request_sha256"]
@@ -185,8 +199,8 @@ def build_attestation(env: Mapping[str, str]) -> dict[str, Any]:
         "workflow_run_id": run_id,
         "workflow_run_attempt": run_attempt,
         "workflow_sha": workflow_sha,
-        "workflow_actor": ALLOWED_ACTOR,
-        "workflow_actor_id": ALLOWED_ACTOR_ID,
+        "workflow_actor": expected_actor,
+        "workflow_actor_id": int(expected_actor_id),
         "request_sha256": request_sha,
         "title_sha256": title_sha,
         "issue_binding_sha256": issue_binding_sha,
