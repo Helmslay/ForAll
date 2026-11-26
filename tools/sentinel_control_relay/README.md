@@ -18,7 +18,9 @@ The public workflow receives only:
 It must never receive the private Issue URL/number, raw title/body, operation,
 arguments, GitHub App credentials, VPS credentials, or Ed25519 key material.
 The workflow is pinned to this public repository's `main` branch and to the
-single operator identity configured in the code and workflow.
+fixed Sentinel App bot identity for automated Issue events. The manual
+workflow-dispatch recovery path remains restricted to the single operator
+identity configured in the code.
 
 The relay creates one public prerelease containing only
 `approval-attestation.json`. The attestation contains the hashes, one-time
@@ -49,14 +51,16 @@ Workflow: `.github/workflows/sentinel-control-command-approval.yml`
    `Helmslay/sentinel-explorer-agent` repository.
 2. A human changes only its title to begin with `[APPROVED] `. That title
    transition remains the explicit authorization signal.
-3. A trusted integration creates a public relay Issue in `Helmslay/ForAll`
-   containing only the request hash, approved-title hash, opaque private-Issue
-   binding hash, fresh release tag and `I_APPROVE`. It does not copy the
-   private Issue number, title, body, operation or arguments.
-4. The `issues.opened` workflow runs on GitHub-hosted infrastructure, checks
-   the event actor and Issue author against the configured operator identity,
-   validates the exact payload schema, then publishes one prerelease with
-   exactly one asset: `approval-attestation.json`.
+3. The private Sentinel GitHub App creates a public relay Issue in
+   `Helmslay/ForAll` using a short-lived installation token scoped to that
+   repository and the existing `issues:write` grant. The Issue contains only
+   the hashes, fresh release tag and `I_APPROVE`; no private Issue identifiers,
+   title/body, operation or arguments are copied.
+4. The `issues.opened` workflow runs on GitHub-hosted infrastructure and
+   accepts only the exact Sentinel App bot (ID `358728370`) as Issue author,
+   event sender and workflow actor. It validates the exact payload schema,
+   then publishes one prerelease with exactly one asset:
+   `approval-attestation.json`.
 5. The private VPS independently validates the workflow run, pinned files,
    timestamp, hashes and private Issue identity before its local Ed25519 signer
    may issue the command envelope.
