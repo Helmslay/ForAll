@@ -8,6 +8,8 @@ from pathlib import Path
 from sentinel_control_relay.approval import (
     ALLOWED_ACTOR,
     ALLOWED_ACTOR_ID,
+    RELAY_BOT_ID,
+    RELAY_BOT_LOGIN,
     REPOSITORY,
     REPOSITORY_ID,
     WORKFLOW_PATH,
@@ -59,8 +61,8 @@ class CommandApprovalAttestationTests(unittest.TestCase):
         self.assertNotIn("arguments", value)
         self.assertNotIn("private_key", value)
 
-    def issue_event(self, *, action="opened", issue_user_id=ALLOWED_ACTOR_ID,
-                    sender_id=ALLOWED_ACTOR_ID, repository_id=int(REPOSITORY_ID),
+    def issue_event(self, *, action="opened", issue_user_id=RELAY_BOT_ID,
+                    sender_id=RELAY_BOT_ID, repository_id=int(REPOSITORY_ID),
                     repository_name=REPOSITORY, title=None, body=None):
         release_tag = VALID_ENV["RELEASE_TAG"]
         payload = {
@@ -78,9 +80,9 @@ class CommandApprovalAttestationTests(unittest.TestCase):
                 "state": "open",
                 "title": title or "Sentinel command relay " + release_tag,
                 "body": body if body is not None else json.dumps(payload, separators=(",", ":")),
-                "user": {"id": issue_user_id},
+                "user": {"id": issue_user_id, "login": RELAY_BOT_LOGIN if issue_user_id == RELAY_BOT_ID else "other"},
             },
-            "sender": {"id": sender_id},
+            "sender": {"id": sender_id, "login": RELAY_BOT_LOGIN if sender_id == RELAY_BOT_ID else "other"},
             "repository": {"id": repository_id, "full_name": repository_name},
         }
         return event
@@ -93,6 +95,8 @@ class CommandApprovalAttestationTests(unittest.TestCase):
             env = dict(VALID_ENV)
             env.update({
                 "GITHUB_EVENT_NAME": "issues",
+                "GITHUB_ACTOR": RELAY_BOT_LOGIN,
+                "GITHUB_ACTOR_ID": str(RELAY_BOT_ID),
                 "GITHUB_EVENT_PATH": str(event_path),
                 "REQUEST_SHA256": "",
                 "TITLE_SHA256": "",
@@ -122,7 +126,13 @@ class CommandApprovalAttestationTests(unittest.TestCase):
                 with tempfile.TemporaryDirectory() as directory:
                     path = Path(directory) / "event.json"
                     path.write_text(json.dumps(event), encoding="utf-8")
-                    env = dict(VALID_ENV, GITHUB_EVENT_NAME="issues", GITHUB_EVENT_PATH=str(path))
+                    env = dict(
+                        VALID_ENV,
+                        GITHUB_EVENT_NAME="issues",
+                        GITHUB_ACTOR=RELAY_BOT_LOGIN,
+                        GITHUB_ACTOR_ID=str(RELAY_BOT_ID),
+                        GITHUB_EVENT_PATH=str(path),
+                    )
                     with self.assertRaises(ApprovalInputError):
                         build_attestation(env)
 
@@ -178,6 +188,40 @@ class CommandApprovalAttestationTests(unittest.TestCase):
             env[key] = value
             with self.subTest(key=key), self.assertRaises(ApprovalInputError):
                 build_attestation(env)
+
+    def test_issue_event_rejects_wrong_relay_bot_identity(self):
+        for event in (
+            self.issue_event(issue_user_id=RELAY_BOT_ID + 1),
+            self.issue_event(sender_id=RELAY_BOT_ID + 1),
+        ):
+            with self.subTest(event=event), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "event.json"
+                path.write_text(json.dumps(event), encoding="utf-8")
+                env = dict(
+                    VALID_ENV,
+                    GITHUB_EVENT_NAME="issues",
+                    GITHUB_ACTOR=RELAY_BOT_LOGIN,
+                    GITHUB_ACTOR_ID=str(RELAY_BOT_ID),
+                    GITHUB_EVENT_PATH=str(path),
+                )
+                with self.assertRaises(ApprovalInputError):
+                    build_attestation(env)
+
+    def test_issue_event_requires_actual_relay_bot_workflow_actor(self):
+        event = self.issue_event()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "event.json"
+            path.write_text(json.dumps(event), encoding="utf-8")
+            for actor, actor_id in ((ALLOWED_ACTOR, str(ALLOWED_ACTOR_ID)), ("another[bot]", "42")):
+                env = dict(
+                    VALID_ENV,
+                    GITHUB_EVENT_NAME="issues",
+                    GITHUB_ACTOR=actor,
+                    GITHUB_ACTOR_ID=actor_id,
+                    GITHUB_EVENT_PATH=str(path),
+                )
+                with self.subTest(actor=actor), self.assertRaises(ApprovalInputError):
+                    build_attestation(env)
 
     def test_writes_deterministic_schema_without_request_payload(self):
         value = build_attestation(VALID_ENV)
