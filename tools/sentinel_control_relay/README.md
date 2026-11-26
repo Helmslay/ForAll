@@ -18,9 +18,7 @@ The public workflow receives only:
 It must never receive the private Issue URL/number, raw title/body, operation,
 arguments, GitHub App credentials, VPS credentials, or Ed25519 key material.
 The workflow is pinned to this public repository's `main` branch and to the
-fixed Sentinel App bot identity for automated Issue events. The manual
-workflow-dispatch recovery path remains restricted to the single operator
-identity configured in the code.
+single operator identity configured in the code and workflow.
 
 The relay creates one public prerelease containing only
 `approval-attestation.json`. The attestation contains the hashes, one-time
@@ -47,27 +45,19 @@ present in ForAll or in GitHub Actions.
 
 Workflow: `.github/workflows/sentinel-control-command-approval.yml`
 
-1. Prepare an open, unapproved typed Issue in the private
-   `Helmslay/sentinel-explorer-agent` repository.
-2. A human changes only its title to begin with `[APPROVED] `. That title
-   transition remains the explicit authorization signal.
-3. The private Sentinel GitHub App creates a public relay Issue in
-   `Helmslay/ForAll` using a short-lived installation token scoped to that
-   repository and the existing `issues:write` grant. The Issue contains only
-   the hashes, fresh release tag and `I_APPROVE`; no private Issue identifiers,
-   title/body, operation or arguments are copied.
-4. The `issues.opened` workflow runs on GitHub-hosted infrastructure and
-   accepts only the exact Sentinel App bot (ID `358728370`) as Issue author,
-   event sender and workflow actor. It validates the exact payload schema,
-   then publishes one prerelease with exactly one asset:
-   `approval-attestation.json`.
-5. The private VPS independently validates the workflow run, pinned files,
-   timestamp, hashes and private Issue identity before its local Ed25519 signer
-   may issue the command envelope.
+1. Prepare an open, unapproved Issue in `Helmslay/sentinel-explorer-agent`.
+2. Make the final intended title begin with `[APPROVED] `.
+3. Generate a fresh random approval nonce and a new unique `sentinel-command-<32 lowercase hex>` tag. Do not reuse the tag for another request.
+4. Compute SHA-256 over the **exact raw UTF-8 Issue body** and exact title. Compute the opaque binding hash over the private repository ID, Issue ID/number, both hashes, release tag and nonce using the private canonical JSON profile.
+5. In public `Helmslay/ForAll`, open Actions → **Sentinel Control Command
+   Approval** → Run workflow on `main`; supply the two content hashes, the opaque Issue-binding hash, the tag and
+   select `I_APPROVE` only after reviewing the pair.
+6. The public workflow validates its own repository/ref/workflow/actor context,
+   writes the hash-only attestation and creates a prerelease with exactly one
+   asset: `approval-attestation.json`.
 
-The previous `workflow_dispatch` path remains available as a manual recovery
-path. A successful public run only means that an attestation was emitted; it
-does not mean that the private VPS accepted, signed or executed the request.
+A successful public run only means that an attestation was emitted. It does not
+mean that the private VPS accepted, signed or executed the request.
 
 ## Offline validation
 
